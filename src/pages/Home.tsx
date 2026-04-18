@@ -198,7 +198,7 @@ export const Home: React.FC = () => {
       </div>
 
       {/* Sticky Top Bar (Animated) */}
-      <div className={`fixed top-0 left-0 w-full z-[100] bg-[#F9F8F6] shadow-[0_16px_40px_rgba(0,0,0,0.1)] border-b border-[#1A1A1A]/10 transition-transform duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isScrolled ? 'translate-y-0' : '-translate-y-[120%]'}`}>
+      <div className={`fixed top-16 lg:top-20 left-0 w-full z-[100] bg-[#F9F8F6] shadow-[0_16px_40px_rgba(0,0,0,0.1)] border-b border-[#1A1A1A]/10 transition-transform duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isScrolled ? 'translate-y-0' : '-translate-y-[150%]'}`}>
         <div className="max-w-[1600px] mx-auto px-8 py-3 flex flex-col md:flex-row items-center gap-4 xl:gap-6 w-full">
           <SearchBarContent isSticky={true} />
         </div>
@@ -230,68 +230,6 @@ export const Home: React.FC = () => {
           <div className="bg-[#F9F8F6] p-6 md:p-8 xl:py-10 shadow-[0_32px_64px_rgba(0,0,0,0.5)] flex flex-col md:flex-row items-center gap-6 xl:gap-8 w-full relative before:absolute before:inset-0 before:border before:border-[#1A1A1A]/10 before:pointer-events-none">
             <SearchBarContent isSticky={false} />
           </div>
-        </div>
-      </section>
-          <div className="absolute inset-0 bg-gradient-to-b from-[#1A1A1A]/40 via-transparent to-[#1A1A1A]/80 mix-blend-multiply"></div>
-        </div>
-
-        {/* Hero Text */}
-        <div className="relative z-10 text-center flex flex-col items-center justify-center w-full px-8 mt-[-10vh]">
-          <h1 className="text-6xl md:text-[8rem] lg:text-[10rem] tracking-tight leading-[0.85] font-serif mb-6 text-[#F9F8F6] drop-shadow-xl text-balance">
-            A serene <span className="italic text-[#D4AF37]">refuge.</span>
-          </h1>
-          <p className="text-[#F9F8F6]/90 text-sm md:text-lg font-serif italic max-w-xl text-center tracking-wide">
-            Escape the daily noise and discover unparalleled luxury in curated destinations worldwide.
-          </p>
-        </div>
-
-        {/* Normal Searching Bar Container */}
-        <div className="absolute bottom-12 md:bottom-20 left-1/2 -translate-x-1/2 w-full max-w-[90%] xl:max-w-7xl px-4 md:px-8 z-40">
-          <div className="bg-[#F9F8F6] p-6 md:p-8 xl:py-10 shadow-[0_32px_64px_rgba(0,0,0,0.5)] flex flex-col md:flex-row items-center gap-6 xl:gap-8 w-full relative before:absolute before:inset-0 before:border before:border-[#1A1A1A]/10 before:pointer-events-none">
-            <SearchBarContent isSticky={false} />
-          </div>
-        </div>
-      </section>>
-
-      <section className="bg-[#1A1A1A] text-[#F9F8F6] pt-32 pb-40 px-8 md:px-16 mx-auto max-w-[1600px] w-full grid grid-cols-1 md:grid-cols-12 gap-12">
-        <div className="md:col-span-4 relative group cursor-pointer overflow-hidden p-1 shadow-[0_4px_24px_rgba(0,0,0,0.2)]">
-            <span className="mb-4 block text-[10px] uppercase font-bold tracking-[0.3em] text-[#6C6863]/60 group-hover:text-[#D4AF37] transition-colors duration-[1500ms]">01 / Sanctuary</span>
-            <img 
-               src="https://images.unsplash.com/photo-1551882547-ff40c634ad5w?w=900&auto=format&fit=crop&q=60" 
-               alt="Spa" 
-               className="w-full aspect-[3/4] object-cover grayscale opacity-80 duration-[2000ms] group-hover:grayscale-0 group-hover:scale-105"
-               onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1540518614846-7eded433c457?w=900&auto=format&fit=crop" }}
-             />
-        </div>
-        
-        <div className="md:col-span-6 md:col-start-6 lg:col-start-7 flex flex-col justify-center">
-            <h2 className="text-5xl md:text-7xl font-serif mb-8 leading-[1.1] text-[#F9F8F6]">
-               Elevated <span className="italic text-[#D4AF37]">Amenities</span>
-            </h2>
-            <div className="space-y-6">
-                <Card className="border-t border-[#F9F8F6]/20 hover:bg-[#F9F8F6]/5 hover:shadow-none p-0 py-8 px-6 group transition-all duration-[750ms]">
-                    <div className="flex justify-between items-center group-hover:pl-4 transition-all duration-500">
-                        <p className="text-xl font-serif group-hover:text-[#D4AF37] transition-all duration-500">Wellness Spa & Retreat</p>
-                        <span className="text-[10px] uppercase tracking-[0.2em] text-[#F9F8F6]/40 group-hover:text-[#D4AF37]/50 duration-500">Explore</span>
-                    </div>
-                </Card>
-                <Card className="border-t border-[#F9F8F6]/20 hover:bg-[#F9F8F6]/5 hover:shadow-none p-0 py-8 px-6 group transition-all duration-[750ms]">
-                    <div className="flex justify-between items-center group-hover:pl-4 transition-all duration-500">
-                        <p className="text-xl font-serif group-hover:text-[#D4AF37] transition-all duration-500">Michelin-Starred Dining</p>
-                        <span className="text-[10px] uppercase tracking-[0.2em] text-[#F9F8F6]/40 group-hover:text-[#D4AF37]/50 duration-500">Explore</span>
-                    </div>
-                </Card>
-                <Card className="border-t border-[#F9F8F6]/20 hover:bg-[#F9F8F6]/5 hover:shadow-none p-0 py-8 px-6 group transition-all duration-[750ms]">
-                    <div className="flex justify-between items-center group-hover:pl-4 transition-all duration-500">
-                        <p className="text-xl font-serif group-hover:text-[#D4AF37] transition-all duration-500">Curated Excursions</p>
-                        <span className="text-[10px] uppercase tracking-[0.2em] text-[#F9F8F6]/40 group-hover:text-[#D4AF37]/50 duration-500">Explore</span>
-                    </div>
-                </Card>
-            </div>
-            
-            <Button onClick={() => navigate('/search')} variant="secondary" className="border-[#F9F8F6]/20 text-[#F9F8F6] self-start mt-12 hover:bg-[#D4AF37] hover:border-[#D4AF37] hover:text-[#1A1A1A]">
-                Reserve Your Stay
-            </Button>
         </div>
       </section>
     </>

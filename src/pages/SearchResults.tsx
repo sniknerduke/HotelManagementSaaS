@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
@@ -22,161 +22,186 @@ export const SearchResults: React.FC = () => {
     const [rooms, setRooms] = useState(1);
     const totalGuests = adults + children;
 
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    useEffect(() => {
+      const handleScroll = () => {
+        setIsScrolled(window.scrollY > window.innerHeight * 0.2); // Lower threshold for search page
+      };
+      window.addEventListener('scroll', handleScroll);
+      return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const SearchBarContent = ({ isSticky = false }: { isSticky?: boolean }) => (
+      <>
+        {/* Location */}
+        <div className={`flex-1 w-full border-b md:border-b-0 md:border-r border-[#1A1A1A]/10 ${isSticky ? 'pb-2 md:pb-0 md:pr-6 xl:pr-8' : 'pb-4 md:pb-0 md:pr-8 xl:pr-12'} group cursor-text`}>
+          <label className={`block uppercase font-bold tracking-[0.2em] text-[#6C6863] group-hover:text-[#1A1A1A] transition-colors ${isSticky ? 'text-[8px] mb-1' : 'text-[10px] mb-3'}`}>Destination</label>
+          <input 
+            type="text" 
+            placeholder="Where to?" 
+            className={`w-full bg-transparent border-none outline-none text-[#1A1A1A] font-serif placeholder:text-[#1A1A1A]/30 focus:ring-0 p-0 ${isSticky ? 'text-lg xl:text-xl' : 'text-xl xl:text-3xl'}`} 
+          />
+        </div>
+
+        {/* Dates / Custom Luxury Date Picker Trigger */}
+        <div className={`flex-[1.5] w-full border-b md:border-b-0 md:border-r border-[#1A1A1A]/10 ${isSticky ? 'pb-2 md:pb-0 md:px-6 xl:px-8' : 'pb-4 md:pb-0 md:px-8 xl:px-12'} group cursor-pointer relative`}>
+          <label className={`block uppercase font-bold tracking-[0.2em] text-[#6C6863] group-hover:text-[#1A1A1A] transition-colors ${isSticky ? 'text-[8px] mb-1' : 'text-[10px] mb-3'}`}>Check in - Check out</label>
+          <div 
+            className={`flex items-center justify-between w-full h-full ${isSticky ? 'py-0' : 'py-1'}`}
+            onClick={() => {
+              setIsDatePickerOpen(!isDatePickerOpen);
+              setIsGuestPickerOpen(false);
+            }}
+          >
+            <span className={`font-serif transition-colors ${isSticky ? 'text-lg xl:text-xl' : 'text-xl xl:text-3xl'} ${!checkIn ? 'text-[#1A1A1A]/30' : 'text-[#1A1A1A]'}`}>
+              {!checkIn ? 'Add dates' : !checkOut ? `May ${checkIn} - Checkout` : `May ${checkIn} - May ${checkOut}`}
+            </span>
+            <svg className={`w-4 h-4 text-[#1A1A1A]/40 transition-transform duration-500 transform ${isDatePickerOpen ? 'rotate-180 text-[#1A1A1A]' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
+
+          {/* Simulated Luxury Calendar Dropdown */}
+          {isDatePickerOpen && (
+            <div className="absolute top-[120%] left-0 w-[400px] bg-[#F9F8F6] border border-[#1A1A1A]/10 shadow-[0_32px_64px_rgba(0,0,0,0.2)] z-50 p-8 animate-in fade-in slide-in-from-top-4 duration-500">
+              <div className="flex justify-between items-center mb-8">
+                <button onClick={(e) => e.stopPropagation()} className="text-[#1A1A1A]/40 hover:text-[#1A1A1A] transition-colors h-8 w-8 flex items-center justify-center border border-transparent hover:border-[#1A1A1A]/20">←</button>
+                <span className="font-serif italic text-xl text-[#1A1A1A]">May 2026</span>
+                <button onClick={(e) => e.stopPropagation()} className="text-[#1A1A1A]/40 hover:text-[#1A1A1A] transition-colors h-8 w-8 flex items-center justify-center border border-transparent hover:border-[#1A1A1A]/20">→</button>
+              </div>
+              <div className="grid grid-cols-7 gap-2 text-center mb-4">
+                {['S','M','T','W','T','F','S'].map(d => (
+                   <span key={d} className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863]/60">{d}</span>
+                ))}
+              </div>
+              <div className="grid grid-cols-7 gap-y-4 gap-x-0 overflow-hidden text-center font-serif text-lg">
+                 <span className="opacity-0 bg-transparent"></span><span className="opacity-0 bg-transparent"></span><span className="opacity-0 bg-transparent"></span><span className="opacity-0 bg-transparent"></span><span className="opacity-0 bg-transparent"></span>
+                 {[...Array(31)].map((_, i) => {
+                   const day = i + 1;
+                   const isSelected = day === checkIn || day === checkOut;
+                   const isInRange = checkIn && checkOut && day > checkIn && day < checkOut;
+                   return (
+                     <div key={i} className={`relative flex items-center justify-center h-10 ${isInRange ? 'bg-[#D4AF37]/15' : ''} ${day === checkIn && checkOut ? 'bg-gradient-to-r from-transparent to-[#D4AF37]/15' : ''} ${day === checkOut ? 'bg-gradient-to-l from-transparent to-[#D4AF37]/15' : ''}`}>
+                       <button 
+                         onClick={(e) => { 
+                           e.stopPropagation();
+                           if (!checkIn || (checkIn && checkOut)) {
+                             setCheckIn(day);
+                             setCheckOut(null);
+                           } else if (day >= checkIn) {
+                             if (day !== checkIn) {
+                              setCheckOut(day);
+                              setIsDatePickerOpen(false);
+                             }
+                           } else {
+                             setCheckIn(day);
+                           }
+                         }}
+                         className={`w-10 h-10 rounded-none flex flex-shrink-0 items-center justify-center transition-colors relative z-10 ${isSelected ? 'bg-[#1A1A1A] text-[#F9F8F6]' : 'text-[#1A1A1A] hover:bg-[#1A1A1A]/5'}`}
+                       >
+                         {day}
+                       </button>
+                     </div>
+                   );
+                 })}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Guests Custom Luxury Selector */}
+        <div className={`flex-1 w-full ${isSticky ? 'pb-2 md:pb-0 md:px-6 xl:px-8' : 'pb-4 md:pb-0 md:px-8 xl:px-12'} group cursor-pointer relative`}>
+          <label className={`block uppercase font-bold tracking-[0.2em] text-[#6C6863] group-hover:text-[#1A1A1A] transition-colors ${isSticky ? 'text-[8px] mb-1' : 'text-[10px] mb-3'}`}>Guests</label>
+          <div 
+            className={`flex items-center justify-between w-full h-full ${isSticky ? 'py-0' : 'py-1'}`}
+            onClick={() => {
+              setIsGuestPickerOpen(!isGuestPickerOpen);
+              setIsDatePickerOpen(false);
+            }}
+          >
+            <div className="flex flex-col">
+              <span className={`font-serif text-[#1A1A1A] transition-colors ${isSticky ? 'text-lg xl:text-xl' : 'text-xl xl:text-3xl'}`}>
+                {totalGuests} {totalGuests === 1 ? 'Guest' : 'Guests'}
+              </span>
+              {!isSticky && (
+                <span className="text-[10px] uppercase tracking-[0.1em] text-[#6C6863]/60 mt-1">
+                  {rooms} {rooms === 1 ? 'Room' : 'Rooms'}
+                </span>
+              )}
+            </div>
+            <svg className={`w-4 h-4 text-[#1A1A1A]/40 transition-transform duration-500 transform ${isGuestPickerOpen ? 'rotate-180 text-[#1A1A1A]' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
+
+          {/* Guest Matrix Dropdown */}
+          {isGuestPickerOpen && (
+            <div className="absolute top-[120%] right-0 lg:right-auto md:left-0 w-[350px] bg-[#F9F8F6] border border-[#1A1A1A]/10 shadow-[0_32px_64px_rgba(0,0,0,0.2)] z-50 p-8 animate-in fade-in slide-in-from-top-4 duration-500">
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-serif text-lg text-[#1A1A1A]">Adults</p>
+                    <p className="text-xs text-[#6C6863] italic">Ages 13 or above</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <button onClick={(e) => { e.stopPropagation(); setAdults(Math.max(1, adults - 1)); }} className="w-8 h-8 rounded-full border border-[#1A1A1A]/20 flex items-center justify-center text-[#1A1A1A] hover:border-[#1A1A1A] transition-colors">−</button>
+                    <span className="font-serif w-4 text-center">{adults}</span>
+                    <button onClick={(e) => { e.stopPropagation(); setAdults(adults + 1); }} className="w-8 h-8 rounded-full border border-[#1A1A1A]/20 flex items-center justify-center text-[#1A1A1A] hover:border-[#1A1A1A] transition-colors">+</button>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between border-t border-[#1A1A1A]/10 pt-6">
+                  <div>
+                    <p className="font-serif text-lg text-[#1A1A1A]">Children</p>
+                    <p className="text-xs text-[#6C6863] italic">Ages 2-12</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <button onClick={(e) => { e.stopPropagation(); setChildren(Math.max(0, children - 1)); }} className="w-8 h-8 rounded-full border border-[#1A1A1A]/20 flex items-center justify-center text-[#1A1A1A] hover:border-[#1A1A1A] transition-colors">−</button>
+                    <span className="font-serif w-4 text-center">{children}</span>
+                    <button onClick={(e) => { e.stopPropagation(); setChildren(children + 1); }} className="w-8 h-8 rounded-full border border-[#1A1A1A]/20 flex items-center justify-center text-[#1A1A1A] hover:border-[#1A1A1A] transition-colors">+</button>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between border-t border-[#1A1A1A]/10 pt-6">
+                  <div>
+                    <p className="font-serif text-lg text-[#1A1A1A]">Rooms</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <button onClick={(e) => { e.stopPropagation(); setRooms(Math.max(1, rooms - 1)); }} className="w-8 h-8 rounded-full border border-[#1A1A1A]/20 flex items-center justify-center text-[#1A1A1A] hover:border-[#1A1A1A] transition-colors">−</button>
+                    <span className="font-serif w-4 text-center">{rooms}</span>
+                    <button onClick={(e) => { e.stopPropagation(); setRooms(rooms + 1); }} className="w-8 h-8 rounded-full border border-[#1A1A1A]/20 flex items-center justify-center text-[#1A1A1A] hover:border-[#1A1A1A] transition-colors">+</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className={`w-full md:w-auto mt-4 md:mt-0 shrink-0 relative z-10 ${isSticky ? 'xl:pl-6' : 'xl:pl-8'}`}>
+          <Button className={`w-full md:w-auto bg-[#1A1A1A] hover:bg-[#D4AF37] text-[#F9F8F6] hover:text-[#1A1A1A] transition-colors duration-500 shadow-none border-none tracking-[0.3em] ${isSticky ? 'px-8 py-4 text-xs' : 'px-16 py-6 xl:py-8 text-sm'}`}>
+            Update
+          </Button>
+        </div>
+      </>
+    );
+
     return (
         <div className="max-w-[1600px] mx-auto w-full px-8 md:px-16 pt-24 pb-40">
+            
+            {/* Sticky Top Bar (Animated) */}
+            <div className={`fixed top-16 lg:top-20 left-0 w-full z-[100] bg-[#F9F8F6] shadow-[0_16px_40px_rgba(0,0,0,0.1)] border-b border-[#1A1A1A]/10 transition-transform duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isScrolled ? 'translate-y-0' : '-translate-y-[150%]'}`}>
+              <div className="max-w-[1600px] mx-auto px-8 py-3 flex flex-col md:flex-row items-center gap-4 xl:gap-6 w-full">
+                <SearchBarContent isSticky={true} />
+              </div>
+            </div>
+
             <h1 className="text-4xl md:text-6xl font-serif text-[#1A1A1A] mb-12 leading-[1.1]">
                 Find your <span className="italic">escape.</span>
             </h1>
 
-            {/* Luxury Searching Bar */}
+            {/* Luxury Searching Bar - Normal */}
             <div className="mb-20 w-full relative z-40">
               <div className="bg-[#F9F8F6] p-6 md:p-8 xl:py-10 shadow-[0_32px_64px_rgba(0,0,0,0.08)] flex flex-col md:flex-row items-center gap-6 xl:gap-8 w-full border border-[#1A1A1A]/10">
-                
-                {/* Location */}
-                <div className="flex-1 w-full border-b md:border-b-0 md:border-r border-[#1A1A1A]/10 pb-4 md:pb-0 md:pr-8 xl:pr-12 group cursor-text">
-                  <label className="block text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-3 group-hover:text-[#1A1A1A] transition-colors">Destination</label>
-                  <input 
-                    type="text" 
-                    placeholder="Where to?" 
-                    className="w-full bg-transparent border-none outline-none text-[#1A1A1A] text-xl xl:text-3xl font-serif placeholder:text-[#1A1A1A]/30 focus:ring-0 p-0" 
-                  />
-                </div>
-
-                {/* Dates / Custom Luxury Date Picker Trigger */}
-                <div className="flex-[1.5] w-full border-b md:border-b-0 md:border-r border-[#1A1A1A]/10 pb-4 md:pb-0 md:px-8 xl:px-12 group cursor-pointer relative">
-                  <label className="block text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-3 group-hover:text-[#1A1A1A] transition-colors">Check in - Check out</label>
-                  <div 
-                    className="flex items-center justify-between w-full h-full py-1"
-                    onClick={() => {
-                      setIsDatePickerOpen(!isDatePickerOpen);
-                      setIsGuestPickerOpen(false);
-                    }}
-                  >
-                    <span className={`text-xl xl:text-3xl font-serif transition-colors ${!checkIn ? 'text-[#1A1A1A]/30' : 'text-[#1A1A1A]'}`}>
-                      {!checkIn ? 'Add dates' : !checkOut ? `May ${checkIn} - Checkout` : `May ${checkIn} - May ${checkOut}`}
-                    </span>
-                    <svg className={`w-4 h-4 text-[#1A1A1A]/40 transition-transform duration-500 transform ${isDatePickerOpen ? 'rotate-180 text-[#1A1A1A]' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                  </div>
-
-                  {/* Simulated Luxury Calendar Dropdown */}
-                  {isDatePickerOpen && (
-                    <div className="absolute top-[120%] left-0 w-[400px] bg-[#F9F8F6] border border-[#1A1A1A]/10 shadow-[0_32px_64px_rgba(0,0,0,0.2)] z-50 p-8 animate-in fade-in slide-in-from-top-4 duration-500">
-                      <div className="flex justify-between items-center mb-8">
-                        <button className="text-[#1A1A1A]/40 hover:text-[#1A1A1A] transition-colors h-8 w-8 flex items-center justify-center border border-transparent hover:border-[#1A1A1A]/20">←</button>
-                        <span className="font-serif italic text-xl text-[#1A1A1A]">May 2026</span>
-                        <button className="text-[#1A1A1A]/40 hover:text-[#1A1A1A] transition-colors h-8 w-8 flex items-center justify-center border border-transparent hover:border-[#1A1A1A]/20">→</button>
-                      </div>
-                      <div className="grid grid-cols-7 gap-2 text-center mb-4">
-                        {['S','M','T','W','T','F','S'].map(d => (
-                           <span key={d} className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863]/60">{d}</span>
-                        ))}
-                      </div>
-                      <div className="grid grid-cols-7 gap-y-4 gap-x-0 overflow-hidden text-center font-serif text-lg">
-                         <span className="opacity-0 bg-transparent"></span><span className="opacity-0 bg-transparent"></span><span className="opacity-0 bg-transparent"></span><span className="opacity-0 bg-transparent"></span><span className="opacity-0 bg-transparent"></span>
-                         {[...Array(31)].map((_, i) => {
-                           const day = i + 1;
-                           const isSelected = day === checkIn || day === checkOut;
-                           const isInRange = checkIn && checkOut && day > checkIn && day < checkOut;
-                           return (
-                             <div key={i} className={`relative flex items-center justify-center h-10 ${isInRange ? 'bg-[#D4AF37]/15' : ''} ${day === checkIn && checkOut ? 'bg-gradient-to-r from-transparent to-[#D4AF37]/15' : ''} ${day === checkOut ? 'bg-gradient-to-l from-transparent to-[#D4AF37]/15' : ''}`}>
-                               <button 
-                                 onClick={(e) => { 
-                                   e.stopPropagation();
-                                   if (!checkIn || (checkIn && checkOut)) {
-                                     setCheckIn(day);
-                                     setCheckOut(null);
-                                   } else if (day >= checkIn) {
-                                     if (day !== checkIn) {
-                                      setCheckOut(day);
-                                      setIsDatePickerOpen(false);
-                                     }
-                                   } else {
-                                     setCheckIn(day);
-                                   }
-                                 }}
-                                 className={`w-10 h-10 rounded-none flex flex-shrink-0 items-center justify-center transition-colors relative z-10 ${isSelected ? 'bg-[#1A1A1A] text-[#F9F8F6]' : 'text-[#1A1A1A] hover:bg-[#1A1A1A]/5'}`}
-                               >
-                                 {day}
-                               </button>
-                             </div>
-                           );
-                         })}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Guests Custom Luxury Selector */}
-                <div className="flex-1 w-full pb-4 md:pb-0 md:px-8 xl:px-12 group cursor-pointer relative">
-                  <label className="block text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-3 group-hover:text-[#1A1A1A] transition-colors">Guests</label>
-                  <div 
-                    className="flex items-center justify-between w-full h-full py-1"
-                    onClick={() => {
-                      setIsGuestPickerOpen(!isGuestPickerOpen);
-                      setIsDatePickerOpen(false);
-                    }}
-                  >
-                    <div className="flex flex-col">
-                      <span className="text-xl xl:text-3xl font-serif text-[#1A1A1A] transition-colors">
-                        {totalGuests} {totalGuests === 1 ? 'Guest' : 'Guests'}
-                      </span>
-                      <span className="text-[10px] uppercase tracking-[0.1em] text-[#6C6863]/60 mt-1">
-                        {rooms} {rooms === 1 ? 'Room' : 'Rooms'}
-                      </span>
-                    </div>
-                    <svg className={`w-4 h-4 text-[#1A1A1A]/40 transition-transform duration-500 transform ${isGuestPickerOpen ? 'rotate-180 text-[#1A1A1A]' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                  </div>
-
-                  {/* Guest Matrix Dropdown */}
-                  {isGuestPickerOpen && (
-                    <div className="absolute top-[120%] right-0 lg:right-auto md:left-0 w-[350px] bg-[#F9F8F6] border border-[#1A1A1A]/10 shadow-[0_32px_64px_rgba(0,0,0,0.2)] z-50 p-8 animate-in fade-in slide-in-from-top-4 duration-500">
-                      <div className="space-y-6">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-serif text-lg text-[#1A1A1A]">Adults</p>
-                            <p className="text-xs text-[#6C6863] italic">Ages 13 or above</p>
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <button onClick={(e) => { e.stopPropagation(); setAdults(Math.max(1, adults - 1)); }} className="w-8 h-8 rounded-full border border-[#1A1A1A]/20 flex items-center justify-center text-[#1A1A1A] hover:border-[#1A1A1A] transition-colors">−</button>
-                            <span className="font-serif w-4 text-center">{adults}</span>
-                            <button onClick={(e) => { e.stopPropagation(); setAdults(adults + 1); }} className="w-8 h-8 rounded-full border border-[#1A1A1A]/20 flex items-center justify-center text-[#1A1A1A] hover:border-[#1A1A1A] transition-colors">+</button>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between border-t border-[#1A1A1A]/10 pt-6">
-                          <div>
-                            <p className="font-serif text-lg text-[#1A1A1A]">Children</p>
-                            <p className="text-xs text-[#6C6863] italic">Ages 2-12</p>
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <button onClick={(e) => { e.stopPropagation(); setChildren(Math.max(0, children - 1)); }} className="w-8 h-8 rounded-full border border-[#1A1A1A]/20 flex items-center justify-center text-[#1A1A1A] hover:border-[#1A1A1A] transition-colors">−</button>
-                            <span className="font-serif w-4 text-center">{children}</span>
-                            <button onClick={(e) => { e.stopPropagation(); setChildren(children + 1); }} className="w-8 h-8 rounded-full border border-[#1A1A1A]/20 flex items-center justify-center text-[#1A1A1A] hover:border-[#1A1A1A] transition-colors">+</button>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between border-t border-[#1A1A1A]/10 pt-6">
-                          <div>
-                            <p className="font-serif text-lg text-[#1A1A1A]">Rooms</p>
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <button onClick={(e) => { e.stopPropagation(); setRooms(Math.max(1, rooms - 1)); }} className="w-8 h-8 rounded-full border border-[#1A1A1A]/20 flex items-center justify-center text-[#1A1A1A] hover:border-[#1A1A1A] transition-colors">−</button>
-                            <span className="font-serif w-4 text-center">{rooms}</span>
-                            <button onClick={(e) => { e.stopPropagation(); setRooms(rooms + 1); }} className="w-8 h-8 rounded-full border border-[#1A1A1A]/20 flex items-center justify-center text-[#1A1A1A] hover:border-[#1A1A1A] transition-colors">+</button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="w-full md:w-auto mt-4 md:mt-0 xl:pl-8 shrink-0 relative z-10">
-                  <Button className="w-full md:w-auto px-16 py-6 xl:py-8 bg-[#1A1A1A] hover:bg-[#D4AF37] text-[#F9F8F6] hover:text-[#1A1A1A] transition-colors duration-500 shadow-none border-none text-sm tracking-[0.3em]">
-                    Update
-                  </Button>
-                </div>
+                <SearchBarContent isSticky={false} />
               </div>
             </div>
 

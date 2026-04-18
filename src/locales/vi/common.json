@@ -111,6 +111,29 @@
       "total": "Tổng cộng"
     }
   },
+  "search": {
+    "title": "Tìm nơi",
+    "titleItalic": "\"thả hồn\" của bạn.",
+    "update": "Cập nhật",
+    "residencesAvailable": "Có {{count}} lựa chọn.",
+    "accommodates": "Phù hợp cho tối đa {{count}} khách.",
+    "roomDescription": "Không gian sống mở rộng rãi với các chi tiết thủ công và nội thất bespoke được tuyển chọn.",
+    "startingFrom": "Giá chỉ từ",
+    "night": "đêm",
+    "reserve": "Đặt chỗ",
+    "filters": {
+      "amenities": "Tiện ích",
+      "privatePool": "Bể bơi riêng",
+      "oceanView": "Hướng biển",
+      "butlerService": "Dịch vụ quản gia",
+      "balcony": "Ban công / Sân hiên",
+      "spaAccess": "Sử dụng Spa",
+      "fitnessCenter": "Trung tâm thể hình",
+      "wifi": "Wi-Fi tốc độ cao",
+      "petFriendly": "Thân thiện với thú cưng",
+      "breakfast": "Bữa sáng miễn phí"
+    }
+  },
   "contact": {
     "hero": {
       "subtitle": "Chúng Tôi Luôn Sẵn Sàng Hỗ Trợ",
@@ -136,12 +159,20 @@
       "submit": "Gửi Yêu Cầu"
     },
     "info": {
-      "location": "Vị Trí Khu Nghỉ Dưỡng",
+      "location": "Vị trí & Khả năng tiếp cận",
+      "addressTitle": "Địa chỉ",
+      "address": "124 Luxury Avenue, Historic District, Metropolis 10001",
+      "discoverArea": "Khám phá Khu vực",
+      "transitHubs": "Các Trạm Trung Chuyển",
+      "airport": "Sân bay Quốc tế Metropolis",
+      "airportDesc": "25 dặm / 40 phút",
+      "train": "Ga Tàu Trung tâm Central Grand",
+      "trainDesc": "3 dặm / 10 phút",
+      "nearbyLandmarks": "Danh lam thắng cảnh Lân cận",
+      "landmark1": "Nhà hát Opera Lớn (0,5 dặm)",
+      "landmark2": "Bảo tàng Nghệ thuật Quốc gia (1,2 dặm)",
+      "landmark3": "Vườn Bách thảo Hoàng gia (2,0 dặm)",
       "directions": "Chỉ dẫn đường đi",
-      "airport": "Từ Sân bay Quốc tế Metropolis:",
-      "airportDesc": "40 phút qua đường I-90 West, hoặc chúng tôi có thể sắp xếp xe đưa đón riêng.",
-      "train": "Từ Ga Tàu Trung tâm Central Grand:",
-      "trainDesc": "10 phút qua tuyến Metro A đến Ga Luxury Ave.",
       "direct": "Liên Hệ Trực Tiếp",
       "frontDesk": "Quầy Lễ Tân",
       "reservations": "Bộ Phận Đặt Phòng",
@@ -150,6 +181,64 @@
       "faq": "Câu Hỏi Thường Gặp",
       "instagram": "Trang Instagram",
       "twitter": "Cập nhật X (Twitter)"
+    }
+  },
+  "home": {
+    "destination": "Điểm Đến",
+    "whereTo": "Bạn sẽ đi đâu?",
+    "checkInCheckOut": "Nhận phòng - Trả phòng",
+    "addDates": "Thêm ngày",
+    "checkout": "Trả phòng",
+    "guests": "Khách",
+    "guest_one": "Khách",
+    "guest_other": "Khách",
+    "room_one": "Phòng",
+    "room_other": "Phòng",
+    "adults": "Người lớn",
+    "adultsAge": "Từ 13 tuổi trở lên",
+    "children": "Trẻ em",
+    "childrenAge": "Từ 2 đến 12 tuổi",
+    "search": "Tìm kiếm",
+    "hero": {
+      "title": "Nơi ẩn náu",
+      "titleItalic": "bình yên.",
+      "description": "Thoát khỏi sự ồn ào hàng ngày và khám phá sự sang trọng vô song tại những điểm đến được tuyển chọn trên toàn thế giới."
+    },
+    "intro": {
+      "subtitle": "Trải Nghiệm Lumière",
+      "title": "Nơi Di Sản Kết Nối Với Sự Sang Trọng Hiện Đại",
+      "description": "Nằm giữa lòng khu phố lịch sử, The Lumière hiện lên như một biểu tượng của sự sang trọng tinh tế. Triết lý thiết kế của chúng tôi tôn vinh vẻ hào nhoáng của kiến trúc quá khứ, đồng thời mang đến dịch vụ trực quan và riêng biệt của tương lai. Mỗi chi tiết đều là minh chứng cho sự tận tâm của chúng tôi đối với nghệ thuật hiếu khách."
+    },
+    "accommodations": {
+      "subtitle": "Một Kỳ Nghỉ Được Tuyển Chọn",
+      "title": "Phòng Nghỉ",
+      "titleItalic": "Nổi Bật.",
+      "viewAll": "Xem Tất Cả Phòng",
+      "deluxeOceanView": "Deluxe Hướng Biển",
+      "signatureSuite": "Signature Suite",
+      "grandPenthouse": "The Grand Penthouse",
+      "from": "Từ",
+      "upToGuests": "Tối đa {{count}} Khách",
+      "viewDetails": "Xem Chi Tiết"
+    },
+    "amenities": {
+      "title": "Tiện Nghi",
+      "titleItalic": "Thượng Lưu",
+      "spa": "Spa & Chăm Sóc Sức Khỏe",
+      "fineDining": "Ẩm Thực Tinh Túy",
+      "pool": "Hồ Bơi Vô Cực",
+      "wifi": "Wi-Fi Tốc Độ Cao",
+      "fitness": "Trung Tâm Thể Hình"
+    },
+    "testimonials": {
+      "subtitle": "Trải Nghiệm Khách Hàng",
+      "title": "Lời Chúc Tốt Đẹp Từ",
+      "titleItalic": "Quý Khách.",
+      "reviews": {
+        "eleanor": "Một trải nghiệm hoàn toàn ngoạn mục. Sự chú ý đến từng chi tiết trong phòng suite là không ai sánh kịp, và nhân viên đã dự đoán mọi nhu cầu của chúng tôi trước cả khi chúng tôi yêu cầu.",
+        "marcus": "Kể từ lúc chúng tôi đến, chúng tôi đã được đối xử như hoàng gia. Hồ bơi vô cực lúc hoàng hôn là một kỷ niệm cốt lõi mà tôi sẽ mãi trân trọng.",
+        "sophia": "Một thánh đường thực sự trong thành phố. Nhà hàng ẩm thực tinh túy đã mang đến một trong những hành trình ẩm thực tinh tế nhất mà chúng tôi từng trải nghiệm."
+      }
     }
   }
 }

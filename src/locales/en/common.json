@@ -111,6 +111,29 @@
       "total": "Total"
     }
   },
+  "search": {
+    "title": "Find your",
+    "titleItalic": "escape.",
+    "update": "Update",
+    "residencesAvailable": "{{count}} Residences available.",
+    "accommodates": "Accommodates up to {{count}} guests.",
+    "roomDescription": "Spacious open-plan living with artisanal details and curated bespoke furniture.",
+    "startingFrom": "Starting from",
+    "night": "night",
+    "reserve": "Reserve",
+    "filters": {
+      "amenities": "Amenities",
+      "privatePool": "Private Pool",
+      "oceanView": "Ocean View",
+      "butlerService": "Butler Service",
+      "balcony": "Balcony / Terrace",
+      "spaAccess": "Spa Access",
+      "fitnessCenter": "Fitness Center",
+      "wifi": "High-Speed Wi-Fi",
+      "petFriendly": "Pet Friendly",
+      "breakfast": "Complimentary Breakfast"
+    }
+  },
   "contact": {
     "hero": {
       "subtitle": "Here To Assist You",
@@ -136,12 +159,20 @@
       "submit": "Submit Request"
     },
     "info": {
-      "location": "Property Location",
+      "location": "Location & Accessibility",
+      "addressTitle": "Address",
+      "address": "124 Luxury Avenue, Historic District, Metropolis 10001",
+      "discoverArea": "Discover the Area",
+      "transitHubs": "Transit Hubs",
+      "airport": "Metropolis International Airport",
+      "airportDesc": "25 miles / 40 min",
+      "train": "Central Grand Train Station",
+      "trainDesc": "3 miles / 10 min",
+      "nearbyLandmarks": "Nearby Landmarks",
+      "landmark1": "The Grand Opera House (0.5 miles)",
+      "landmark2": "National Museum of Art (1.2 miles)",
+      "landmark3": "Royal Botanical Gardens (2.0 miles)",
       "directions": "Directions",
-      "airport": "From Metropolis International Airport:",
-      "airportDesc": "40 minutes via I-90 West, or let us arrange private airport transfer.",
-      "train": "From Central Grand Train Station:",
-      "trainDesc": "10 minutes via Metro Line A to Luxury Ave Station.",
       "direct": "Direct Contact",
       "frontDesk": "Front Desk",
       "reservations": "Reservations Department",
@@ -150,6 +181,64 @@
       "faq": "Frequently Asked Questions",
       "instagram": "Instagram Profile",
       "twitter": "X (Twitter) Updates"
+    }
+  },
+  "home": {
+    "destination": "Destination",
+    "whereTo": "Where to?",
+    "checkInCheckOut": "Check in - Check out",
+    "addDates": "Add dates",
+    "checkout": "Checkout",
+    "guests": "Guests",
+    "guest_one": "Guest",
+    "guest_other": "Guests",
+    "room_one": "Room",
+    "room_other": "Rooms",
+    "adults": "Adults",
+    "adultsAge": "Ages 13 or above",
+    "children": "Children",
+    "childrenAge": "Ages 2-12",
+    "search": "Search",
+    "hero": {
+      "title": "A serene",
+      "titleItalic": "refuge.",
+      "description": "Escape the daily noise and discover unparalleled luxury in curated destinations worldwide."
+    },
+    "intro": {
+      "subtitle": "The Lumière Experience",
+      "title": "Where Heritage Meets Contemporary Luxury",
+      "description": "Nestled in the heart of the historic district, The Lumière stands as a beacon of refined elegance. Our design philosophy embraces the architectural grandeur of the past while offering the intuitive, bespoke service of tomorrow. Every detail is a testament to our dedication to the art of hospitality."
+    },
+    "accommodations": {
+      "subtitle": "A Curated Stay",
+      "title": "Featured",
+      "titleItalic": "Accommodations.",
+      "viewAll": "View All Rooms",
+      "deluxeOceanView": "Deluxe Ocean View",
+      "signatureSuite": "Signature Suite",
+      "grandPenthouse": "The Grand Penthouse",
+      "from": "From",
+      "upToGuests": "Up to {{count}} Guests",
+      "viewDetails": "View Details"
+    },
+    "amenities": {
+      "title": "Curated",
+      "titleItalic": "Amenities",
+      "spa": "Spa & Wellness",
+      "fineDining": "Fine Dining",
+      "pool": "Infinity Pool",
+      "wifi": "High-Speed Wi-Fi",
+      "fitness": "Fitness Center"
+    },
+    "testimonials": {
+      "subtitle": "Guest Experience",
+      "title": "Words from our",
+      "titleItalic": "Guests.",
+      "reviews": {
+        "eleanor": "An absolutely breathtaking experience. The attention to detail in the suite was unmatched, and the staff anticipated our every need before we even asked.",
+        "marcus": "From the moment we arrived, we were treated like royalty. The infinity pool at sunset is a core memory I will cherish forever.",
+        "sophia": "A true sanctuary in the city. The fine dining restaurant offered one of the most exquisite culinary journeys we've ever documented."
+      }
     }
   }
 }

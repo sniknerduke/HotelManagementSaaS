@@ -18,7 +18,7 @@ export const Amenities: React.FC = () => {
                 </div>
                 <div className="relative z-10 text-center flex flex-col items-center justify-center w-full px-8">
                     <span className="block text-[10px] uppercase font-bold tracking-[0.3em] text-[#D4AF37] mb-6">{t('amenities.hero.subtitle')}</span>
-                    <h1 className="text-5xl md:text-[6rem] lg:text-[7rem] tracking-tight leading-[0.9] font-serif mb-6 text-[#F9F8F6] drop-shadow-xl">
+                    <h1 className="text-7xl md:text-[8rem] lg:text-[10rem] tracking-tight leading-[0.9] font-serif mb-6 text-[#F9F8F6] drop-shadow-xl">
                         {t('amenities.hero.title')} <span className="italic text-[#D4AF37]">{t('amenities.hero.titleItalic')}</span>
                     </h1>
                     <p className="text-[#F9F8F6]/90 text-sm md:text-lg font-serif italic max-w-2xl text-center tracking-wide">

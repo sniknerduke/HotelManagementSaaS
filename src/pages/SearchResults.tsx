@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
@@ -10,6 +11,7 @@ const mockRooms = [
 ];
 
 export const SearchResults: React.FC = () => {
+    const { t } = useTranslation();
     const [searchQuery, setSearchQuery] = useState('');
     
     // Luxury Bar State
@@ -40,17 +42,17 @@ export const SearchResults: React.FC = () => {
       <>
         {/* Location */}
         <div className={`flex-1 w-full border-b md:border-b-0 md:border-r border-[#1A1A1A]/10 ${isSticky ? 'pb-2 md:pb-0 md:pr-6 xl:pr-8' : 'pb-4 md:pb-0 md:pr-8 xl:pr-12'} group cursor-text`}>
-          <label className={`block uppercase font-bold tracking-[0.2em] text-[#6C6863] group-hover:text-[#1A1A1A] transition-colors ${isSticky ? 'text-[8px] mb-1' : 'text-[10px] mb-3'}`}>Destination</label>
+          <label className={`block uppercase font-bold tracking-[0.2em] text-[#6C6863] group-hover:text-[#1A1A1A] transition-colors ${isSticky ? 'text-[8px] mb-1' : 'text-[10px] mb-3'}`}>{t('home.destination')}</label>
           <input 
             type="text" 
-            placeholder="Where to?" 
+            placeholder={t('home.whereTo')} 
             className={`w-full bg-transparent border-none outline-none text-[#1A1A1A] font-serif placeholder:text-[#1A1A1A]/30 focus:ring-0 p-0 ${isSticky ? 'text-lg xl:text-xl' : 'text-xl xl:text-3xl'}`} 
           />
         </div>
 
         {/* Dates / Custom Luxury Date Picker Trigger */}
         <div className={`flex-[1.5] w-full border-b md:border-b-0 md:border-r border-[#1A1A1A]/10 ${isSticky ? 'pb-2 md:pb-0 md:px-6 xl:px-8' : 'pb-4 md:pb-0 md:px-8 xl:px-12'} group cursor-pointer relative`}>
-          <label className={`block uppercase font-bold tracking-[0.2em] text-[#6C6863] group-hover:text-[#1A1A1A] transition-colors ${isSticky ? 'text-[8px] mb-1' : 'text-[10px] mb-3'}`}>Check in - Check out</label>
+          <label className={`block uppercase font-bold tracking-[0.2em] text-[#6C6863] group-hover:text-[#1A1A1A] transition-colors ${isSticky ? 'text-[8px] mb-1' : 'text-[10px] mb-3'}`}>{t('home.checkInCheckOut')}</label>
           <div 
             className={`flex items-center justify-between w-full h-full ${isSticky ? 'py-0' : 'py-1'}`}
             onClick={() => {
@@ -59,7 +61,7 @@ export const SearchResults: React.FC = () => {
             }}
           >
             <span className={`font-serif transition-colors ${isSticky ? 'text-lg xl:text-xl' : 'text-xl xl:text-3xl'} ${!checkIn ? 'text-[#1A1A1A]/30' : 'text-[#1A1A1A]'}`}>
-              {!checkIn ? 'Add dates' : !checkOut ? `May ${checkIn} - Checkout` : `May ${checkIn} - May ${checkOut}`}
+              {!checkIn ? t('home.addDates') : !checkOut ? `May ${checkIn} - ${t('home.checkout')}` : `May ${checkIn} - May ${checkOut}`}
             </span>
             <svg className={`w-4 h-4 text-[#1A1A1A]/40 transition-transform duration-500 transform ${activeDatePicker === (isSticky ? 'sticky' : 'normal') ? 'rotate-180 text-[#1A1A1A]' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M19 9l-7 7-7-7"></path>
@@ -116,7 +118,7 @@ export const SearchResults: React.FC = () => {
 
         {/* Guests Custom Luxury Selector */}
         <div className={`flex-1 w-full ${isSticky ? 'pb-2 md:pb-0 md:px-6 xl:px-8' : 'pb-4 md:pb-0 md:px-8 xl:px-12'} group cursor-pointer relative`}>
-          <label className={`block uppercase font-bold tracking-[0.2em] text-[#6C6863] group-hover:text-[#1A1A1A] transition-colors ${isSticky ? 'text-[8px] mb-1' : 'text-[10px] mb-3'}`}>Guests</label>
+          <label className={`block uppercase font-bold tracking-[0.2em] text-[#6C6863] group-hover:text-[#1A1A1A] transition-colors ${isSticky ? 'text-[8px] mb-1' : 'text-[10px] mb-3'}`}>{t('home.guests')}</label>
           <div 
             className={`flex items-center justify-between w-full h-full ${isSticky ? 'py-0' : 'py-1'}`}
             onClick={() => {
@@ -126,11 +128,11 @@ export const SearchResults: React.FC = () => {
           >
             <div className="flex flex-col">
               <span className={`font-serif text-[#1A1A1A] transition-colors ${isSticky ? 'text-lg xl:text-xl' : 'text-xl xl:text-3xl'}`}>
-                {totalGuests} {totalGuests === 1 ? 'Guest' : 'Guests'}
+                {totalGuests} {t('home.guest', { count: totalGuests })}
               </span>
               {!isSticky && (
                 <span className="text-[10px] uppercase tracking-[0.1em] text-[#6C6863]/60 mt-1">
-                  {rooms} {rooms === 1 ? 'Room' : 'Rooms'}
+                  {rooms} {t('home.room', { count: rooms })}
                 </span>
               )}
             </div>
@@ -145,8 +147,8 @@ export const SearchResults: React.FC = () => {
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-serif text-lg text-[#1A1A1A]">Adults</p>
-                    <p className="text-xs text-[#6C6863] italic">Ages 13 or above</p>
+                    <p className="font-serif text-lg text-[#1A1A1A]">{t('home.adults')}</p>
+                    <p className="text-xs text-[#6C6863] italic">{t('home.adultsAge')}</p>
                   </div>
                   <div className="flex items-center gap-4">
                     <button onClick={(e) => { e.stopPropagation(); setAdults(Math.max(1, adults - 1)); }} className="w-8 h-8 rounded-full border border-[#1A1A1A]/20 flex items-center justify-center text-[#1A1A1A] hover:border-[#1A1A1A] transition-colors">−</button>
@@ -156,8 +158,8 @@ export const SearchResults: React.FC = () => {
                 </div>
                 <div className="flex items-center justify-between border-t border-[#1A1A1A]/10 pt-6">
                   <div>
-                    <p className="font-serif text-lg text-[#1A1A1A]">Children</p>
-                    <p className="text-xs text-[#6C6863] italic">Ages 2-12</p>
+                    <p className="font-serif text-lg text-[#1A1A1A]">{t('home.children')}</p>
+                    <p className="text-xs text-[#6C6863] italic">{t('home.childrenAge')}</p>
                   </div>
                   <div className="flex items-center gap-4">
                     <button onClick={(e) => { e.stopPropagation(); setChildren(Math.max(0, children - 1)); }} className="w-8 h-8 rounded-full border border-[#1A1A1A]/20 flex items-center justify-center text-[#1A1A1A] hover:border-[#1A1A1A] transition-colors">−</button>
@@ -167,7 +169,7 @@ export const SearchResults: React.FC = () => {
                 </div>
                 <div className="flex items-center justify-between border-t border-[#1A1A1A]/10 pt-6">
                   <div>
-                    <p className="font-serif text-lg text-[#1A1A1A]">Rooms</p>
+                    <p className="font-serif text-lg text-[#1A1A1A]">{t('home.room_other')}</p>
                   </div>
                   <div className="flex items-center gap-4">
                     <button onClick={(e) => { e.stopPropagation(); setRooms(Math.max(1, rooms - 1)); }} className="w-8 h-8 rounded-full border border-[#1A1A1A]/20 flex items-center justify-center text-[#1A1A1A] hover:border-[#1A1A1A] transition-colors">−</button>
@@ -182,7 +184,7 @@ export const SearchResults: React.FC = () => {
 
         <div className={`w-full md:w-auto mt-4 md:mt-0 shrink-0 relative z-10 ${isSticky ? 'xl:pl-6' : 'xl:pl-8'}`}>
           <Button className={`w-full md:w-auto bg-[#1A1A1A] hover:bg-[#D4AF37] text-[#F9F8F6] hover:text-[#1A1A1A] transition-colors duration-500 shadow-none border-none tracking-[0.3em] ${isSticky ? 'px-8 py-4 text-xs' : 'px-16 py-6 xl:py-8 text-sm'}`}>
-            Update
+            {t('search.update')}
           </Button>
         </div>
       </>
@@ -199,7 +201,7 @@ export const SearchResults: React.FC = () => {
             </div>
 
             <h1 className="text-4xl md:text-6xl font-serif text-[#1A1A1A] mb-12 leading-[1.1]">
-                Find your <span className="italic">escape.</span>
+                {t('search.title')} <span className="italic">{t('search.titleItalic')}</span>
             </h1>
 
             {/* Luxury Searching Bar - Normal */}
@@ -214,43 +216,43 @@ export const SearchResults: React.FC = () => {
                 {/* 2-column Layout: Left Sidebar for filtering */}
                 <div className="md:col-span-4 lg:col-span-3 space-y-12 shrink-0 md:sticky md:top-36 h-max">
                     <div className="pt-8 border-t border-[#1A1A1A]/10 mt-[-2rem]">
-                        <label className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-4 block">Amenities</label>
+                        <label className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-4 block">{t('search.filters.amenities')}</label>
                         <div className="space-y-3 font-serif text-[#1A1A1A] text-sm">
                             <label className="flex items-center gap-3 cursor-pointer group">
                                 <input type="checkbox" className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
-                                <span className="group-hover:text-[#D4AF37] transition-colors">Private Pool</span>
+                                <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.privatePool')}</span>
                             </label>
                             <label className="flex items-center gap-3 cursor-pointer group">
                                 <input type="checkbox" className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
-                                <span className="group-hover:text-[#D4AF37] transition-colors">Ocean View</span>
+                                <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.oceanView')}</span>
                             </label>
                             <label className="flex items-center gap-3 cursor-pointer group">
                                 <input type="checkbox" className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
-                                <span className="group-hover:text-[#D4AF37] transition-colors">Butler Service</span>
+                                <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.butlerService')}</span>
                             </label>
                             <label className="flex items-center gap-3 cursor-pointer group">
                                 <input type="checkbox" className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
-                                <span className="group-hover:text-[#D4AF37] transition-colors">Balcony / Terrace</span>
+                                <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.balcony')}</span>
                             </label>
                             <label className="flex items-center gap-3 cursor-pointer group">
                                 <input type="checkbox" className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
-                                <span className="group-hover:text-[#D4AF37] transition-colors">Spa Access</span>
+                                <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.spaAccess')}</span>
                             </label>
                             <label className="flex items-center gap-3 cursor-pointer group">
                                 <input type="checkbox" className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
-                                <span className="group-hover:text-[#D4AF37] transition-colors">Fitness Center</span>
+                                <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.fitnessCenter')}</span>
                             </label>
                             <label className="flex items-center gap-3 cursor-pointer group">
                                 <input type="checkbox" className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
-                                <span className="group-hover:text-[#D4AF37] transition-colors">High-Speed Wi-Fi</span>
+                                <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.wifi')}</span>
                             </label>
                             <label className="flex items-center gap-3 cursor-pointer group">
                                 <input type="checkbox" className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
-                                <span className="group-hover:text-[#D4AF37] transition-colors">Pet Friendly</span>
+                                <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.petFriendly')}</span>
                             </label>
                             <label className="flex items-center gap-3 cursor-pointer group">
                                 <input type="checkbox" className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
-                                <span className="group-hover:text-[#D4AF37] transition-colors">Complimentary Breakfast</span>
+                                <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.breakfast')}</span>
                             </label>
                         </div>
                     </div>
@@ -258,7 +260,7 @@ export const SearchResults: React.FC = () => {
 
                 {/* Right Main Column: Rooms */}
                 <div className="md:col-span-8 lg:col-span-8 lg:col-start-5 space-y-16">
-                    <p className="text-[#6C6863] font-serif italic text-sm">{mockRooms.length} Residences available.</p>
+                    <p className="text-[#6C6863] font-serif italic text-sm">{t('search.residencesAvailable', { count: mockRooms.length })}</p>
 
                     {mockRooms.map((room, idx) => (
                         <div key={idx} className="group grid grid-cols-1 lg:grid-cols-2 gap-8 border-t border-[#1A1A1A]/10 pt-16 mt-16 first:mt-4 first:pt-4">
@@ -274,21 +276,21 @@ export const SearchResults: React.FC = () => {
                                 <div>
                                     <h2 className="text-3xl lg:text-4xl font-serif text-[#1A1A1A] group-hover:text-[#D4AF37] transition-colors duration-700">{room.name}</h2>
                                     <div className="mt-6 space-y-2 text-[#6C6863] text-sm leading-relaxed">
-                                        <p>Accommodates up to {room.guests} guests.</p>
-                                        <p>Spacious open-plan living with artisanal details and curated bespoke furniture.</p>
+                                        <p>{t('search.accommodates', { count: room.guests })}</p>
+                                        <p>{t('search.roomDescription')}</p>
                                     </div>
                                 </div>
                                 <div className="mt-12 flex justify-between items-end">
                                     <div>
-                                        <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-1">Starting from</p>
-                                        <p className="text-2xl font-serif">${room.price} <span className="text-sm italic text-[#6C6863]">/ night</span></p>
+                                        <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-1">{t('search.startingFrom')}</p>
+                                        <p className="text-2xl font-serif">${room.price} <span className="text-sm italic text-[#6C6863]">/ {t('search.night')}</span></p>
                                     </div>
                                     <Button 
                                         variant="secondary" 
                                         className="group-hover:bg-[#1A1A1A] group-hover:text-white transition-all duration-700"
                                         onClick={() => window.location.href = '/checkout'}
                                     >
-                                        Reserve
+                                        {t('search.reserve')}
                                     </Button>
                                 </div>
                             </div>

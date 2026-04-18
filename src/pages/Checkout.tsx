@@ -17,7 +17,7 @@ export const Checkout: React.FC = () => {
                 
                 {/* Left Area: Stepper & Forms */}
                 <div className="lg:col-span-7 space-y-16">
-                    <h1 className="text-4xl md:text-5xl font-serif text-[#1A1A1A] mb-12">
+                    <h1 className="text-6xl md:text-7xl lg:text-8xl font-serif text-[#1A1A1A] mb-12">
                         {t('checkout.title')} <span className="italic text-[#D4AF37]">{t('checkout.titleItalic')}</span>
                     </h1>
 

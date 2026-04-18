@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@theme {
+  --color-alabaster: #F9F8F6;
+  --color-charcoal: #1A1A1A;
+  --color-taupe: #EBE5DE;
+  --color-warm-grey: #6C6863;
+  --color-gold: #D4AF37;
+  --color-white: #FFFFFF;
+
+  --color-background: var(--color-alabaster);
+  --color-foreground: var(--color-charcoal);
+  
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Inter", sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: var(--color-alabaster);
+    --foreground: var(--color-charcoal);
+  }
+
+  html {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: inherit;
+    /* Force 0px border radius on literally everything per the design system */
+  }
+
+  /* Headings inherit Playfair */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+  }
+  
+  /* Selection styling */
+  ::selection {
+    background-color: var(--color-gold);
+    color: var(--color-white);
+  }
+}
+
+@layer utilities {
+  .vertical-rl {
+    writing-mode: vertical-rl;
+  }
+}

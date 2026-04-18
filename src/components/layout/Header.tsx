@@ -13,7 +13,7 @@ export const Header: React.FC = () => {
           The <span className="italic">Lumière</span>
         </NavLink>
 
-        <nav className="hidden md:flex items-center justify-center absolute left-1/2 -translate-x-1/2 gap-10 lg:gap-14 text-xs uppercase tracking-[0.25em] font-medium text-[#1A1A1A]">
+        <nav className="hidden md:flex items-center justify-center absolute left-1/2 -translate-x-1/2 gap-10 lg:gap-14 text-xs uppercase tracking-[0.25em] font-medium text-[#1A1A1A] z-20">
           <NavLink to="/" className={({isActive}) => cn("hover:text-[#D4AF37] transition-colors duration-500", isActive && "text-[#D4AF37] relative after:absolute after:-bottom-2 after:left-0 after:h-px after:w-full after:bg-[#D4AF37]")}>
             Home
           </NavLink>

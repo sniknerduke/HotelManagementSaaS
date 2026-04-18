@@ -8,6 +8,7 @@ import { Register } from './pages/Register';
 import { Profile } from './pages/Profile';
 import { Checkout } from './pages/Checkout';
 import { Amenities } from './pages/Amenities';
+import { Contact } from './pages/Contact';
 import { AuthProvider } from './context/AuthContext';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
             <Route index element={<Home />} />
             <Route path='search' element={<SearchResults />} />
             <Route path='amenities' element={<Amenities />} />
+            <Route path='contact' element={<Contact />} />
             <Route path='checkout' element={<Checkout />} />
             <Route path='dashboard' element={<Dashboard />} />
             <Route path='login' element={<Login />} />

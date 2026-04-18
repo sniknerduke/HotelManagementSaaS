@@ -37,7 +37,7 @@ export const Header: React.FC = () => {
           <div className="hidden xl:flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-[#6C6863]">
             <span className="text-[#1A1A1A] cursor-pointer hover:text-[#D4AF37] transition-colors">EN</span> 
             <span className="w-px h-3 bg-[#1A1A1A]/20"></span>
-            <span className="cursor-pointer hover:text-[#D4AF37] transition-colors">JA</span>
+            <span className="cursor-pointer hover:text-[#D4AF37] transition-colors">VN</span>
           </div>
           <NavLink to="/login" className="hidden sm:block text-[10px] uppercase tracking-[0.25em] font-bold text-[#1A1A1A] hover:text-[#D4AF37] transition-colors whitespace-nowrap">
             Sign In

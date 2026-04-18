@@ -5,11 +5,11 @@ import { useNavigate } from 'react-router-dom';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [activeDatePicker, setActiveDatePicker] = useState<'sticky' | 'normal' | null>(null);
   const [checkIn, setCheckIn] = useState<number | null>(null);
   const [checkOut, setCheckOut] = useState<number | null>(null);
   
-  const [isGuestPickerOpen, setIsGuestPickerOpen] = useState(false);
+  const [activeGuestPicker, setActiveGuestPicker] = useState<'sticky' | 'normal' | null>(null);
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
   const [rooms, setRooms] = useState(1);
@@ -18,7 +18,11 @@ export const Home: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > window.innerHeight * 0.7);
+      const scrolled = window.scrollY > window.innerHeight * 0.7;
+      setIsScrolled(scrolled);
+      
+      setActiveDatePicker(prev => prev ? (scrolled ? 'sticky' : 'normal') : null);
+      setActiveGuestPicker(prev => prev ? (scrolled ? 'sticky' : 'normal') : null);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -44,20 +48,20 @@ export const Home: React.FC = () => {
         <div 
           className={`flex items-center justify-between w-full h-full ${isSticky ? 'py-0' : 'py-1'}`}
           onClick={() => {
-            setIsDatePickerOpen(!isDatePickerOpen);
-            setIsGuestPickerOpen(false);
+            setActiveDatePicker(activeDatePicker === (isSticky ? 'sticky' : 'normal') ? null : (isSticky ? 'sticky' : 'normal'));
+            setActiveGuestPicker(null);
           }}
         >
           <span className={`font-serif transition-colors ${isSticky ? 'text-lg xl:text-xl' : 'text-xl xl:text-3xl'} ${!checkIn ? 'text-[#1A1A1A]/30' : 'text-[#1A1A1A]'}`}>
             {!checkIn ? 'Add dates' : !checkOut ? `May ${checkIn} - Checkout` : `May ${checkIn} - May ${checkOut}`}
           </span>
-          <svg className={`w-4 h-4 text-[#1A1A1A]/40 transition-transform duration-500 transform ${isDatePickerOpen ? 'rotate-180 text-[#1A1A1A]' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={`w-4 h-4 text-[#1A1A1A]/40 transition-transform duration-500 transform ${activeDatePicker === (isSticky ? 'sticky' : 'normal') ? 'rotate-180 text-[#1A1A1A]' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M19 9l-7 7-7-7"></path>
           </svg>
         </div>
 
         {/* Simulated Luxury Calendar Dropdown */}
-        {isDatePickerOpen && (
+        {activeDatePicker === (isSticky ? 'sticky' : 'normal') && (
           <div className="absolute top-[120%] left-0 w-[400px] bg-[#F9F8F6] border border-[#1A1A1A]/10 shadow-[0_32px_64px_rgba(0,0,0,0.2)] z-50 p-8 animate-in fade-in slide-in-from-top-4 duration-500">
             <div className="flex justify-between items-center mb-8">
               <button onClick={(e) => e.stopPropagation()} className="text-[#1A1A1A]/40 hover:text-[#1A1A1A] transition-colors h-8 w-8 flex items-center justify-center border border-transparent hover:border-[#1A1A1A]/20">←</button>
@@ -89,7 +93,7 @@ export const Home: React.FC = () => {
                             setCheckOut(null);
                            } else {
                             setCheckOut(day);
-                            setIsDatePickerOpen(false);
+                            setActiveDatePicker(null);
                            }
                          } else {
                            setCheckIn(day);
@@ -113,8 +117,8 @@ export const Home: React.FC = () => {
         <div 
           className={`flex items-center justify-between w-full h-full ${isSticky ? 'py-0' : 'py-1'}`}
           onClick={() => {
-            setIsGuestPickerOpen(!isGuestPickerOpen);
-            setIsDatePickerOpen(false);
+            setActiveGuestPicker(activeGuestPicker === (isSticky ? 'sticky' : 'normal') ? null : (isSticky ? 'sticky' : 'normal'));
+            setActiveDatePicker(null);
           }}
         >
           <div className="flex flex-col">
@@ -127,13 +131,13 @@ export const Home: React.FC = () => {
               </span>
             )}
           </div>
-          <svg className={`w-4 h-4 text-[#1A1A1A]/40 transition-transform duration-500 transform ${isGuestPickerOpen ? 'rotate-180 text-[#1A1A1A]' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={`w-4 h-4 text-[#1A1A1A]/40 transition-transform duration-500 transform ${activeGuestPicker === (isSticky ? 'sticky' : 'normal') ? 'rotate-180 text-[#1A1A1A]' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M19 9l-7 7-7-7"></path>
           </svg>
         </div>
 
         {/* Guest Matrix Dropdown */}
-        {isGuestPickerOpen && (
+        {activeGuestPicker === (isSticky ? 'sticky' : 'normal') && (
           <div className="absolute top-[120%] right-0 w-[350px] bg-[#F9F8F6] border border-[#1A1A1A]/10 shadow-[0_32px_64px_rgba(0,0,0,0.2)] z-50 p-8 animate-in fade-in slide-in-from-top-4 duration-500">
             <div className="space-y-6">
               {/* Adults */}

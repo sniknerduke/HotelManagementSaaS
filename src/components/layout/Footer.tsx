@@ -30,18 +30,18 @@ export const Footer: React.FC = () => {
             <ul className="space-y-4 text-sm font-medium">
               <li><NavLink to="/" className="hover:text-[#D4AF37] transition-colors duration-500">The Estate</NavLink></li>
               <li><NavLink to="/search" className="hover:text-[#D4AF37] transition-colors duration-500">Destinations</NavLink></li>
-              <li><NavLink to="/#features" className="hover:text-[#D4AF37] transition-colors duration-500">Amenities</NavLink></li>
-              <li><span className="hover:text-[#D4AF37] transition-colors duration-500 cursor-pointer">Experiences</span></li>
+              <li><NavLink to="/amenities" className="hover:text-[#D4AF37] transition-colors duration-500">Amenities</NavLink></li>
+              <li><NavLink to="/experiences" className="hover:text-[#D4AF37] transition-colors duration-500">Experiences</NavLink></li>
             </ul>
           </div>
 
           <div className="md:col-span-2">
             <h3 className="text-[10px] uppercase tracking-[0.3em] text-[#6C6863] mb-6">Support</h3>
             <ul className="space-y-4 text-sm font-medium">
-              <li><span className="hover:text-[#D4AF37] transition-colors duration-500 cursor-pointer">Contact Us</span></li>
-              <li><span className="hover:text-[#D4AF37] transition-colors duration-500 cursor-pointer">FAQ</span></li>
-              <li><span className="hover:text-[#D4AF37] transition-colors duration-500 cursor-pointer">Privacy Policy</span></li>
-              <li><span className="hover:text-[#D4AF37] transition-colors duration-500 cursor-pointer">Terms of Service</span></li>
+              <li><NavLink to="/contact" className="hover:text-[#D4AF37] transition-colors duration-500">Contact Us</NavLink></li>
+              <li><NavLink to="/faq" className="hover:text-[#D4AF37] transition-colors duration-500">FAQ</NavLink></li>
+              <li><NavLink to="/privacy" className="hover:text-[#D4AF37] transition-colors duration-500">Privacy Policy</NavLink></li>
+              <li><NavLink to="/terms" className="hover:text-[#D4AF37] transition-colors duration-500">Terms of Service</NavLink></li>
             </ul>
           </div>
         </div>
@@ -49,9 +49,9 @@ export const Footer: React.FC = () => {
         <div className="pt-8 border-t border-[#F9F8F6]/10 flex flex-col md:flex-row items-center justify-between gap-6 text-[10px] uppercase tracking-[0.2em] text-[#6C6863]">
           <p>© {new Date().getFullYear()} The Lumière Estate. All rights reserved.</p>
           <div className="flex gap-6">
-            <span className="hover:text-[#F9F8F6] transition-colors duration-500 cursor-pointer">Instagram</span>
-            <span className="hover:text-[#F9F8F6] transition-colors duration-500 cursor-pointer">Facebook</span>
-            <span className="hover:text-[#F9F8F6] transition-colors duration-500 cursor-pointer">Twitter</span>
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#F9F8F6] transition-colors duration-500">Instagram</a>
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#F9F8F6] transition-colors duration-500">Facebook</a>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#F9F8F6] transition-colors duration-500">Twitter</a>
           </div>
         </div>
       </div>

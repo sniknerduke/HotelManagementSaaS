@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
+// import { Card } from '../components/ui/Card';
 import { useNavigate } from 'react-router-dom';
 
 export const Home: React.FC = () => {

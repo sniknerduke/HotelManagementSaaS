@@ -106,7 +106,7 @@ export const Profile: React.FC = () => {
                     </div>
                     <svg className="w-8 h-8 text-[#D4AF37] opacity-50 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                   </div>
-                  <Button variant="outline" className="w-full text-xs">View QR Key</Button>
+                  <Button variant="ghost" className="border border-[#1A1A1A]/20 w-full text-xs">View QR Key</Button>
                 </Card>
               </div>
 
@@ -187,7 +187,7 @@ export const Profile: React.FC = () => {
                         <p className="text-xs text-[#6C6863] mt-2">{booking.dates}</p>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-3">
-                      <Button variant="outline" className="text-xs h-9">Download Invoice</Button>
+                      <Button variant="ghost" className="border border-[#1A1A1A]/20 text-xs h-9">Download Invoice</Button>
                       <Button variant="primary" className="text-xs h-9 bg-[#1A1A1A] text-white">Leave a Review</Button>
                     </div>
                   </Card>
@@ -233,7 +233,7 @@ export const Profile: React.FC = () => {
                         <p className="font-serif text-[#1A1A1A] text-lg">Password</p>
                         <p className="text-xs text-[#6C6863] mt-1">Last changed 3 months ago</p>
                       </div>
-                      <Button variant="outline" className="text-xs bg-transparent">Reset Password</Button>
+                      <Button variant="ghost" className="border border-[#1A1A1A]/20 text-xs bg-transparent">Reset Password</Button>
                     </div>
 
                     {/* Language Toggle */}

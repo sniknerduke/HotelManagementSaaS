@@ -26,11 +26,6 @@ export const Header: React.FC = () => {
           <NavLink to="/contact" className={({isActive}) => cn("hover:text-[#D4AF37] transition-colors duration-500", isActive && "text-[#D4AF37] relative after:absolute after:-bottom-2 after:left-0 after:h-px after:w-full after:bg-[#D4AF37]")}>
             Contact
           </NavLink>
-          {isAdmin && (
-            <NavLink to="/dashboard" className={({isActive}) => cn("hover:text-[#D4AF37] transition-colors duration-500", isActive && "text-[#D4AF37] relative after:absolute after:-bottom-2 after:left-0 after:h-px after:w-full after:bg-[#D4AF37]")}>
-              Manage
-            </NavLink>
-          )}
         </nav>
 
         <div className="flex items-center gap-6 z-10 flex-1 justify-end">

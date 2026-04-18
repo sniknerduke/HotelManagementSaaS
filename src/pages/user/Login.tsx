@@ -11,7 +11,7 @@ export const Login: React.FC = () => {
   const handleDemoLogin = (role: 'GUEST' | 'ADMIN') => {
     login(role);
     if (role === 'ADMIN') {
-      navigate('/dashboard');
+      navigate('/admin');
     } else {
       navigate('/profile');
     }

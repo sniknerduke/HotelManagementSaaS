@@ -13,6 +13,7 @@ import { Experiences } from './pages/footer/Experiences';
 import { FAQ } from './pages/footer/FAQ';
 import { PrivacyPolicy } from './pages/footer/PrivacyPolicy';
 import { TermsOfService } from './pages/footer/TermsOfService';
+import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AuthProvider } from './context/AuthContext';
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
             <Route path='login' element={<Login />} />
             <Route path='register' element={<Register />} />
             <Route path='profile' element={<Profile />} />
+            <Route path='admin' element={<AdminDashboard />} />
           </Route>
         </Routes>
       </BrowserRouter>

@@ -1,0 +1,155 @@
+{
+  "nav": {
+    "home": "Trang Chủ",
+    "rooms": "Phòng & Suite",
+    "amenities": "Tiện Ích",
+    "contact": "Liên Hệ",
+    "signIn": "Đăng Nhập",
+    "bookNow": "Đặt Ngay"
+  },
+  "footer": {
+    "title1": "Đăng ký",
+    "title2": " nhận bản tin",
+    "title3": "độc quyền của chúng tôi.",
+    "emailPlaceholder": "Địa chỉ Email",
+    "subscribe": "Đăng Ký",
+    "explore": "Khám Phá",
+    "theEstate": "Khu Nghỉ Dưỡng",
+    "destinations": "Điểm Đến",
+    "amenities": "Tiện Ích",
+    "experiences": "Trải Nghiệm",
+    "support": "Hỗ Trợ",
+    "contactUs": "Liên Hệ",
+    "faq": "Câu Hỏi Thường Gặp",
+    "privacyPolicy": "Chính Sách Bảo Mật",
+    "termsOfService": "Điều Khoản Dịch Vụ",
+    "allRightsReserved": "The Lumière Estate. Đã đăng ký bản quyền."
+  },
+  "amenities": {
+    "hero": {
+      "subtitle": "Thiết Kế Tỉ Mỉ",
+      "title": "Nâng Tầm",
+      "titleItalic": "Tiện Ích.",
+      "description": "Sự kết hợp giữa vẻ đẹp vượt thời gian và sự hiện đại tinh tế cho sự thoải mái tối đa của bạn."
+    },
+    "core": {
+      "title": "Cơ Sở Vật Chất Cốt Lõi",
+      "wifi": "Wi-Fi Tốc Độ Cao",
+      "pool": "Hồ Bơi (Trong Nhà/Ngoài Trời)",
+      "fitness": "Trung Tâm Thể Hình / Gym",
+      "spa": "Trung Tâm Spa & Chăm Sóc Sức Khỏe",
+      "restaurant": "Nhà Hàng & Quầy Bar Tại Chỗ",
+      "business": "Trung Tâm Doanh Nhân / Phòng Hội Nghị",
+      "parking": "Bãi Đậu Xe An Toàn / Dịch Vụ Đỗ Xe"
+    },
+    "inRoom": {
+      "title": "Tiện Nghi Trong Phòng",
+      "ac": "Điều Hòa / Kiểm Soát Khí Hậu",
+      "tv": "TV Màn Hình Phẳng",
+      "minibar": "Minibar Được Tuyển Chọn",
+      "bathroom": "Phòng Tắm Riêng (Bồn Tắm/Vòi Hoa Sen)",
+      "safe": "Két Sắt An Toàn",
+      "coffee": "Máy Pha Cà Phê / Trà"
+    },
+    "services": {
+      "title": "Dịch Vụ Khách Hàng",
+      "frontDesk": "Lễ Tân & Phục Vụ 24/7",
+      "roomService": "Phục Vụ Tại Phòng (24 giờ hoặc có hạn chế)",
+      "shuttle": "Xe Đưa Đón Sân Bay",
+      "laundry": "Dịch Vụ Giặt Ủi",
+      "housekeeping": "Dọn Phòng Hàng Ngày"
+    },
+    "testimonials": {
+      "subtitle": "Di Sản Của Sự Xuất Sắc",
+      "title": "Được Tôn Vinh Bởi Những",
+      "titleItalic": "Tầm Vóc.",
+      "quote1": "\"Một chuẩn mực của sự sang trọng hiện đại. Họ đã hoàn thiện nghệ thuật hiếu khách, mang đến một nơi ẩn náu vô song khỏi thế giới với sự chú ý tỉ mỉ đến từng chi tiết.\"",
+      "author1": "Tạp chí Vogue",
+      "context1": "Đánh giá biên tập, 2025",
+      "quote2": "\"Dịch vụ không chỉ đáp ứng mong đợi của bạn; nó còn dự đoán nhu cầu của bạn trước khi bạn nhận ra chúng. Thực sự là đỉnh cao của một nơi nghỉ dưỡng được tuyển chọn.\"",
+      "author2": "Leonardo DiCaprio",
+      "context2": "Khách hàng riêng"
+    }
+  },
+  "checkout": {
+    "title": "Hoàn tất",
+    "titleItalic": "đặt phòng của bạn.",
+    "steps": {
+      "details": "01 Thông tin",
+      "payment": "02 Thanh toán",
+      "confirmation": "03 Xác nhận"
+    },
+    "guestInfo": {
+      "title": "Thông Tin Khách Hàng",
+      "firstName": "Tên",
+      "lastName": "Họ",
+      "email": "Địa chỉ Email",
+      "phone": "Số Điện Thoại",
+      "continue": "Tiếp tục thanh toán"
+    },
+    "paymentDetails": {
+      "title": "Chi Tiết Thanh Toán",
+      "cardholder": "Tên Chủ Thẻ",
+      "cardNumber": "Số Thẻ",
+      "expiry": "Ngày Hết Hạn",
+      "cvc": "Mã Bảo Mật",
+      "secure": "Mọi giao dịch đều được bảo mật và mã hóa.",
+      "back": "Quay lại thông tin",
+      "confirm": "Xác Nhận Đặt Phòng"
+    },
+    "confirmation": {
+      "status": "Đã Xác Nhận Đặt Phòng",
+      "thanks": "Cảm ơn bạn đã",
+      "thanksItalic": "chọn Lumière.",
+      "reference": "Mã số đặt phòng của bạn là",
+      "viewStays": "Xem các kỳ nghỉ của tôi"
+    },
+    "summary": {
+      "title": "Kỳ nghỉ của bạn",
+      "nights": "{{count}} Đêm (${{price}}/đêm)",
+      "taxes": "Thuế & Phí",
+      "total": "Tổng cộng"
+    }
+  },
+  "contact": {
+    "hero": {
+      "subtitle": "Chúng Tôi Luôn Sẵn Sàng Hỗ Trợ",
+      "title": "Liên Hệ",
+      "titleItalic": "Chúng Tôi."
+    },
+    "form": {
+      "title": "Gửi tin nhắn cho",
+      "titleItalic": "chúng tôi.",
+      "fullName": "Họ và Tên",
+      "email": "Địa chỉ Email",
+      "phone": "Số Điện Thoại",
+      "optional": "(Tùy chọn)",
+      "subject": {
+        "label": "Chủ đề",
+        "general": "Yêu cầu Chung",
+        "modification": "Thay đổi Đặt phòng",
+        "feedback": "Phản hồi",
+        "other": "Khác"
+      },
+      "message": "Nội dung Tin nhắn",
+      "placeholder": "Chúng tôi có thể giúp gì cho bạn hôm nay?",
+      "submit": "Gửi Yêu Cầu"
+    },
+    "info": {
+      "location": "Vị Trí Khu Nghỉ Dưỡng",
+      "directions": "Chỉ dẫn đường đi",
+      "airport": "Từ Sân bay Quốc tế Metropolis:",
+      "airportDesc": "40 phút qua đường I-90 West, hoặc chúng tôi có thể sắp xếp xe đưa đón riêng.",
+      "train": "Từ Ga Tàu Trung tâm Central Grand:",
+      "trainDesc": "10 phút qua tuyến Metro A đến Ga Luxury Ave.",
+      "direct": "Liên Hệ Trực Tiếp",
+      "frontDesk": "Quầy Lễ Tân",
+      "reservations": "Bộ Phận Đặt Phòng",
+      "email": "Email Chính Thức",
+      "support": "Hỗ Trợ & Liên Kết",
+      "faq": "Câu Hỏi Thường Gặp",
+      "instagram": "Trang Instagram",
+      "twitter": "Cập nhật X (Twitter)"
+    }
+  }
+}

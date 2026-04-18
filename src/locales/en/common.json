@@ -1,0 +1,155 @@
+{
+  "nav": {
+    "home": "Home",
+    "rooms": "Rooms & Suites",
+    "amenities": "Amenities",
+    "contact": "Contact",
+    "signIn": "Sign In",
+    "bookNow": "Book Now"
+  },
+  "footer": {
+    "title1": "Sign up",
+    "title2": " for our",
+    "title3": "exclusive newsletters.",
+    "emailPlaceholder": "Email Address",
+    "subscribe": "Subscribe",
+    "explore": "Explore",
+    "theEstate": "The Estate",
+    "destinations": "Destinations",
+    "amenities": "Amenities",
+    "experiences": "Experiences",
+    "support": "Support",
+    "contactUs": "Contact Us",
+    "faq": "FAQ",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "allRightsReserved": "The Lumière Estate. All rights reserved."
+  },
+  "amenities": {
+    "hero": {
+      "subtitle": "Meticulously Designed",
+      "title": "Elevated",
+      "titleItalic": "Amenities.",
+      "description": "Blending timeless elegance with modern sophistication for your utmost comfort."
+    },
+    "core": {
+      "title": "Core Facilities",
+      "wifi": "High-Speed Wi-Fi",
+      "pool": "Swimming Pool (Indoor/Outdoor)",
+      "fitness": "Fitness Center / Gym",
+      "spa": "Spa & Wellness Center",
+      "restaurant": "On-site Restaurant & Bar",
+      "business": "Business Center / Conference Rooms",
+      "parking": "Secure Parking / Valet Parking"
+    },
+    "inRoom": {
+      "title": "In-Room Amenities",
+      "ac": "Air Conditioning / Climate Control",
+      "tv": "Flat-screen TV",
+      "minibar": "Curated Minibar",
+      "bathroom": "En-suite Bathroom (Bathtub/Shower)",
+      "safe": "Safe Deposit Box",
+      "coffee": "Coffee / Tea Maker"
+    },
+    "services": {
+      "title": "Guest Services",
+      "frontDesk": "24/7 Front Desk & Concierge",
+      "roomService": "Room Service (24 hours or limited)",
+      "shuttle": "Airport Shuttle",
+      "laundry": "Laundry & Dry Cleaning Service",
+      "housekeeping": "Daily Housekeeping"
+    },
+    "testimonials": {
+      "subtitle": "A Legacy of Excellence",
+      "title": "Acclaimed by",
+      "titleItalic": "visionaries.",
+      "quote1": "\"A paradigm of modern luxury. They have perfected the art of hospitality, offering an unparalleled refuge from the world with meticulous attention to detail.\"",
+      "author1": "Vogue Magazine",
+      "context1": "Editorial Review, 2025",
+      "quote2": "\"The service doesn't just meet your expectations; it anticipates your needs before you even realize them. Truly the pinnacle of a curated retreat.\"",
+      "author2": "Leonardo DiCaprio",
+      "context2": "Private Guest"
+    }
+  },
+  "checkout": {
+    "title": "Complete your",
+    "titleItalic": "reservation.",
+    "steps": {
+      "details": "01 Details",
+      "payment": "02 Payment",
+      "confirmation": "03 Confirmation"
+    },
+    "guestInfo": {
+      "title": "Guest Information",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "continue": "Continue to Payment"
+    },
+    "paymentDetails": {
+      "title": "Payment Details",
+      "cardholder": "Cardholder Name",
+      "cardNumber": "Card Number",
+      "expiry": "Expiration Date",
+      "cvc": "Security Code",
+      "secure": "All transactions are secure and encrypted.",
+      "back": "Back to Details",
+      "confirm": "Confirm Reservation"
+    },
+    "confirmation": {
+      "status": "Reservation Confirmed",
+      "thanks": "Thank you for",
+      "thanksItalic": "choosing Lumière.",
+      "reference": "Your booking reference is",
+      "viewStays": "View My Stays"
+    },
+    "summary": {
+      "title": "Your Stay",
+      "nights": "{{count}} Nights (${{price}}/night)",
+      "taxes": "Taxes & Fees",
+      "total": "Total"
+    }
+  },
+  "contact": {
+    "hero": {
+      "subtitle": "Here To Assist You",
+      "title": "Contact",
+      "titleItalic": "Us."
+    },
+    "form": {
+      "title": "Send us a",
+      "titleItalic": "message.",
+      "fullName": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "optional": "(Optional)",
+      "subject": {
+        "label": "Subject",
+        "general": "General Inquiry",
+        "modification": "Reservation Modification",
+        "feedback": "Feedback",
+        "other": "Other"
+      },
+      "message": "Message Body",
+      "placeholder": "How can we assist you today?",
+      "submit": "Submit Request"
+    },
+    "info": {
+      "location": "Property Location",
+      "directions": "Directions",
+      "airport": "From Metropolis International Airport:",
+      "airportDesc": "40 minutes via I-90 West, or let us arrange private airport transfer.",
+      "train": "From Central Grand Train Station:",
+      "trainDesc": "10 minutes via Metro Line A to Luxury Ave Station.",
+      "direct": "Direct Contact",
+      "frontDesk": "Front Desk",
+      "reservations": "Reservations Department",
+      "email": "Official Email",
+      "support": "Support & Links",
+      "faq": "Frequently Asked Questions",
+      "instagram": "Instagram Profile",
+      "twitter": "X (Twitter) Updates"
+    }
+  }
+}

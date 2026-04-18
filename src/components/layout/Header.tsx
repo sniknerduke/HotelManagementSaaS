@@ -15,6 +15,12 @@ export const Header: React.FC = () => {
           <NavLink to="/search" className={({isActive}) => cn("hover:text-[#D4AF37] transition-colors duration-500", isActive && "text-[#D4AF37] relative after:absolute after:-bottom-2 after:left-0 after:h-px after:w-full after:bg-[#D4AF37]")}>
             Destinations
           </NavLink>
+          <NavLink
+            to="/search"
+            className={({isActive}) => cn("uppercase text-[10px] tracking-[0.2em] font-medium border-b border-[#1A1A1A] pb-1 hover:text-[#D4AF37] hover:border-[#D4AF37] transition-all duration-500", isActive && "text-[#D4AF37] border-[#D4AF37]")}
+          >
+            Check Availability
+          </NavLink>
           <NavLink to="/dashboard" className={({isActive}) => cn("hover:text-[#D4AF37] transition-colors duration-500", isActive && "text-[#D4AF37] relative after:absolute after:-bottom-2 after:left-0 after:h-px after:w-full after:bg-[#D4AF37]")}>
             Manage
           </NavLink>
@@ -28,12 +34,6 @@ export const Header: React.FC = () => {
           </div>
           <NavLink to="/login" className="hidden sm:block text-xs uppercase tracking-[0.25em] font-medium text-[#1A1A1A] hover:text-[#D4AF37] transition-colors mr-4">
             Sign In
-          </NavLink>
-          <NavLink
-            to="/search"
-            className="uppercase text-[10px] tracking-[0.2em] font-medium border-b border-[#1A1A1A] pb-1 hover:text-[#D4AF37] hover:border-[#D4AF37] transition-all duration-500"
-          >
-            Check Availability
           </NavLink>
         </div>
       </div>

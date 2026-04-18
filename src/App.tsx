@@ -7,22 +7,25 @@ import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Profile } from './pages/Profile';
 import { Checkout } from './pages/Checkout';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path='search' element={<SearchResults />} />
-          <Route path='checkout' element={<Checkout />} />
-          <Route path='dashboard' element={<Dashboard />} />
-          <Route path='login' element={<Login />} />
-          <Route path='register' element={<Register />} />
-          <Route path='profile' element={<Profile />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path='/' element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path='search' element={<SearchResults />} />
+            <Route path='checkout' element={<Checkout />} />
+            <Route path='dashboard' element={<Dashboard />} />
+            <Route path='login' element={<Login />} />
+            <Route path='register' element={<Register />} />
+            <Route path='profile' element={<Profile />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

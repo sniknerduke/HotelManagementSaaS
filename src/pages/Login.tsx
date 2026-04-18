@@ -1,9 +1,22 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
+import { useAuth } from '../context/AuthContext';
 
 export const Login: React.FC = () => {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleDemoLogin = (role: 'GUEST' | 'ADMIN') => {
+    login(role);
+    if (role === 'ADMIN') {
+      navigate('/dashboard');
+    } else {
+      navigate('/profile');
+    }
+  };
+
   return (
     <div className="flex-1 flex items-center justify-center py-20 px-8">
       <div className="w-full max-w-md">
@@ -16,10 +29,10 @@ export const Login: React.FC = () => {
           </p>
         </div>
 
-        <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
+        <form className="space-y-8" onSubmit={(e) => { e.preventDefault(); handleDemoLogin('GUEST'); }}>
           <div className="space-y-6">
-            <Input label="Email Address" type="email" placeholder="Enter your email" required />
-            <Input label="Password" type="password" placeholder="Enter your password" required />
+            <Input label="Email Address" type="email" placeholder="Enter your email" />
+            <Input label="Password" type="password" placeholder="Enter your password" />
           </div>
 
           <div className="flex items-center justify-between">
@@ -32,7 +45,10 @@ export const Login: React.FC = () => {
             </a>
           </div>
 
-          <Button type="submit" className="w-full">Sign In</Button>
+          <div className="space-y-4 pt-4">
+            <Button type="button" onClick={() => handleDemoLogin('GUEST')} className="w-full">Sign In as Guest</Button>
+            <Button type="button" onClick={() => handleDemoLogin('ADMIN')} variant="secondary" className="w-full border-[#1A1A1A]">Sign In as Admin</Button>
+          </div>
         </form>
 
         <div className="mt-12 text-center border-t border-[#1A1A1A]/10 pt-8">

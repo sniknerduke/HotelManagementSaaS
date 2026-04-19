@@ -548,6 +548,7 @@
     "passwordPlaceholder": "Nhập mật khẩu của bạn",
     "rememberMe": "Ghi nhớ tôi",
     "forgotPassword": "Quên mật khẩu?",
+    "signIn": "Đăng Nhập",
     "signInGuest": "Đăng nhập với tư cách Khách",
     "signInAdmin": "Đăng nhập với tư cách Admin",
     "noAccount": "Chưa có tài khoản?",

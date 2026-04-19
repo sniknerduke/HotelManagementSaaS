@@ -524,6 +524,7 @@
     "passwordPlaceholder": "Enter your password",
     "rememberMe": "Remember me",
     "forgotPassword": "Forgot Password?",
+    "signIn": "Sign In",
     "signInGuest": "Sign In as Guest",
     "signInAdmin": "Sign In as Admin",
     "noAccount": "Don't have an account?",

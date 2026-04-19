@@ -7,7 +7,7 @@ export type User = { id: string; email: string; firstName: string; lastName: str
 interface AuthContextType {
   user: User;
   token: string | null;
-  login: (token: string, userId: string) => Promise<void>;
+  login: (token: string, userId: string) => Promise<any>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -50,8 +50,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const userData = await AuthService.getProfile(userId);
       setUser(userData);
+      return userData;
     } catch (error) {
       console.error("Failed to load profile", error);
+      return null;
     }
   };
 

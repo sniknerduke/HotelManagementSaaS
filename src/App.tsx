@@ -6,6 +6,7 @@ import { Dashboard } from './pages/user/Dashboard';
 import { Login } from './pages/user/Login';
 import { Register } from './pages/user/Register';
 import { Profile } from './pages/user/Profile';
+import { AuthCallback } from './pages/user/AuthCallback';
 import { Checkout } from './pages/Checkout';
 import { Amenities } from './pages/Amenities';
 import { Contact } from './pages/Contact';
@@ -34,6 +35,7 @@ function App() {
             <Route path='dashboard' element={<Dashboard />} />
             <Route path='login' element={<Login />} />
             <Route path='register' element={<Register />} />
+            <Route path='oauth/callback' element={<AuthCallback />} />
             <Route path='profile' element={<Profile />} />
             <Route path='admin' element={<AdminDashboard />} />
           </Route>

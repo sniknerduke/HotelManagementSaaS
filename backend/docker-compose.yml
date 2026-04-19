@@ -1,0 +1,166 @@
+version: "3.9"
+
+services:
+  # ========================
+  # PostgreSQL Databases
+  # ========================
+  user-db:
+    image: postgres:16-alpine
+    container_name: hotel-user-db
+    environment:
+      POSTGRES_DB: hotel_user_db
+      POSTGRES_USER: hotel
+      POSTGRES_PASSWORD: hotel_secret
+    ports:
+      - "5481:5432"
+    volumes:
+      - user-db-data:/var/lib/postgresql/data
+    networks:
+      - hotel-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hotel -d hotel_user_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  inventory-db:
+    image: postgres:16-alpine
+    container_name: hotel-inventory-db
+    environment:
+      POSTGRES_DB: hotel_inventory_db
+      POSTGRES_USER: hotel
+      POSTGRES_PASSWORD: hotel_secret
+    ports:
+      - "5482:5432"
+    volumes:
+      - inventory-db-data:/var/lib/postgresql/data
+    networks:
+      - hotel-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hotel -d hotel_inventory_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  booking-db:
+    image: postgres:16-alpine
+    container_name: hotel-booking-db
+    environment:
+      POSTGRES_DB: hotel_booking_db
+      POSTGRES_USER: hotel
+      POSTGRES_PASSWORD: hotel_secret
+    ports:
+      - "5483:5432"
+    volumes:
+      - booking-db-data:/var/lib/postgresql/data
+    networks:
+      - hotel-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hotel -d hotel_booking_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  payment-db:
+    image: postgres:16-alpine
+    container_name: hotel-payment-db
+    environment:
+      POSTGRES_DB: hotel_payment_db
+      POSTGRES_USER: hotel
+      POSTGRES_PASSWORD: hotel_secret
+    ports:
+      - "5484:5432"
+    volumes:
+      - payment-db-data:/var/lib/postgresql/data
+    networks:
+      - hotel-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hotel -d hotel_payment_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ========================
+  # Quarkus Microservices
+  # ========================
+  user-service:
+    build:
+      context: .
+      dockerfile: user-service/Dockerfile
+    container_name: hotel-user-service
+    ports:
+      - "8081:8081"
+    environment:
+      QUARKUS_PROFILE: docker
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://user-db:5432/hotel_user_db
+      QUARKUS_DATASOURCE_USERNAME: hotel
+      QUARKUS_DATASOURCE_PASSWORD: hotel_secret
+    depends_on:
+      user-db:
+        condition: service_healthy
+    networks:
+      - hotel-network
+
+  inventory-service:
+    build:
+      context: .
+      dockerfile: inventory-service/Dockerfile
+    container_name: hotel-inventory-service
+    ports:
+      - "8082:8082"
+    environment:
+      QUARKUS_PROFILE: docker
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://inventory-db:5432/hotel_inventory_db
+      QUARKUS_DATASOURCE_USERNAME: hotel
+      QUARKUS_DATASOURCE_PASSWORD: hotel_secret
+    depends_on:
+      inventory-db:
+        condition: service_healthy
+    networks:
+      - hotel-network
+
+  booking-service:
+    build:
+      context: .
+      dockerfile: booking-service/Dockerfile
+    container_name: hotel-booking-service
+    ports:
+      - "8083:8083"
+    environment:
+      QUARKUS_PROFILE: docker
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://booking-db:5432/hotel_booking_db
+      QUARKUS_DATASOURCE_USERNAME: hotel
+      QUARKUS_DATASOURCE_PASSWORD: hotel_secret
+    depends_on:
+      booking-db:
+        condition: service_healthy
+    networks:
+      - hotel-network
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: payment-service/Dockerfile
+    container_name: hotel-payment-service
+    ports:
+      - "8084:8084"
+    environment:
+      QUARKUS_PROFILE: docker
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://payment-db:5432/hotel_payment_db
+      QUARKUS_DATASOURCE_USERNAME: hotel
+      QUARKUS_DATASOURCE_PASSWORD: hotel_secret
+    depends_on:
+      payment-db:
+        condition: service_healthy
+    networks:
+      - hotel-network
+
+volumes:
+  user-db-data:
+  inventory-db-data:
+  booking-db-data:
+  payment-db-data:
+
+networks:
+  hotel-network:
+    driver: bridge

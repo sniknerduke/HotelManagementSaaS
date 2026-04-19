@@ -55,12 +55,17 @@ export const Contact: React.FC = () => {
                             </div>
                             <div className="flex flex-col">
                                 <label className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-2">{t('contact.form.subject.label')}</label>
-                                <select required className="w-full bg-transparent border-b border-[#1A1A1A]/20 py-3 outline-none focus:border-[#D4AF37] transition-colors font-serif text-lg text-[#1A1A1A] appearance-none cursor-pointer">
-                                    <option value="General Inquiry">{t('contact.form.subject.general')}</option>
-                                    <option value="Reservation Modification">{t('contact.form.subject.modification')}</option>
-                                    <option value="Feedback">{t('contact.form.subject.feedback')}</option>
-                                    <option value="Other">{t('contact.form.subject.other')}</option>
-                                </select>
+                                <div className="relative">
+                                    <select required className="w-full bg-transparent border-b border-[#1A1A1A]/20 py-3 pr-8 outline-none focus:border-[#D4AF37] transition-colors font-serif text-lg text-[#1A1A1A] appearance-none cursor-pointer relative z-10">
+                                        <option value="General Inquiry" className="font-serif bg-[#F9F8F6] text-[#1A1A1A] pl-4 py-2">{t('contact.form.subject.general')}</option>
+                                        <option value="Reservation Modification" className="font-serif bg-[#F9F8F6] text-[#1A1A1A] pl-4 py-2">{t('contact.form.subject.modification')}</option>
+                                        <option value="Feedback" className="font-serif bg-[#F9F8F6] text-[#1A1A1A] pl-4 py-2">{t('contact.form.subject.feedback')}</option>
+                                        <option value="Other" className="font-serif bg-[#F9F8F6] text-[#1A1A1A] pl-4 py-2">{t('contact.form.subject.other')}</option>
+                                    </select>
+                                    <svg className="w-4 h-4 text-[#1A1A1A]/50 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none z-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
                             </div>
                         </div>
 

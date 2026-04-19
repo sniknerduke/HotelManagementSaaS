@@ -5,7 +5,129 @@
     "amenities": "Tiện Ích",
     "contact": "Liên Hệ",
     "signIn": "Đăng Nhập",
-    "bookNow": "Đặt Ngay"
+    "bookNow": "Đặt Ngay",
+    "profile": "Hồ sơ"
+  },
+  "dashboard": {
+    "title": "Quản lý",
+    "nav": {
+      "overview": "Tổng quan",
+      "reservations": "Đặt phòng",
+      "inventory": "Kho hàng",
+      "guests": "Khách hàng",
+      "settings": "Cài đặt"
+    },
+    "metrics": {
+      "title": "Chỉ số",
+      "titleItalic": "Hiệu suất",
+      "occupancy": "Công suất phòng hôm nay",
+      "checkIns": "Nhận phòng chờ xử lý",
+      "revenue": "Doanh thu (Tháng)"
+    },
+    "recent": {
+      "title": "Đơn đặt gần đây",
+      "viewAll": "Xem lịch"
+    },
+    "table": {
+      "guest": "Khách hàng",
+      "dates": "Ngày",
+      "residence": "Chỗ ở",
+      "status": "Trạng thái",
+      "action": "Hành động",
+      "confirmed": "Đã xác nhận",
+      "pending": "Đang chờ",
+      "manage": "Quản lý"
+    },
+    "rooms": {
+      "grandSuite": "Căn hộ Grand Suite",
+      "oceanVilla": "Biệt thự Hướng biển"
+    }
+  },
+  "profile": {
+    "welcome": "Chào mừng,",
+    "activeStay": "Kỳ nghỉ hiện tại",
+    "reservations": "Đơn đặt phòng",
+    "management": "Quản lý hồ sơ",
+    "payment": "Phương thức thanh toán",
+    "preferences": "Sở thích cá nhân",
+    "signOut": "Đăng xuất",
+    "currentStay": {
+      "title": "Kỳ nghỉ",
+      "titleItalic": "hiện tại của bạn",
+      "checkedIn": "Đã nhận phòng",
+      "roomDetails": "Chi tiết phòng",
+      "digitalAccess": "Truy cập Kỹ thuật số",
+      "wifiCreds": "Khóa số & WiFi",
+      "network": "Mạng",
+      "password": "Mật khẩu",
+      "viewQr": "Tạo mã QR khóa số",
+      "liveFolio": "Hóa đơn trực tiếp & Chi phí",
+      "roomRate": "Giá phòng",
+      "dining": "Ẩm thực & Bar",
+      "spa": "Dịch vụ Spa",
+      "balance": "Tổng số dư"
+    },
+    "manageBookings": {
+      "upcoming": "Sắp",
+      "reservations": "đến",
+      "conf": "Mã xác nhận #",
+      "totalCost": "Tổng chi phí",
+      "modify": "Sửa đổi đặt phòng",
+      "cancel": "Hủy đặt",
+      "noUpcoming": "Bạn không có đơn đặt phòng nào sắp tới.",
+      "past": "Các kỳ nghỉ",
+      "stays": "trước đây",
+      "downloadInvoice": "Tải hóa đơn",
+      "leaveReview": "Viết đánh giá",
+      "noPast": "Không tìm thấy lịch sử kỳ nghỉ nào."
+    },
+    "personalDetails": {
+      "title": "Thông tin",
+      "titleItalic": "Cá nhân",
+      "firstName": "Tên",
+      "lastName": "Họ",
+      "email": "Địa chỉ Email",
+      "phone": "Số điện thoại"
+    },
+    "accountSettings": {
+      "title": "Cài đặt",
+      "titleItalic": "Tài khoản",
+      "password": "Mật khẩu",
+      "lastChanged": "Cập nhật {{count}} tháng trước",
+      "resetPassword": "Đặt lại mật khẩu",
+      "langPref": "Sở thích ngôn ngữ",
+      "langDesc": "Chọn ngôn ngữ giao diện ưu tiên của bạn",
+      "saveChanges": "Lưu thay đổi"
+    },
+    "paymentMethods": {
+      "title": "Phương thức",
+      "titleItalic": "Thanh toán",
+      "expires": "Hết hạn",
+      "remove": "Xóa",
+      "addNew": "Thêm thẻ mới"
+    },
+    "guestPreferences": {
+      "title": "Sở thích",
+      "titleItalic": "Khách hàng",
+      "subtitle": "Giúp chúng tôi điều chỉnh trải nghiệm của bạn tại The Lumière Estate",
+      "roomReq": "Yêu cầu về phòng",
+      "prefs": {
+        "highFloor": "Ưu tiên tầng cao",
+        "nearElevator": "Gần thang máy",
+        "awayElevator": "Xa thang máy",
+        "accessibility": "Tiếp cận cho người khuyết tật",
+        "extraPillows": "Thêm gối lông vũ",
+        "firmMattress": "Yêu cầu nệm cứng"
+      },
+      "dietary": "Hạn chế Chế độ ăn uống & Dị ứng",
+      "dietaryPlaceholder": "Vui lòng mô tả bất kỳ dị ứng hoặc sở thích ăn uống nào...",
+      "notifications": "Cài đặt Thông báo",
+      "emailAlerts": "Bản tin Email",
+      "emailDesc": "Nhận ưu đãi độc quyền và cập nhật từ khu nghỉ dưỡng",
+      "smsAlerts": "Thông báo SMS",
+      "smsDesc": "Nhận cập nhật đặt phòng và nhắc nhở nhận phòng",
+      "update": "Cập nhật sở thích"
+    }
   },
   "footer": {
     "title1": "Đăng ký",
@@ -134,6 +256,133 @@
       "breakfast": "Bữa sáng miễn phí"
     }
   },
+  "admin": {
+    "sidebar": {
+      "title": "Quản trị",
+      "overview": "1. Tổng quan Toàn cầu",
+      "reservations": "2. Đặt phòng",
+      "inventory": "3. Kho & Phòng",
+      "users": "4. Người dùng & Nhân viên",
+      "reports": "5. Báo cáo & Phân tích",
+      "settings": "6. Cài đặt Hệ thống"
+    },
+    "overview": {
+      "title": "Bảng",
+      "titleItalic": "Điều khiển",
+      "metrics": "Số liệu Thời gian thực",
+      "occupancy": "Tỷ lệ Lấp đầy",
+      "occupancyChange": "+5% so với tuần trước",
+      "availableRooms": "Phòng Trống",
+      "totalRooms": "Tổng số 160 phòng",
+      "dailyRevenue": "Doanh thu Hàng ngày",
+      "revenueChange": "+12% so với hôm qua",
+      "operations": "Vận hành Hàng ngày",
+      "expectedCheckins": "Nhận phòng Dự kiến",
+      "pending": "Đang chờ",
+      "expectedCheckouts": "Trả phòng Dự kiến",
+      "completed": "Đã xong",
+      "stayOvers": "Khách lưu trú",
+      "actionNeeded": "Cần Xử lý (Cảnh báo)",
+      "overbooked": "Loại phòng vượt mức",
+      "overbookedDesc": "Standard King đang bị đặt vượt 2 phòng cho ngày 15/10.",
+      "paymentFailure": "Lỗi Thanh toán",
+      "paymentFailureDesc": "Tiền đặt cọc bị lỗi cho Mã xác nhận #RES-1042.",
+      "pendingRequest": "Yêu cầu từ Khách",
+      "pendingRequestDesc": "Phòng 304 yêu cầu trả phòng muộn."
+    },
+    "reservations": {
+      "title": "Quầy",
+      "titleItalic": "Lễ tân",
+      "walkIn": "Đặt trực tiếp",
+      "calendar": "Lịch / Lưới",
+      "searchPlaceholder": "Tìm theo Tên, Mã, hoặc Phòng",
+      "statusAll": "Trạng thái: Tất cả",
+      "checkedIn": "Đã Nhận phòng",
+      "reserved": "Đã Đặt",
+      "checkedOut": "Đã Trả phòng",
+      "table": {
+        "guest": "Khách",
+        "conf": "Mã xác nhận",
+        "room": "Phòng",
+        "dates": "Ngày",
+        "status": "Trạng thái",
+        "actions": "Thao tác",
+        "edit": "Sửa",
+        "checkIn": "Nhận phòng",
+        "checkOut": "Trả phòng"
+      }
+    },
+    "inventory": {
+      "title": "Quản lý",
+      "titleItalic": "Kho",
+      "addCategory": "+ Thêm Danh mục",
+      "roomStatus": "Kiểm soát Trạng thái Phòng",
+      "setStatus": "Đặt Trạng thái",
+      "available": "Sẵn sàng",
+      "occupied": "Đang ở",
+      "cleaning": "Đang dọn dẹp",
+      "maintenance": "Bảo trì",
+      "rateControl": "Cài đặt Giá Mặc định",
+      "seasonalMultipliers": "Hệ số Theo mùa",
+      "highSeason": "Hệ số Mùa cao điểm",
+      "activePromotions": "Ưu đãi Đang hoạt động",
+      "editPricing": "Sửa Quy tắc Giá"
+    },
+    "users": {
+      "title": "Nhân viên",
+      "titleItalic": "& Vai trò",
+      "register": "+ Đăng ký Tài khoản",
+      "table": {
+        "name": "Tên",
+        "role": "Vai trò (RBAC)",
+        "dept": "Phòng ban",
+        "settings": "Cài đặt"
+      },
+      "roles": {
+        "manager": "Quản lý Chung",
+        "frontDesk": "Nhân viên Lễ tân",
+        "cleaning": "Dọn phòng"
+      },
+      "actions": {
+        "edit": "Sửa Vai trò",
+        "suspend": "Tạm dừng"
+      },
+      "crm": {
+        "title": "CSDL Khách hàng CRM",
+        "description": "Truy cập hồ sơ lịch sử khách hàng, thời gian lưu trú và ghi chú nội bộ.",
+        "open": "Mở Module CRM"
+      }
+    },
+    "reports": {
+      "title": "Xuất dữ liệu",
+      "titleItalic": "& Phân tích",
+      "financial": "Sổ cái Tài chính",
+      "financialDesc": "Báo cáo doanh thu, thuế và định tuyến cổng thanh toán.",
+      "operational": "Danh sách Vận hành",
+      "operationalDesc": "Danh sách dọn dẹp, lịch bảo trì và ăn uống hàng ngày.",
+      "revenueLedger": "Sổ cái Doanh thu Tháng",
+      "taxRemittance": "Báo cáo Thuế (Q3)",
+      "housekeepingRoute": "Lịch dọn dẹp Hôm nay",
+      "occupancyForecast": "Dự báo Lấp đầy (30 ngày)",
+      "exportCSV": "Xuất CSV",
+      "downloadPDF": "Tải PDF",
+      "printPDF": "In PDF"
+    },
+    "settings": {
+      "title": "Cấu hình",
+      "titleItalic": "Toàn cầu",
+      "propertyMeta": "Thông tin Tài sản",
+      "hotelName": "Tên Khách sạn Chính thức",
+      "taxRate": "Thuế suất Tiêu chuẩn (%)",
+      "currency": "Tiền tệ Cơ sở",
+      "integrations": "Tích hợp Bên thứ ba",
+      "apiActive": "Khóa API Đang hoạt động",
+      "disconnected": "Đã ngắt kết nối",
+      "renewToken": "Làm mới Token",
+      "provideKey": "Cung cấp Khóa",
+      "saveChanges": "Lưu Thay đổi Toàn cầu"
+    }
+  },
   "contact": {
     "hero": {
       "subtitle": "Chúng Tôi Luôn Sẵn Sàng Hỗ Trợ",
@@ -151,8 +400,8 @@
         "label": "Chủ đề",
         "general": "Yêu cầu Chung",
         "modification": "Thay đổi Đặt phòng",
-        "feedback": "Phản hồi",
-        "other": "Khác"
+        "feedback": "Chia sẻ Trải nghiệm",
+        "other": "Yêu cầu Khác"
       },
       "message": "Nội dung Tin nhắn",
       "placeholder": "Chúng tôi có thể giúp gì cho bạn hôm nay?",
@@ -182,6 +431,142 @@
       "instagram": "Trang Instagram",
       "twitter": "Cập nhật X (Twitter)"
     }
+  },
+  "experiences": {
+    "title": "Trải nghiệm",
+    "titleItalic": "Chọn lọc.",
+    "description": "Đắm mình trong những khoảnh khắc phi thường được thiết kế riêng cho khách hàng của chúng tôi. Từ thuê du thuyền riêng đến các lớp học ẩm thực cá nhân hóa, hãy nâng tầm kỳ nghỉ của bạn trên cả sự mong đợi.",
+    "items": {
+      "gastronomy": {
+        "title": "Ẩm thực Riêng tư",
+        "description": "Một hành trình ấm cúng cho vị giác của bạn."
+      },
+      "wellness": {
+        "title": "Sức khỏe Toàn diện",
+        "description": "Trẻ hóa tâm trí, cơ thể và tâm hồn."
+      }
+    }
+  },
+  "faq": {
+    "badge": "Chính sách của Khách",
+    "title": "Câu hỏi Thường",
+    "titleItalic": "Gặp.",
+    "questions": {
+      "checkInOut": {
+        "q": "Thời gian nhận phòng và trả phòng tiêu chuẩn là khi nào?",
+        "a": "Giờ nhận phòng tiêu chuẩn của chúng tôi bắt đầu lúc 3:00 CH và giờ trả phòng là 11:00 SA. Các yêu cầu nhận phòng sớm hoặc trả phòng muộn tùy thuộc vào tình trạng phòng trống và có thể tính thêm phí."
+      },
+      "parking": {
+        "q": "Có bãi đậu xe tại chỗ không?",
+        "a": "Có, chúng tôi cung cấp dịch vụ đỗ xe an toàn 24 giờ cho tất cả khách hàng với một mức phí bổ sung hàng đêm. Không có bãi đậu xe tự quản."
+      },
+      "pets": {
+        "q": "Khách sạn có cho phép mang theo thú cưng không?",
+        "a": "Chúng tôi chào đón những chú chó ngoan dưới 25 lbs trong một số phòng được chọn với phí vệ sinh thú cưng không hoàn lại. Động vật hỗ trợ được miễn các hạn chế này."
+      },
+      "shuttle": {
+        "q": "Khách sạn có cung cấp dịch vụ đưa đón sân bay không?",
+        "a": "Chúng tôi cung cấp dịch vụ đưa đón sang trọng có tài xế riêng từ Sân bay Quốc tế Metropolis. Dịch vụ này phải được đặt ít nhất 48 giờ trước khi đến."
+      }
+    }
+  },
+  "terms": {
+    "badge": "Thỏa thuận Pháp lý",
+    "title": "Điều khoản",
+    "titleItalic": "Dịch vụ.",
+    "lastUpdated": "Cập nhật lần cuối: tháng 4 năm 2026",
+    "sections": {
+      "acceptance": {
+        "title": "1. Chấp nhận các Điều khoản",
+        "content": "Bằng cách đặt phòng tại The Lumière Estate, truy cập các nền tảng kỹ thuật số của chúng tôi hoặc tham gia các dịch vụ của chúng tôi, bạn đồng ý tuân thủ và bị ràng buộc bởi các điều khoản sau đây. Việc không tuân thủ các điều khoản này cho phép ban quản lý của chúng tôi có quyền chấm dứt việc đặt phòng của bạn mà không hoàn lại tiền."
+      },
+      "reservations": {
+        "title": "2. Chính sách Đặt phòng & Thanh toán",
+        "content": "Thẻ tín dụng hợp lệ là bắt buộc để đảm bảo tất cả các đặt phòng. Một khoản phí ủy quyền trước tương đương với đêm đầu tiên cộng với thuế sẽ được xử lý 72 giờ trước khi đến. Nếu việc ủy quyền này thất bại, nhân viên hỗ trợ của chúng tôi sẽ cố gắng liên lạc với bạn; nếu không, việc đặt phòng có thể bị hủy một cách tôn trọng."
+      },
+      "liability": {
+        "title": "3. Giao thức Trách nhiệm",
+        "content": "Lumière không chịu trách nhiệm cho các vật phẩm cá nhân bị mất, hư hỏng hoặc bị mất cắp mà không có người trông coi bên trong phòng nghỉ hoặc khu vực công cộng. Chúng tôi đặc biệt khuyến khích sử dụng két sắt an toàn miễn phí trong phòng cho tất cả hàng hóa cao cấp, tiền mặt và các giấy tờ quan trọng."
+      },
+      "cancellation": {
+        "title": "4. Kiến trúc Hủy bỏ",
+        "content": "Để tránh phí phạt hủy phòng tương đương với một đêm đầy đủ cộng với thuế, các đặt phòng phải được hủy hoặc sửa đổi trước 4:00 chiều giờ địa phương của khách sạn ít nhất 48 giờ trước ngày dự kiến đến. Các đặt phòng không hoàn lại trong mùa cao điểm là ngoại lệ cho chính sách khoan hồng này."
+      }
+    }
+  },
+  "terms": {
+    "badge": "Thỏa thuận Pháp lý",
+    "title": "Điều khoản",
+    "titleItalic": "Dịch vụ.",
+    "lastUpdated": "Cập nhật lần cuối: tháng 4 năm 2026",
+    "sections": {
+      "acceptance": {
+        "title": "1. Chấp nhận các Điều khoản",
+        "content": "Bằng cách đặt phòng tại The Lumière Estate, truy cập các nền tảng kỹ thuật số của chúng tôi hoặc tham gia các dịch vụ của chúng tôi, bạn đồng ý tuân thủ và bị ràng buộc bởi các điều khoản sau đây. Việc không tuân thủ các điều khoản này cho phép ban quản lý của chúng tôi có quyền chấm dứt việc đặt phòng của bạn mà không hoàn lại tiền."
+      },
+      "reservations": {
+        "title": "2. Chính sách Đặt phòng & Thanh toán",
+        "content": "Thẻ tín dụng hợp lệ là bắt buộc để đảm bảo tất cả các đặt phòng. Một khoản phí ủy quyền trước tương đương với đêm đầu tiên cộng với thuế sẽ được xử lý 72 giờ trước khi đến. Nếu việc ủy quyền này thất bại, nhân viên hỗ trợ của chúng tôi sẽ cố gắng liên lạc với bạn; nếu không, việc đặt phòng có thể bị hủy một cách tôn trọng."
+      },
+      "liability": {
+        "title": "3. Giao thức Trách nhiệm",
+        "content": "Lumière không chịu trách nhiệm cho các vật phẩm cá nhân bị mất, hư hỏng hoặc bị mất cắp mà không có người trông coi bên trong phòng nghỉ hoặc khu vực công cộng. Chúng tôi đặc biệt khuyến khích sử dụng két sắt an toàn miễn phí trong phòng cho tất cả hàng hóa cao cấp, tiền mặt và các giấy tờ quan trọng."
+      },
+      "cancellation": {
+        "title": "4. Kiến trúc Hủy bỏ",
+        "content": "Để tránh phí phạt hủy phòng tương đương với một đêm đầy đủ cộng với thuế, các đặt phòng phải được hủy hoặc sửa đổi trước 4:00 chiều giờ địa phương của khách sạn ít nhất 48 giờ trước ngày dự kiến đến. Các đặt phòng không hoàn lại trong mùa cao điểm là ngoại lệ cho chính sách khoan hồng này."
+      }
+    }
+  },
+  "privacy": {
+    "title": "Chính sách",
+    "titleItalic": "Bảo mật.",
+    "lastUpdated": "Cập nhật lần cuối: tháng 4 năm 2026",
+    "sections": {
+      "collect": {
+        "title": "Thông tin Chúng tôi Thu thập",
+        "p1": "The Lumière Estate cam kết bảo vệ sự riêng tư của bạn. Chúng tôi thu thập và xử lý tỉ mỉ chỉ những thông tin cá nhân cơ bản cần thiết để cung cấp dịch vụ hiếu khách vô song. Điều này bao gồm chi tiết liên lạc để đảm bảo việc đặt phòng của bạn, giấy tờ tùy thân do chính phủ cấp khi đến nơi và bất kỳ sở thích đặc biệt nào bạn chia sẻ với đội ngũ nhân viên hỗ trợ của chúng tôi.",
+        "p2": "Ngoài việc đảm bảo kỳ nghỉ của bạn, chúng tôi thu thập dữ liệu thanh toán, dữ liệu này được mã hóa mạnh mẽ và được mã hóa bằng mã thông báo (tokenized)."
+      },
+      "security": {
+        "title": "Cách Dữ liệu của Bạn được Bảo mật",
+        "content": "Trải nghiệm sang trọng của bạn mở rộng liền mạch đến lĩnh vực kỹ thuật số. Chúng tôi triển khai các quy trình mã hóa mạnh mẽ, cấp quân sự và hạn chế nghiêm ngặt việc truy cập nội bộ vào dữ liệu khách hàng chỉ dành cho nhân viên được ủy quyền. Chúng tôi không bán hoặc cho thuê danh sách khách hàng của mình cho bên thứ ba."
+      },
+      "cookies": {
+        "title": "Cookies & Theo dõi",
+        "content": "Nền tảng kỹ thuật số của chúng tôi sử dụng các tệp cookie tối thiểu nhằm mục đích chính là hợp lý hóa hiệu suất và theo dõi số liệu phân tích để liên tục cải thiện giao diện hướng tới khách hàng của chúng tôi."
+      }
+    }
+  },
+  "login": {
+    "title": "Chào mừng",
+    "titleItalic": "trở lại.",
+    "subtitle": "Truy cập các đặt chỗ và sở thích được tuyển chọn của bạn.",
+    "emailLabel": "Địa chỉ Email",
+    "emailPlaceholder": "Nhập email của bạn",
+    "passwordLabel": "Mật khẩu",
+    "passwordPlaceholder": "Nhập mật khẩu của bạn",
+    "rememberMe": "Ghi nhớ tôi",
+    "forgotPassword": "Quên mật khẩu?",
+    "signInGuest": "Đăng nhập với tư cách Khách",
+    "signInAdmin": "Đăng nhập với tư cách Admin",
+    "noAccount": "Chưa có tài khoản?",
+    "createAccount": "Tạo tài khoản"
+  },
+  "register": {
+    "title": "Gia nhập",
+    "titleItalic": "Bộ sưu tập.",
+    "subtitle": "Mở khóa những trải nghiệm độc quyền và quản lý kỳ nghỉ của bạn.",
+    "firstName": "Tên",
+    "lastName": "Họ",
+    "email": "Địa chỉ Email",
+    "password": "Mật khẩu",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "agreeTo": "Tôi đồng ý với",
+    "and": "và",
+    "registerNow": "Đăng ký ngay",
+    "alreadyHave": "Đã có tài khoản?",
+    "signIn": "Đăng nhập"
   },
   "home": {
     "destination": "Điểm Đến",

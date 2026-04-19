@@ -297,7 +297,7 @@ export const Home: React.FC = () => {
             {/* Card 3 */}
             <div className="group cursor-pointer">
               <div className="overflow-hidden aspect-[4/5] relative mb-6">
-                <img src="https://images.unsplash.com/photo-1631049307264-da0ec4d70104?q=80&w=1000&auto=format&fit=crop" alt="The Grand Penthouse" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90 group-hover:opacity-100" />
+                <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1000&auto=format&fit=crop" alt="The Grand Penthouse" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90 group-hover:opacity-100" />
               </div>
               <div className="flex justify-between items-start mb-2">
                 <h3 className="text-2xl font-serif">{t('home.accommodations.grandPenthouse')}</h3>

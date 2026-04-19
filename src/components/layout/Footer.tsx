@@ -52,9 +52,9 @@ export const Footer: React.FC = () => {
         <div className="pt-8 border-t border-[#F9F8F6]/10 flex flex-col md:flex-row items-center justify-between gap-6 text-[10px] uppercase tracking-[0.2em] text-[#6C6863]">
           <p>© {new Date().getFullYear()} {t('footer.allRightsReserved')}</p>
           <div className="flex gap-6">
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#F9F8F6] transition-colors duration-500">Instagram</a>
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#F9F8F6] transition-colors duration-500">Facebook</a>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#F9F8F6] transition-colors duration-500">Twitter</a>
+            <a href="https://instagram.com/sniknerduke" target="_blank" rel="noopener noreferrer" className="hover:text-[#F9F8F6] transition-colors duration-500">Instagram</a>
+            <a href="https://facebook.com/sniknerduke" target="_blank" rel="noopener noreferrer" className="hover:text-[#F9F8F6] transition-colors duration-500">Facebook</a>
+            <a href="https://twitter.com/sniknerduke" target="_blank" rel="noopener noreferrer" className="hover:text-[#F9F8F6] transition-colors duration-500">Twitter</a>
           </div>
         </div>
       </div>

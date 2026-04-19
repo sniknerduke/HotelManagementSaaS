@@ -5,7 +5,129 @@
     "amenities": "Amenities",
     "contact": "Contact",
     "signIn": "Sign In",
-    "bookNow": "Book Now"
+    "bookNow": "Book Now",
+    "profile": "Profile"
+  },
+  "dashboard": {
+    "title": "Management",
+    "nav": {
+      "overview": "Overview",
+      "reservations": "Reservations",
+      "inventory": "Inventory",
+      "guests": "Guests",
+      "settings": "Settings"
+    },
+    "metrics": {
+      "title": "Performance",
+      "titleItalic": "Metrics",
+      "occupancy": "Today's Occupancy",
+      "checkIns": "Pending Check-Ins",
+      "revenue": "Revenue (MTD)"
+    },
+    "recent": {
+      "title": "Recent Reservations",
+      "viewAll": "View All Calendar"
+    },
+    "table": {
+      "guest": "Guest",
+      "dates": "Dates",
+      "residence": "Residence",
+      "status": "Status",
+      "action": "Action",
+      "confirmed": "Confirmed",
+      "pending": "Pending",
+      "manage": "Manage"
+    },
+    "rooms": {
+      "grandSuite": "The Grand Suite",
+      "oceanVilla": "Ocean Villa"
+    }
+  },
+  "profile": {
+    "welcome": "Welcome,",
+    "activeStay": "Active Stay",
+    "reservations": "Reservations",
+    "management": "Profile Management",
+    "payment": "Payment Methods",
+    "preferences": "Guest Preferences",
+    "signOut": "Sign Out",
+    "currentStay": {
+      "title": "Your",
+      "titleItalic": "Current Stay",
+      "checkedIn": "Checked In",
+      "roomDetails": "Room Details",
+      "digitalAccess": "Digital Access",
+      "wifiCreds": "Digital Key & WiFi",
+      "network": "Network",
+      "password": "Password",
+      "viewQr": "Generate Digital Key QR",
+      "liveFolio": "Live Folio & Expenses",
+      "roomRate": "Room Rate",
+      "dining": "Dining & Bar",
+      "spa": "Spa Services",
+      "balance": "Total Balance"
+    },
+    "manageBookings": {
+      "upcoming": "Upcoming",
+      "reservations": "Reservations",
+      "conf": "Conf #",
+      "totalCost": "Total Cost",
+      "modify": "Modify Booking",
+      "cancel": "Cancel",
+      "noUpcoming": "You have no upcoming reservations.",
+      "past": "Past",
+      "stays": "Stays",
+      "downloadInvoice": "Download Invoice",
+      "leaveReview": "Leave Review",
+      "noPast": "No past stays found."
+    },
+    "personalDetails": {
+      "title": "Personal",
+      "titleItalic": "Details",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "phone": "Phone Number"
+    },
+    "accountSettings": {
+      "title": "Account",
+      "titleItalic": "Settings",
+      "password": "Password",
+      "lastChanged": "Last updated {{count}} months ago",
+      "resetPassword": "Reset Password",
+      "langPref": "Language Preference",
+      "langDesc": "Select your preferred interface language",
+      "saveChanges": "Save Changes"
+    },
+    "paymentMethods": {
+      "title": "Payment",
+      "titleItalic": "Methods",
+      "expires": "Expires",
+      "remove": "Remove",
+      "addNew": "Add New Card"
+    },
+    "guestPreferences": {
+      "title": "Guest",
+      "titleItalic": "Preferences",
+      "subtitle": "Help us tailor your experience at The Lumière Estate",
+      "roomReq": "Room Requirements",
+      "prefs": {
+        "highFloor": "High Floor Preference",
+        "nearElevator": "Near Elevator",
+        "awayElevator": "Away from Elevator",
+        "accessibility": "Accessibility Access",
+        "extraPillows": "Extra Feather Pillows",
+        "firmMattress": "Firm Mattress Request"
+      },
+      "dietary": "Dietary Restrictions & Allergies",
+      "dietaryPlaceholder": "Please specify any allergies or dietary preferences...",
+      "notifications": "Notification Settings",
+      "emailAlerts": "Email Newsletters",
+      "emailDesc": "Receive exclusive offers and estate updates",
+      "smsAlerts": "SMS Notifications",
+      "smsDesc": "Receive booking updates and check-in reminders",
+      "update": "Update Preferences"
+    }
   },
   "footer": {
     "title1": "Sign up",
@@ -134,6 +256,133 @@
       "breakfast": "Complimentary Breakfast"
     }
   },
+  "admin": {
+    "sidebar": {
+      "title": "Admin",
+      "overview": "1. Global Overview",
+      "reservations": "2. Reservations",
+      "inventory": "3. Inventory & Rooms",
+      "users": "4. Users & Staff",
+      "reports": "5. Reports Analytics",
+      "settings": "6. System Settings"
+    },
+    "overview": {
+      "title": "Main",
+      "titleItalic": "Dashboard",
+      "metrics": "Real-time Metrics",
+      "occupancy": "Occupancy Rate",
+      "occupancyChange": "+5% from last week",
+      "availableRooms": "Available Rooms",
+      "totalRooms": "Out of 160 total rooms",
+      "dailyRevenue": "Daily Revenue",
+      "revenueChange": "+12% from yesterday",
+      "operations": "Daily Operations",
+      "expectedCheckins": "Expected Check-ins",
+      "pending": "Pending",
+      "expectedCheckouts": "Expected Check-outs",
+      "completed": "Completed",
+      "stayOvers": "Stay-overs",
+      "actionNeeded": "Action Needed (Alerts)",
+      "overbooked": "Overbooked Room Type",
+      "overbookedDesc": "Standard King is overbooked by 2 rooms for Oct 15.",
+      "paymentFailure": "Payment Failure",
+      "paymentFailureDesc": "Deposit failed for Confirmation #RES-1042.",
+      "pendingRequest": "Pending Guest Request",
+      "pendingRequestDesc": "Room 304 requested late checkout."
+    },
+    "reservations": {
+      "title": "Front",
+      "titleItalic": "Desk",
+      "walkIn": "Walk-in Booking",
+      "calendar": "Calendar / Grid",
+      "searchPlaceholder": "Search by Name, Conf#, or Room",
+      "statusAll": "Status: All",
+      "checkedIn": "Checked In",
+      "reserved": "Reserved",
+      "checkedOut": "Checked Out",
+      "table": {
+        "guest": "Guest",
+        "conf": "Conf #",
+        "room": "Room",
+        "dates": "Dates",
+        "status": "Status",
+        "actions": "Actions",
+        "edit": "Edit",
+        "checkIn": "Check In",
+        "checkOut": "Check Out"
+      }
+    },
+    "inventory": {
+      "title": "Inventory",
+      "titleItalic": "Management",
+      "addCategory": "+ Add Category",
+      "roomStatus": "Room Status Control",
+      "setStatus": "Set Status",
+      "available": "Available",
+      "occupied": "Occupied",
+      "cleaning": "Cleaning",
+      "maintenance": "Maintenance",
+      "rateControl": "Rate Control Defaults",
+      "seasonalMultipliers": "Seasonal Multipliers",
+      "highSeason": "High Season Multiplier",
+      "activePromotions": "Active Promotions",
+      "editPricing": "Edit Pricing Rules"
+    },
+    "users": {
+      "title": "Staff",
+      "titleItalic": "& Roles",
+      "register": "+ Register Account",
+      "table": {
+        "name": "Name",
+        "role": "Role (RBAC)",
+        "dept": "Department",
+        "settings": "Settings"
+      },
+      "roles": {
+        "manager": "General Manager",
+        "frontDesk": "Front Desk Associate",
+        "cleaning": "Housekeeping"
+      },
+      "actions": {
+        "edit": "Edit Role",
+        "suspend": "Suspend"
+      },
+      "crm": {
+        "title": "Guest Database CRM",
+        "description": "Access historical guest profiles, lifetime stays, and maintain internal notes.",
+        "open": "Open CRM Module"
+      }
+    },
+    "reports": {
+      "title": "Data",
+      "titleItalic": "Export & Analytics",
+      "financial": "Financial Ledgers",
+      "financialDesc": "Generated revenue breakdowns, taxes, and payment gateways routing.",
+      "operational": "Operational Manifests",
+      "operationalDesc": "Daily housekeeping task lists, maintenance schedules, and food & beverage.",
+      "revenueLedger": "Monthly Revenue Ledger",
+      "taxRemittance": "Tax Remittance (Q3)",
+      "housekeepingRoute": "Today's Housekeeping Route",
+      "occupancyForecast": "Occupancy Forecast (30 Day)",
+      "exportCSV": "Export CSV",
+      "downloadPDF": "Download PDF",
+      "printPDF": "Print PDF"
+    },
+    "settings": {
+      "title": "Global",
+      "titleItalic": "Configuration",
+      "propertyMeta": "Property Meta",
+      "hotelName": "Official Hotel Name",
+      "taxRate": "Standard Tax Rate (%)",
+      "currency": "Base Currency",
+      "integrations": "3rd-Party Integrations",
+      "apiActive": "API Key Active",
+      "disconnected": "Disconnected",
+      "renewToken": "Renew Token",
+      "provideKey": "Provide Key",
+      "saveChanges": "Commit Global Changes"
+    }
+  },
   "contact": {
     "hero": {
       "subtitle": "Here To Assist You",
@@ -151,8 +400,8 @@
         "label": "Subject",
         "general": "General Inquiry",
         "modification": "Reservation Modification",
-        "feedback": "Feedback",
-        "other": "Other"
+        "feedback": "Sharing My Experience",
+        "other": "Other Assistance"
       },
       "message": "Message Body",
       "placeholder": "How can we assist you today?",
@@ -182,6 +431,118 @@
       "instagram": "Instagram Profile",
       "twitter": "X (Twitter) Updates"
     }
+  },
+  "experiences": {
+    "title": "Curated",
+    "titleItalic": "Experiences.",
+    "description": "Immerse yourself in extraordinary moments designed exclusively for our guests. From private yacht charters to personalized culinary masterclasses, elevate your stay beyond the ordinary.",
+    "items": {
+      "gastronomy": {
+        "title": "Private Gastronomy",
+        "description": "An intimate journey for your palate."
+      },
+      "wellness": {
+        "title": "Holistic Wellness",
+        "description": "Rejuvenate the mind, body, and soul."
+      }
+    }
+  },
+  "faq": {
+    "badge": "Guest Policies",
+    "title": "Frequently Asked",
+    "titleItalic": "Questions.",
+    "questions": {
+      "checkInOut": {
+        "q": "What is your standard check-in and check-out time?",
+        "a": "Our standard check-in begins at 3:00 PM, and check-out is at 11:00 AM. Early check-in or late check-out requests are subject to availability and may incur an additional fee."
+      },
+      "parking": {
+        "q": "Is parking available on property?",
+        "a": "Yes, we exclusively provide a secure 24-hour valet parking service to all our guests for an additional nightly rate. Self-parking is not available."
+      },
+      "pets": {
+        "q": "Do you accommodate pets?",
+        "a": "We welcome well-behaved dogs under exactly 25 lbs in select rooms with a non-refundable pet cleaning fee. Service animals are exempt from restrictions."
+      },
+      "shuttle": {
+        "q": "Is an airport shuttle service provided?",
+        "a": "We offer bespoke chauffeur-driven luxury transfers from Metropolis International Airport. This service must be reserved at least 48 hours prior to arrival."
+      }
+    }
+  },
+  "terms": {
+    "badge": "Legal Agreement",
+    "title": "Terms of",
+    "titleItalic": "Service.",
+    "lastUpdated": "Last updated: April 2026",
+    "sections": {
+      "acceptance": {
+        "title": "1. Acceptance of Terms",
+        "content": "By booking a reservation with The Lumière Estate, accessing our digital platforms, or partaking in our services, you expressly agree to abide by and be bound by the forthcoming terms. Failure to adhere to these terms grants our management the right to terminate your reservation without refund."
+      },
+      "reservations": {
+        "title": "2. Reservations & Payment Policies",
+        "content": "A valid credit card is strictly required to guarantee all reservations. A pre-authorization charge equivalent to the first night's room and tax will be processed 72 hours prior to arrival. Should this authorization fail, our luxury concierge will attempt to contact you; otherwise, the reservation may be respectfully released."
+      },
+      "liability": {
+        "title": "3. Liability Protocol",
+        "content": "The Lumière assumes no responsibility for lost, damaged, or stolen personal items left unattended inside guest quarters or public areas. We strongly encourage the use of our in-room complimentary secure safe deposit boxes for all luxury goods, cash, and significant documentation."
+      },
+      "cancellation": {
+        "title": "4. Cancellation Architecture",
+        "content": "To avoid a cancellation penalty equivalent to one full room night plus tax, reservations must exclusively be canceled or modified by 4:00 PM local property time at least 48 hours prior to your scheduled arrival. Peak luxury season non-refundable bookings are an exception to this leniency."
+      }
+    }
+  },
+  "privacy": {
+    "title": "Privacy",
+    "titleItalic": "Policy.",
+    "lastUpdated": "Last updated: April 2026",
+    "sections": {
+      "collect": {
+        "title": "Information We Collect",
+        "p1": "The Lumière Estate is committed to safeguarding your privacy. We meticulously collect and process only the fundamental personal information necessary to offer unparalleled hospitality. This includes your contact details to secure your reservation, government-issued identification upon arrival, and any special preferences you share with our concierge team.",
+        "p2": "In addition to securing your stay, we gather payment data, which is heavily encrypted and tokenized."
+      },
+      "security": {
+        "title": "How Your Data Is Secured",
+        "content": "Your luxury experience seamlessly extends to the digital realm. We implement robust, military-grade encryption procedures and strictly restrict internal access to guest data strictly to authorized personnel. We do not sell or rent our guest rosters to third parties."
+      },
+      "cookies": {
+        "title": "Cookies & Tracking",
+        "content": "Our digital platform utilizes minimal cookies aimed primarily at streamlining performance and tracking analytics for continuous improvement of our guest-facing interfaces."
+      }
+    }
+  },
+  "login": {
+    "title": "Welcome",
+    "titleItalic": "back.",
+    "subtitle": "Access your reservations and curated preferences.",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "Enter your email",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot Password?",
+    "signInGuest": "Sign In as Guest",
+    "signInAdmin": "Sign In as Admin",
+    "noAccount": "Don't have an account?",
+    "createAccount": "Create an Account"
+  },
+  "register": {
+    "title": "Join the",
+    "titleItalic": "Collection.",
+    "subtitle": "Unlock exclusive experiences and manage your stays.",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email Address",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "agreeTo": "I agree to the",
+    "and": "and",
+    "registerNow": "Register Now",
+    "alreadyHave": "Already have an account?",
+    "signIn": "Sign In"
   },
   "home": {
     "destination": "Destination",

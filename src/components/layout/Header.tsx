@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../ui/Button';
@@ -6,13 +6,20 @@ import { cn } from '../ui/Button';
 export const Header: React.FC = () => {
   const { t, i18n } = useTranslation();
   const isAdmin = false;
+  const [isChangingLanguage, setIsChangingLanguage] = useState(false);
 
   const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
+    if (i18n.language === lng) return;
+    setIsChangingLanguage(true);
+    setTimeout(() => {
+      i18n.changeLanguage(lng);
+      setIsChangingLanguage(false);
+    }, 500);
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[110] bg-[#F9F8F6]/90 backdrop-blur-sm border-b border-[#1A1A1A]/10">
+    <>
+      <header className="fixed top-0 left-0 right-0 z-[110] bg-[#F9F8F6]/90 backdrop-blur-sm border-b border-[#1A1A1A]/10">
       <div className="max-w-[1600px] mx-auto px-8 md:px-16 h-16 lg:h-20 flex items-center justify-between relative">
         
         <NavLink to="/" className="text-xl md:text-2xl font-serif tracking-tight text-[#1A1A1A] hover:text-[#D4AF37] transition-colors duration-500 z-10 flex-1">
@@ -52,5 +59,13 @@ export const Header: React.FC = () => {
         </div>
       </div>
     </header>
+
+    {/* Luxury Loading Blur Overlay */}
+    {isChangingLanguage && (
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#F9F8F6]/40 backdrop-blur-[4px] transition-all duration-500 animate-in fade-in">
+        <div className="w-12 h-12 border border-[#1A1A1A]/20 border-t-[#D4AF37] rounded-full animate-spin"></div>
+      </div>
+    )}
+    </>
   );
 };

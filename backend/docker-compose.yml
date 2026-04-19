@@ -155,6 +155,35 @@ services:
     networks:
       - hotel-network
 
+  # ========================
+  # Kong API Gateway
+  # ========================
+  kong:
+    image: kong:3.4-ubuntu
+    container_name: hotel-api-gateway
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_ADMIN_GUI_LISTEN: 0.0.0.0:8002
+    ports:
+      - "8000:8000"  # Gateway Proxy Port (Frontend hits this)
+      - "8001:8001"  # Kong Admin API
+      - "8002:8002"  # Kong Admin GUI
+    volumes:
+      - ./kong/kong.yml:/usr/local/kong/declarative/kong.yml
+    networks:
+      - hotel-network
+    depends_on:
+      - user-service
+      - inventory-service
+      - booking-service
+      - payment-service
+
 volumes:
   user-db-data:
   inventory-db-data:

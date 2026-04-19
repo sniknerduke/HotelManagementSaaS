@@ -1,0 +1,42 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: user-service
+    url: http://hotel-user-service:8081
+    routes:
+      - name: user-route
+        paths:
+          - /api/users
+        strip_path: false
+
+  - name: inventory-service
+    url: http://hotel-inventory-service:8082
+    routes:
+      - name: inventory-route
+        paths:
+          - /api/inventory
+        strip_path: false
+
+  - name: booking-service
+    url: http://hotel-booking-service:8083
+    routes:
+      - name: booking-route
+        paths:
+          - /api/bookings
+        strip_path: false
+
+  - name: payment-service
+    url: http://hotel-payment-service:8084
+    routes:
+      - name: payment-route
+        paths:
+          - /api/payments
+        strip_path: false
+
+# Example of a global plugin: Add Rate Limiting globally
+plugins:
+  - name: rate-limiting
+    config:
+      minute: 60
+      policy: local

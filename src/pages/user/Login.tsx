@@ -1,21 +1,46 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { useAuth } from '../../context/AuthContext';
+import { AuthService } from '../../api';
 
 export const Login: React.FC = () => {
   const { t } = useTranslation();
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleDemoLogin = (role: 'GUEST' | 'ADMIN') => {
-    login(role);
-    if (role === 'ADMIN') {
-      navigate('/admin');
-    } else {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      return;
+    }
+    
+    setError('');
+    setLoading(true);
+    try {
+      // 1. Call Backend API
+      const response = await AuthService.login({ email, password });
+      
+      // 2. We mock storing a dummy token if backend isn't returning it strictly yet
+      const token = response.token || 'dummy_token_123';
+      
+      // 3. Keep to local auth context
+      await login(token, response.userId);
+      
+      // 4. Redirect
       navigate('/profile');
+    } catch (err: any) {
+      setError(err.message || 'Invalid email or password');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -31,10 +56,26 @@ export const Login: React.FC = () => {
           </p>
         </div>
 
-        <form className="space-y-8" onSubmit={(e) => { e.preventDefault(); handleDemoLogin('GUEST'); }}>
+        <form className="space-y-8" onSubmit={handleLogin}>
+          {error && <div className="text-red-500 text-sm text-center mb-4">{error}</div>}
+          
           <div className="space-y-6">
-            <Input label={t('login.emailLabel')} type="email" placeholder={t('login.emailPlaceholder')} />
-            <Input label={t('login.passwordLabel')} type="password" placeholder={t('login.passwordPlaceholder')} />
+            <Input 
+              label={t('login.emailLabel')} 
+              type="email" 
+              placeholder={t('login.emailPlaceholder')} 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <Input 
+              label={t('login.passwordLabel')} 
+              type="password" 
+              placeholder={t('login.passwordPlaceholder')} 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
           </div>
 
           <div className="flex items-center justify-between">
@@ -48,8 +89,9 @@ export const Login: React.FC = () => {
           </div>
 
           <div className="space-y-4 pt-4">
-            <Button type="button" onClick={() => handleDemoLogin('GUEST')} className="w-full">{t('login.signInGuest')}</Button>
-            <Button type="button" onClick={() => handleDemoLogin('ADMIN')} variant="secondary" className="w-full border-[#1A1A1A]">{t('login.signInAdmin')}</Button>
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? 'Processing...' : t('login.signIn')}
+            </Button>
           </div>
         </form>
 

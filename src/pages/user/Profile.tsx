@@ -2,12 +2,21 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 type Tab = 'active' | 'bookings' | 'profile' | 'payment' | 'preferences';
 
 export const Profile: React.FC = () => {
   const { t, i18n } = useTranslation();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>('active');
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   const language = i18n.language.toUpperCase() === 'VI' ? 'VN' : i18n.language.toUpperCase();
   const setLanguage = (lang: string) => {
@@ -39,7 +48,9 @@ export const Profile: React.FC = () => {
           <h1 className="text-4xl md:text-5xl font-serif text-[#1A1A1A] mb-[2px]">
             {t('profile.welcome')}
           </h1>
-          <h2 className="text-3xl font-serif italic text-[#D4AF37] mb-12">John Doe</h2>
+          <h2 className="text-3xl font-serif italic text-[#D4AF37] mb-12">
+            {user?.firstName} {user?.lastName}
+          </h2>
 
           <nav className="flex flex-col space-y-2 text-xs uppercase tracking-[0.2em] font-medium text-[#6C6863]">
             {hasActiveStay && (
@@ -76,7 +87,10 @@ export const Profile: React.FC = () => {
               {t('profile.preferences')}
             </button>
 
-            <button className="text-left py-4 mt-8 text-[#1A1A1A] hover:text-red-500 transition-colors uppercase font-bold tracking-[0.2em] border border-[#1A1A1A]/10 px-4 text-center">
+            <button 
+              onClick={handleLogout}
+              className="text-left py-4 mt-8 text-[#1A1A1A] hover:text-red-500 transition-colors uppercase font-bold tracking-[0.2em] border border-[#1A1A1A]/10 px-4 text-center"
+            >
               {t('profile.signOut')}
             </button>
           </nav>

@@ -3,6 +3,23 @@ import { Button } from '../components/ui/Button';
 // import { Card } from '../components/ui/Card';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { motion, type Variants } from 'framer-motion';
+
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { duration: 1, ease: [0.25, 0.1, 0.25, 1] } 
+  }
+};
+
+const staggerContainer: Variants = {
+  hidden: { opacity: 1 },
+  visible: {
+    transition: { staggerChildren: 0.2 }
+  }
+};
 
 export const Home: React.FC = () => {
   const { t } = useTranslation('common');
@@ -224,48 +241,70 @@ export const Home: React.FC = () => {
         </div>
 
         {/* Hero Text */}
-        <div className="relative z-10 text-center flex flex-col items-center justify-center w-full px-8 mt-[-10vh]">
-          <h1 className="text-8xl md:text-[10rem] lg:text-[12rem] tracking-tight leading-[0.85] font-serif mb-6 text-[#F9F8F6] drop-shadow-xl text-balance">
+        <motion.div 
+          initial="hidden"
+          animate="visible"
+          variants={staggerContainer}
+          className="relative z-10 text-center flex flex-col items-center justify-center w-full px-8 mt-[-10vh]"
+        >
+          <motion.h1 variants={fadeInUp} className="text-8xl md:text-[10rem] lg:text-[12rem] tracking-tight leading-[0.85] font-serif mb-8 md:mb-12 text-[#F9F8F6] drop-shadow-2xl text-balance">
             {t('home.hero.title')} <span className="italic text-[#D4AF37]">{t('home.hero.titleItalic')}</span>
-          </h1>
-          <p className="text-[#F9F8F6]/90 text-sm md:text-lg font-serif italic max-w-xl text-center tracking-wide">
+          </motion.h1>
+          <motion.p variants={fadeInUp} className="text-[#F9F8F6] text-base md:text-xl font-serif italic max-w-2xl text-center tracking-widest px-6 py-2 drop-shadow-md bg-black/10 rounded-full backdrop-blur-[2px]">
             {t('home.hero.description')}
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         {/* Normal Searching Bar Container */}
-        <div className="absolute bottom-12 md:bottom-20 left-1/2 -translate-x-1/2 w-full max-w-[90%] xl:max-w-7xl px-4 md:px-8 z-40">
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+          className="absolute bottom-12 md:bottom-20 left-1/2 -translate-x-1/2 w-full max-w-[90%] xl:max-w-7xl px-4 md:px-8 z-40"
+        >
           <div className="bg-[#F9F8F6] p-6 md:p-8 xl:py-10 shadow-[0_32px_64px_rgba(0,0,0,0.5)] flex flex-col md:flex-row items-center gap-6 xl:gap-8 w-full relative before:absolute before:inset-0 before:border before:border-[#1A1A1A]/10 before:pointer-events-none">
             <SearchBarContent isSticky={false} />
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* 2. Introduction / Value Proposition */}
-      <section className="bg-[#F9F8F6] py-24 md:py-32 px-8 md:px-16 text-center w-full">
-        <div className="max-w-4xl mx-auto">
-          <span className="block text-[10px] uppercase font-bold tracking-[0.3em] text-[#D4AF37] mb-6">{t('home.intro.subtitle')}</span>
-          <h2 className="text-4xl md:text-5xl font-serif text-[#1A1A1A] mb-8 leading-tight">{t('home.intro.title')}</h2>
-          <p className="text-lg md:text-xl text-[#6C6863] font-serif italic leading-relaxed">
+      <section className="bg-[#F9F8F6] py-24 md:py-32 px-8 md:px-16 text-center w-full overflow-hidden">
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={staggerContainer}
+          className="max-w-4xl mx-auto"
+        >
+          <motion.span variants={fadeInUp} className="block text-[10px] uppercase font-bold tracking-[0.3em] text-[#D4AF37] mb-6">{t('home.intro.subtitle')}</motion.span>
+          <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-serif text-[#1A1A1A] mb-8 leading-tight">{t('home.intro.title')}</motion.h2>
+          <motion.p variants={fadeInUp} className="text-lg md:text-xl text-[#6C6863] font-serif italic leading-relaxed">
             {t('home.intro.description')}
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
       </section>
 
       {/* 3. Featured Rooms & Suites */}
-      <section className="bg-[#1A1A1A] py-24 md:py-32 px-8 md:px-16 w-full text-[#F9F8F6]">
-        <div className="max-w-[1600px] mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8">
+      <section className="bg-[#1A1A1A] py-24 md:py-32 px-8 md:px-16 w-full text-[#F9F8F6] overflow-hidden">
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={staggerContainer}
+          className="max-w-[1600px] mx-auto"
+        >
+          <motion.div variants={fadeInUp} className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8">
             <div>
               <span className="block text-[10px] uppercase font-bold tracking-[0.3em] text-[#D4AF37] mb-4">{t('home.accommodations.subtitle')}</span>
               <h2 className="text-4xl md:text-5xl font-serif">{t('home.accommodations.title')} <span className="italic text-[#D4AF37]">{t('home.accommodations.titleItalic')}</span></h2>
             </div>
             <Button onClick={() => navigate('/search')} className="bg-transparent border border-[#F9F8F6]/20 text-[#F9F8F6] hover:bg-[#F9F8F6] hover:text-[#1A1A1A] transition-colors rounded-none px-8 py-4 text-xs tracking-[0.2em] uppercase shadow-none ring-0">{t('home.accommodations.viewAll')}</Button>
-          </div>
+          </motion.div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Card 1 */}
-            <div className="group cursor-pointer">
+            <motion.div variants={fadeInUp} className="group cursor-pointer">
               <div className="overflow-hidden aspect-[4/5] relative mb-6">
                 <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=1000&auto=format&fit=crop" alt="Deluxe Ocean View" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90 group-hover:opacity-100" />
               </div>
@@ -277,10 +316,10 @@ export const Home: React.FC = () => {
                 <p className="text-sm text-[#F9F8F6]/60">{t('home.accommodations.upToGuests', { count: 2 })} • 45 sqm</p>
                 <span className="text-[10px] uppercase tracking-[0.2em] font-bold border-b border-[#D4AF37] text-[#D4AF37] pb-1 group-hover:text-[#F9F8F6] group-hover:border-[#F9F8F6] transition-colors">{t('home.accommodations.viewDetails')}</span>
               </div>
-            </div>
+            </motion.div>
             
             {/* Card 2 */}
-            <div className="group cursor-pointer">
+            <motion.div variants={fadeInUp} className="group cursor-pointer">
               <div className="overflow-hidden aspect-[4/5] relative mb-6">
                 <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1000&auto=format&fit=crop" alt="Signature Suite" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90 group-hover:opacity-100" />
               </div>
@@ -292,10 +331,10 @@ export const Home: React.FC = () => {
                 <p className="text-sm text-[#F9F8F6]/60">{t('home.accommodations.upToGuests', { count: 3 })} • 65 sqm</p>
                 <span className="text-[10px] uppercase tracking-[0.2em] font-bold border-b border-[#D4AF37] text-[#D4AF37] pb-1 group-hover:text-[#F9F8F6] group-hover:border-[#F9F8F6] transition-colors">{t('home.accommodations.viewDetails')}</span>
               </div>
-            </div>
+            </motion.div>
 
             {/* Card 3 */}
-            <div className="group cursor-pointer">
+            <motion.div variants={fadeInUp} className="group cursor-pointer">
               <div className="overflow-hidden aspect-[4/5] relative mb-6">
                 <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1000&auto=format&fit=crop" alt="The Grand Penthouse" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90 group-hover:opacity-100" />
               </div>
@@ -307,46 +346,58 @@ export const Home: React.FC = () => {
                 <p className="text-sm text-[#F9F8F6]/60">{t('home.accommodations.upToGuests', { count: 4 })} • 120 sqm</p>
                 <span className="text-[10px] uppercase tracking-[0.2em] font-bold border-b border-[#D4AF37] text-[#D4AF37] pb-1 group-hover:text-[#F9F8F6] group-hover:border-[#F9F8F6] transition-colors">{t('home.accommodations.viewDetails')}</span>
               </div>
-            </div>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* 4. Core Amenities Overview */}
-      <section className="bg-[#F9F8F6] py-24 px-8 md:px-16 w-full border-b border-[#1A1A1A]/10">
-        <div className="max-w-[1600px] mx-auto">
-          <h2 className="text-3xl md:text-4xl font-serif text-center mb-16 text-[#1A1A1A]">{t('home.amenities.title')} <span className="italic text-[#D4AF37]">{t('home.amenities.titleItalic')}</span></h2>
+      <section className="bg-[#F9F8F6] py-24 px-8 md:px-16 w-full border-b border-[#1A1A1A]/10 overflow-hidden">
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={staggerContainer}
+          className="max-w-[1600px] mx-auto"
+        >
+          <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-serif text-center mb-16 text-[#1A1A1A]">{t('home.amenities.title')} <span className="italic text-[#D4AF37]">{t('home.amenities.titleItalic')}</span></motion.h2>
           
           <div className="grid grid-cols-2 md:grid-cols-5 gap-8 text-center pt-8">
-              <div className="flex flex-col items-center">
-                  <svg className="w-8 h-8 mb-4 text-[#1A1A1A]/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+              <motion.div variants={fadeInUp} className="flex flex-col items-center group cursor-pointer">
+                  <svg className="w-8 h-8 mb-4 text-[#1A1A1A]/80 transition-transform group-hover:-translate-y-2 group-hover:text-[#D4AF37] duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
                   <h4 className="text-xs uppercase tracking-[0.1em] font-bold text-[#1A1A1A]">{t('home.amenities.spa')}</h4>
-              </div>
-              <div className="flex flex-col items-center">
-                  <svg className="w-8 h-8 mb-4 text-[#1A1A1A]/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"></path></svg>
+              </motion.div>
+              <motion.div variants={fadeInUp} className="flex flex-col items-center group cursor-pointer">
+                  <svg className="w-8 h-8 mb-4 text-[#1A1A1A]/80 transition-transform group-hover:-translate-y-2 group-hover:text-[#D4AF37] duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"></path></svg>
                   <h4 className="text-xs uppercase tracking-[0.1em] font-bold text-[#1A1A1A]">{t('home.amenities.fineDining')}</h4>
-              </div>
-              <div className="flex flex-col items-center">
-                  <svg className="w-8 h-8 mb-4 text-[#1A1A1A]/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+              </motion.div>
+              <motion.div variants={fadeInUp} className="flex flex-col items-center group cursor-pointer">
+                  <svg className="w-8 h-8 mb-4 text-[#1A1A1A]/80 transition-transform group-hover:-translate-y-2 group-hover:text-[#D4AF37] duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                   <h4 className="text-xs uppercase tracking-[0.1em] font-bold text-[#1A1A1A]">{t('home.amenities.pool')}</h4>
-              </div>
-              <div className="flex flex-col items-center">
-                  <svg className="w-8 h-8 mb-4 text-[#1A1A1A]/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path></svg>
+              </motion.div>
+              <motion.div variants={fadeInUp} className="flex flex-col items-center group cursor-pointer">
+                  <svg className="w-8 h-8 mb-4 text-[#1A1A1A]/80 transition-transform group-hover:-translate-y-2 group-hover:text-[#D4AF37] duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path></svg>
                   <h4 className="text-xs uppercase tracking-[0.1em] font-bold text-[#1A1A1A]">{t('home.amenities.wifi')}</h4>
-              </div>
-              <div className="flex flex-col items-center">
-                  <svg className="w-8 h-8 mb-4 text-[#1A1A1A]/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+              </motion.div>
+              <motion.div variants={fadeInUp} className="flex flex-col items-center group cursor-pointer">
+                  <svg className="w-8 h-8 mb-4 text-[#1A1A1A]/80 transition-transform group-hover:-translate-y-2 group-hover:text-[#D4AF37] duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                   <h4 className="text-xs uppercase tracking-[0.1em] font-bold text-[#1A1A1A]">{t('home.amenities.fitness')}</h4>
-              </div>
+              </motion.div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* 5. Guest Testimonials / Social Proof */}
-      <section className="bg-[#F4F3F0] py-24 md:py-32 px-8 md:px-16 w-full">
-        <div className="max-w-[1600px] mx-auto text-center border-t border-[#1A1A1A]/5 pt-32">
-          <span className="block text-[10px] uppercase font-bold tracking-[0.3em] text-[#D4AF37] mb-4">{t('home.testimonials.subtitle')}</span>
-          <h2 className="text-4xl md:text-5xl font-serif text-[#1A1A1A] mb-16">{t('home.testimonials.title')} <span className="italic text-[#D4AF37]">{t('home.testimonials.titleItalic')}</span></h2>
+      <section className="bg-[#F4F3F0] py-24 md:py-32 px-8 md:px-16 w-full overflow-hidden">
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={staggerContainer}
+          className="max-w-[1600px] mx-auto text-center border-t border-[#1A1A1A]/5 pt-32"
+        >
+          <motion.span variants={fadeInUp} className="block text-[10px] uppercase font-bold tracking-[0.3em] text-[#D4AF37] mb-4">{t('home.testimonials.subtitle')}</motion.span>
+          <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-serif text-[#1A1A1A] mb-16">{t('home.testimonials.title')} <span className="italic text-[#D4AF37]">{t('home.testimonials.titleItalic')}</span></motion.h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-left">
              {[
@@ -354,7 +405,7 @@ export const Home: React.FC = () => {
                { name: "Marcus", excerpt: t('home.testimonials.reviews.marcus'), rating: 5 },
                { name: "Sophia", excerpt: t('home.testimonials.reviews.sophia'), rating: 5 }
              ].map((review, i) => (
-               <div key={i} className="bg-[#F9F8F6] p-10 relative shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-[#1A1A1A]/5 flex flex-col">
+               <motion.div key={i} variants={fadeInUp} className="bg-[#F9F8F6] p-10 relative shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-[#1A1A1A]/5 flex flex-col hover:shadow-xl transition-shadow duration-500">
                   <div className="flex gap-1 text-[#D4AF37] mb-6">
                     {[...Array(review.rating)].map((_, j) => <svg key={j} className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>)}
                   </div>
@@ -362,16 +413,22 @@ export const Home: React.FC = () => {
                   <div>
                      <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#6C6863]">— {review.name}</p>
                   </div>
-               </div>
+               </motion.div>
              ))}
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* 6. Location & Accessibility */}
-      <section className="bg-[#1A1A1A] py-24 md:py-32 px-8 md:px-16 w-full text-[#F9F8F6]">
-        <div className="max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-16 items-center">
-          <div className="flex-1 w-full order-2 lg:order-1">
+      <section className="bg-[#1A1A1A] py-24 md:py-32 px-8 md:px-16 w-full text-[#F9F8F6] overflow-hidden">
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={staggerContainer}
+          className="max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-16 items-center"
+        >
+          <motion.div variants={fadeInUp} className="flex-1 w-full order-2 lg:order-1">
              <div className="aspect-square md:aspect-video lg:aspect-square w-full relative bg-[#F9F8F6]/10 overflow-hidden group">
                 <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1000&auto=format&fit=crop" alt="Map Location Placeholder" className="w-full h-full object-cover mix-blend-luminosity opacity-60 group-hover:scale-105 transition-transform duration-1000" />
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -381,8 +438,8 @@ export const Home: React.FC = () => {
                    </div>
                 </div>
              </div>
-          </div>
-          <div className="flex-1 w-full order-1 lg:order-2 px-0 lg:px-8">
+          </motion.div>
+          <motion.div variants={fadeInUp} className="flex-1 w-full order-1 lg:order-2 px-0 lg:px-8">
              <span className="block text-[10px] uppercase font-bold tracking-[0.3em] text-[#D4AF37] mb-4">{t('contact.info.discoverArea')}</span>
              <h2 className="text-4xl md:text-5xl font-serif mb-12">{t('contact.info.location')}</h2>
              
@@ -407,8 +464,8 @@ export const Home: React.FC = () => {
                  <li className="flex items-center gap-3"><span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]"></span> {t('contact.info.landmark3')}</li>
                </ul>
              </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
     </>
   );

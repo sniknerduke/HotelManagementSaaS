@@ -1,6 +1,23 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../components/ui/Button';
+import { motion, type Variants } from 'framer-motion';
+
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { duration: 1, ease: [0.25, 0.1, 0.25, 1] } 
+  }
+};
+
+const staggerContainer: Variants = {
+  hidden: { opacity: 1 },
+  visible: {
+    transition: { staggerChildren: 0.2 }
+  }
+};
 
 export const Contact: React.FC = () => {
     const { t } = useTranslation();
@@ -22,18 +39,29 @@ export const Contact: React.FC = () => {
                         className="w-full h-full object-cover scale-105 grayscale-[30%] opacity-40" 
                     />
                 </div>
-                <div className="relative z-10 text-center flex flex-col items-center justify-center w-full px-8">
-                    <span className="block text-[10px] uppercase font-bold tracking-[0.3em] text-[#D4AF37] mb-6">{t('contact.hero.subtitle')}</span>
-                    <h1 className="text-7xl md:text-[8rem] lg:text-[10rem] tracking-tight leading-[0.9] font-serif mb-6 text-[#F9F8F6] drop-shadow-xl">
+                <motion.div 
+                    initial="hidden"
+                    animate="visible"
+                    variants={staggerContainer}
+                    className="relative z-10 text-center flex flex-col items-center justify-center w-full px-8"
+                >
+                    <motion.span variants={fadeInUp} className="block text-[10px] uppercase font-bold tracking-[0.3em] text-[#D4AF37] mb-6">{t('contact.hero.subtitle')}</motion.span>
+                    <motion.h1 variants={fadeInUp} className="text-7xl md:text-[8rem] lg:text-[10rem] tracking-tight leading-[0.9] font-serif mb-6 text-[#F9F8F6] drop-shadow-xl">
                         {t('contact.hero.title')} <span className="italic text-[#D4AF37]">{t('contact.hero.titleItalic')}</span>
-                    </h1>
-                </div>
+                    </motion.h1>
+                </motion.div>
             </div>
 
-            <div className="max-w-[1600px] mx-auto px-8 md:px-16 pt-24 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
+            <motion.div 
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
+                variants={staggerContainer}
+                className="max-w-[1600px] mx-auto px-8 md:px-16 pt-24 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 overflow-hidden"
+            >
                 
                 {/* Left Column: Form */}
-                <div>
+                <motion.div variants={fadeInUp}>
                     <h2 className="text-3xl lg:text-4xl font-serif text-[#1A1A1A] mb-8">{t('contact.form.title')} <span className="italic text-[#D4AF37]">{t('contact.form.titleItalic')}</span></h2>
                     
                     <form onSubmit={handleSubmit} className="space-y-8">
@@ -78,10 +106,10 @@ export const Contact: React.FC = () => {
                             {t('contact.form.submit')}
                         </Button>
                     </form>
-                </div>
+                </motion.div>
 
                 {/* Right Column: Info & Map */}
-                <div className="space-y-12">
+                <motion.div variants={fadeInUp} className="space-y-12">
                     
                     {/* Location Block */}
                     <div>
@@ -170,8 +198,8 @@ export const Contact: React.FC = () => {
                         </div>
                     </div>
 
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
         </div>
     );
 };

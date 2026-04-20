@@ -1,5 +1,22 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { motion, type Variants } from 'framer-motion';
+
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { duration: 1, ease: [0.25, 0.1, 0.25, 1] } 
+  }
+};
+
+const staggerContainer: Variants = {
+  hidden: { opacity: 1 },
+  visible: {
+    transition: { staggerChildren: 0.2 }
+  }
+};
 
 export const Amenities: React.FC = () => {
     const { t } = useTranslation();
@@ -16,21 +33,32 @@ export const Amenities: React.FC = () => {
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-[#1A1A1A]/40 via-transparent to-[#1A1A1A]/90"></div>
                 </div>
-                <div className="relative z-10 text-center flex flex-col items-center justify-center w-full px-8">
-                    <span className="block text-[10px] uppercase font-bold tracking-[0.3em] text-[#D4AF37] mb-6">{t('amenities.hero.subtitle')}</span>
-                    <h1 className="text-7xl md:text-[8rem] lg:text-[10rem] tracking-tight leading-[0.9] font-serif mb-6 text-[#F9F8F6] drop-shadow-xl">
+                <motion.div 
+                    initial="hidden"
+                    animate="visible"
+                    variants={staggerContainer}
+                    className="relative z-10 text-center flex flex-col items-center justify-center w-full px-8"
+                >
+                    <motion.span variants={fadeInUp} className="block text-[10px] uppercase font-bold tracking-[0.3em] text-[#D4AF37] mb-6">{t('amenities.hero.subtitle')}</motion.span>
+                    <motion.h1 variants={fadeInUp} className="text-7xl md:text-[8rem] lg:text-[10rem] tracking-tight leading-[0.9] font-serif mb-6 text-[#F9F8F6] drop-shadow-xl">
                         {t('amenities.hero.title')} <span className="italic text-[#D4AF37]">{t('amenities.hero.titleItalic')}</span>
-                    </h1>
-                    <p className="text-[#F9F8F6]/90 text-sm md:text-lg font-serif italic max-w-2xl text-center tracking-wide">
+                    </motion.h1>
+                    <motion.p variants={fadeInUp} className="text-[#F9F8F6]/90 text-sm md:text-lg font-serif italic max-w-2xl text-center tracking-wide">
                         {t('amenities.hero.description')}
-                    </p>
-                </div>
+                    </motion.p>
+                </motion.div>
             </div>
 
             {/* Core Facilities Grid */}
-            <section className="bg-[#1A1A1A] text-[#F9F8F6] pt-24 pb-32 px-8 md:px-16 mx-auto w-full flex flex-col items-center">
-                <div className="max-w-[1600px] w-full">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-8 lg:gap-16 pt-16">
+            <section className="bg-[#1A1A1A] text-[#F9F8F6] pt-24 pb-32 px-8 md:px-16 mx-auto w-full flex flex-col items-center overflow-hidden">
+                <motion.div 
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-100px" }}
+                    variants={staggerContainer}
+                    className="max-w-[1600px] w-full"
+                >
+                    <motion.div variants={fadeInUp} className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-8 lg:gap-16 pt-16">
                         
                         {/* Core Facilities */}
                         <div>
@@ -79,14 +107,20 @@ export const Amenities: React.FC = () => {
                             <li className="hover:text-[#F9F8F6] transition-colors">{t('amenities.services.housekeeping')}</li>
                         </ul>
                         </div>
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
             </section>
 
             {/* Testimonials & Achievements Section */}
-            <section className="bg-[#F9F8F6] text-[#1A1A1A] py-32 px-8 md:px-16 w-full shadow-[inset_0_1px_0_rgba(0,0,0,0.1)]">
-                <div className="max-w-[1600px] mx-auto">
-                <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-end mb-20 gap-8">
+            <section className="bg-[#F9F8F6] text-[#1A1A1A] py-32 px-8 md:px-16 w-full shadow-[inset_0_1px_0_rgba(0,0,0,0.1)] overflow-hidden">
+                <motion.div 
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-100px" }}
+                    variants={staggerContainer}
+                    className="max-w-[1600px] mx-auto"
+                >
+                <motion.div variants={fadeInUp} className="w-full flex flex-col md:flex-row justify-between items-start md:items-end mb-20 gap-8">
                     <div>
                         <span className="block text-[10px] uppercase font-bold tracking-[0.3em] text-[#6C6863] mb-4">{t('amenities.testimonials.subtitle')}</span>
                         <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif leading-[1.1]">
@@ -104,9 +138,9 @@ export const Amenities: React.FC = () => {
                         <span className="text-[10px] uppercase tracking-[0.2em] text-[#6C6863] mt-2">Condé Nast Gold List</span>
                         </div>
                     </div>
-                </div>
+                </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24 relative before:absolute before:inset-0 before:top-1/2 before:-translate-y-1/2 before:h-px before:bg-[#1A1A1A]/10 md:before:block before:hidden">
+                <motion.div variants={fadeInUp} className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24 relative before:absolute before:inset-0 before:top-1/2 before:-translate-y-1/2 before:h-px before:bg-[#1A1A1A]/10 md:before:block before:hidden">
                     
                     {/* Quote 1 */}
                     <div className="relative pt-12 md:pt-0 pr-0 md:pr-12 lg:pr-24 border-t border-[#1A1A1A]/10 md:border-none">
@@ -132,8 +166,8 @@ export const Amenities: React.FC = () => {
                     </div>
                     </div>
 
-                </div>
-                </div>
+                </motion.div>
+                </motion.div>
             </section>
         </div>
     );

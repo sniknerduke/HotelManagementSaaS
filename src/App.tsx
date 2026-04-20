@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useState } from 'react';
 import { Layout } from './components/layout/Layout';
+import { SplashScreen } from './components/layout/SplashScreen';
 import { Home } from './pages/Home';
 import { SearchResults } from './pages/SearchResults';
 import { Dashboard } from './pages/user/Dashboard';
@@ -18,13 +20,24 @@ import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AuthProvider } from './context/AuthContext';
 
 function App() {
+  const [showSplash, setShowSplash] = useState(() => {
+    return !sessionStorage.getItem('splashPlayed');
+  });
+
+  const handleSplashComplete = () => {
+    sessionStorage.setItem('splashPlayed', 'true');
+    setShowSplash(false);
+  };
+
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path='/' element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path='search' element={<SearchResults />} />
+      {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
+      <div className="w-full min-h-screen relative">
+        <BrowserRouter>
+          <Routes>
+            <Route path='/' element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path='search' element={<SearchResults />} />
             <Route path='amenities' element={<Amenities />} />
             <Route path='contact' element={<Contact />} />
             <Route path='checkout' element={<Checkout />} />
@@ -41,6 +54,7 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
+      </div>
     </AuthProvider>
   );
 }

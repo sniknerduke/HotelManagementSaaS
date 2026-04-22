@@ -16,14 +16,16 @@ public class InventoryResource {
     // --- DTOs ---
 
     public record RoomTypeResponse(Long id, String name, String description,
-                                   java.math.BigDecimal basePrice, int maxGuests, long availableCount) {
+                                   java.math.BigDecimal basePrice, int maxGuests, String imageUrl, long availableCount) {
         public static RoomTypeResponse from(RoomType rt) {
             long available = Room.countAvailableByType(rt.id);
-            return new RoomTypeResponse(rt.id, rt.name, rt.description, rt.basePrice, rt.maxGuests, available);
+            return new RoomTypeResponse(rt.id, rt.name, rt.description, rt.basePrice, rt.maxGuests, rt.imageUrl, available);
         }
     }
 
     public record CreateRoomRequest(String roomNumber, Long roomTypeId) {}
+
+    public record UpdateRoomTypeRequest(String name, String description, java.math.BigDecimal basePrice, Integer maxGuests, String imageUrl) {}
 
     public record UpdateRoomRequest(String roomNumber, Long roomTypeId, Room.RoomStatus status, Integer floor) {}
 
@@ -147,6 +149,16 @@ public class InventoryResource {
     }
 
     @GET
+    @Path("/room-types")
+    public Response getRoomTypes() {
+        List<RoomType> types = RoomType.listAll();
+        List<RoomTypeResponse> result = types.stream()
+                .map(RoomTypeResponse::from)
+                .toList();
+        return Response.ok(result).build();
+    }
+
+    @GET
     @Path("/room-types/{id}")
     public Response getRoomType(@PathParam("id") Long id) {
         RoomType rt = RoomType.findById(id);
@@ -185,5 +197,43 @@ public class InventoryResource {
         return Response.status(Response.Status.CREATED)
                 .entity(RoomTypeResponse.from(roomType))
                 .build();
+    }
+
+    @PUT
+    @Path("/room-types/{id}")
+    @Transactional
+    public Response updateRoomType(@PathParam("id") Long id, UpdateRoomTypeRequest req) {
+        RoomType rt = RoomType.findById(id);
+        if (rt == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        if (req.name() != null) rt.name = req.name();
+        if (req.description() != null) rt.description = req.description();
+        if (req.basePrice() != null) rt.basePrice = req.basePrice();
+        if (req.maxGuests() != null) rt.maxGuests = req.maxGuests();
+        if (req.imageUrl() != null) rt.imageUrl = req.imageUrl();
+
+        return Response.ok(RoomTypeResponse.from(rt)).build();
+    }
+
+    @DELETE
+    @Path("/room-types/{id}")
+    @Transactional
+    public Response deleteRoomType(@PathParam("id") Long id) {
+        RoomType rt = RoomType.findById(id);
+        if (rt == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        long attachedRooms = Room.count("roomType.id = ?1", id);
+        if (attachedRooms > 0) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"Cannot delete room type because it has attached rooms\"}")
+                    .build();
+        }
+
+        rt.delete();
+        return Response.noContent().build();
     }
 }

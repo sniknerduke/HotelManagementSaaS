@@ -13,6 +13,7 @@ export const Register: React.FC = () => {
     firstName: '',
     lastName: '',
     email: '',
+    phoneNumber: '',
     password: '',
     confirmPassword: ''
   });
@@ -41,7 +42,8 @@ export const Register: React.FC = () => {
         email: formData.email,
         password: formData.password,
         firstName: formData.firstName,
-        lastName: formData.lastName
+        lastName: formData.lastName,
+        phoneNumber: formData.phoneNumber
       });
       setSuccess("Account created successfully! Redirecting to login...");
       setTimeout(() => navigate('/login'), 800);
@@ -72,8 +74,7 @@ export const Register: React.FC = () => {
             <Input label={t('register.firstName')} name="firstName" value={formData.firstName} onChange={handleChange} type="text" placeholder="John" required />
             <Input label={t('register.lastName')} name="lastName" value={formData.lastName} onChange={handleChange} type="text" placeholder="Doe" required />
           </div>
-          <Input label={t('register.email')} name="email" value={formData.email} onChange={handleChange} type="email" placeholder="john.doe@example.com" required />
-          <Input label={t('register.password')} name="password" value={formData.password} onChange={handleChange} type="password" placeholder="••••••••" required />
+          <Input label={t('register.email')} name="email" value={formData.email} onChange={handleChange} type="email" placeholder="john.doe@example.com" required />            <Input label={t('register.phone', 'Phone Number')} name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} type="tel" placeholder="+1 (555) 123-4567" required />          <Input label={t('register.password')} name="password" value={formData.password} onChange={handleChange} type="password" placeholder="••••••••" required />
           <Input label={t('register.confirmPassword')} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} type="password" placeholder="••••••••" required />
 
           <label className="flex items-start gap-3 cursor-pointer group mt-4">

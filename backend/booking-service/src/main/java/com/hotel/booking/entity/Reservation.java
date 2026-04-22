@@ -27,6 +27,15 @@ public class Reservation extends PanacheEntity {
     @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
     public BigDecimal totalPrice;
 
+    @Column(name = "adult_count")
+    public Integer adultCount = 1;
+
+    @Column(name = "child_count")
+    public Integer childCount = 0;
+
+    @Column(name = "guest_notes", length = 500)
+    public String guestNotes;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     public ReservationStatus status = ReservationStatus.PENDING;
@@ -40,7 +49,7 @@ public class Reservation extends PanacheEntity {
     }
 
     public enum ReservationStatus {
-        PENDING, CONFIRMED, CANCELLED, COMPLETED
+        PENDING, CONFIRMED, CHECKED_IN, CHECKED_OUT, CANCELLED, NO_SHOW
     }
 
     // --- Finders ---

@@ -21,6 +21,9 @@ public class RoomType extends PanacheEntity {
     @Column(name = "max_guests", nullable = false)
     public int maxGuests;
 
+    @Column(name = "image_url")
+    public String imageUrl;
+
     @OneToMany(mappedBy = "roomType", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     public List<Room> rooms;
 }

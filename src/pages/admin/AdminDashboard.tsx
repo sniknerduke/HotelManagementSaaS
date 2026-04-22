@@ -1,13 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
+import { BookingService, AuthService } from '../../api';
 
 type AdminTab = 'overview' | 'reservations' | 'inventory' | 'users' | 'reports' | 'settings';
 
 export const AdminDashboard: React.FC = () => {
     const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState<AdminTab>('overview');
+    
+    const [bookings, setBookings] = useState<any[]>([]);
+    const [users, setUsers] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [bookingsRes, usersRes] = await Promise.all([
+                    BookingService.getAllBookings(),
+                    AuthService.getAllUsers()
+                ]);
+                setBookings(bookingsRes);
+                setUsers(usersRes);
+            } catch (error) {
+                console.error('Error fetching admin data', error);
+            }
+        };
+        fetchData();
+    }, []);
+
+    // Calculate metrics
+    const totalRooms = 24; // we can hardcode total capacity for now until inventory gets a total
+    const bookedRooms = bookings.filter(b => ['CONFIRMED', 'CHECKED_IN'].includes(b.status)).length;
+    const occupancyRate = totalRooms > 0 ? Math.round((bookedRooms / totalRooms) * 100) : 0;
+    const availableRooms = totalRooms - bookedRooms;
+    const dailyRevenue = bookings.reduce((acc, curr) => acc + (Number(curr.totalPrice) || 0), 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    
+    // Additional Operations Metrics
+    const expectedCheckins = bookings.filter(b => b.status === 'CONFIRMED').length;
+    const expectedCheckouts = bookings.filter(b => b.status === 'CHECKED_IN').length; // simple approximation
+
+    const getUserName = (userId: string) => {
+        const u = users.find(u => u.id === userId);
+        return u ? `${u.firstName} ${u.lastName}` : userId.substring(0, 8);
+    };
 
     return (
         <div className="max-w-[1600px] mx-auto w-full pt-16 md:pt-32 pb-40 px-8 flex flex-col lg:flex-row gap-12">
@@ -43,17 +79,17 @@ export const AdminDashboard: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                             <Card className="p-8 border border-[#1A1A1A]/10 bg-white">
                                 <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#6C6863] mb-2">{t('admin.overview.occupancy')}</p>
-                                <p className="text-4xl font-serif text-[#1A1A1A]">85%</p>
+                                <p className="text-4xl font-serif text-[#1A1A1A]">{occupancyRate}%</p>
                                 <p className="text-xs text-green-600 mt-3 flex items-center gap-1 font-medium"><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeWidth="2" d="M5 15l7-7 7 7"></path></svg> {t('admin.overview.occupancyChange')}</p>
                             </Card>
                             <Card className="p-8 border border-[#1A1A1A]/10 bg-white">
                                 <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#6C6863] mb-2">{t('admin.overview.availableRooms')}</p>
-                                <p className="text-4xl font-serif text-[#1A1A1A]">24</p>
+                                <p className="text-4xl font-serif text-[#1A1A1A]">{availableRooms}</p>
                                 <p className="text-xs text-[#6C6863] mt-3 font-serif italic">{t('admin.overview.totalRooms')}</p>
                             </Card>
                             <Card className="p-8 border-none bg-[#1A1A1A] text-white">
                                 <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/50 mb-2">{t('admin.overview.dailyRevenue')}</p>
-                                <p className="text-4xl font-serif text-[#D4AF37]">$24,500</p>
+                                <p className="text-4xl font-serif text-[#D4AF37]">{dailyRevenue || "$0.00"}</p>
                                 <p className="text-xs text-green-400 mt-3 font-medium">{t('admin.overview.revenueChange')}</p>
                             </Card>
                         </div>
@@ -65,22 +101,22 @@ export const AdminDashboard: React.FC = () => {
                                     <div className="flex justify-between items-center border-b border-[#1A1A1A]/10 pb-4">
                                         <div>
                                             <span className="text-sm font-serif text-[#6C6863] block">{t('admin.overview.expectedCheckins')}</span>
-                                            <span className="text-[10px] uppercase tracking-[0.1em] text-[#D4AF37]">12 {t('admin.overview.pending')}</span>
+                                            <span className="text-[10px] uppercase tracking-[0.1em] text-[#D4AF37]">{expectedCheckins} {t('admin.overview.pending')}</span>
                                         </div>
-                                        <span className="text-2xl font-serif text-[#1A1A1A]">45</span>
+                                        <span className="text-2xl font-serif text-[#1A1A1A]">{expectedCheckins}</span>
                                     </div>
                                     <div className="flex justify-between items-center border-b border-[#1A1A1A]/10 pb-4">
                                         <div>
                                             <span className="text-sm font-serif text-[#6C6863] block">{t('admin.overview.expectedCheckouts')}</span>
-                                            <span className="text-[10px] uppercase tracking-[0.1em] text-[#D4AF37]">4 {t('admin.overview.completed')}</span>
+                                            <span className="text-[10px] uppercase tracking-[0.1em] text-[#D4AF37]">0 {t('admin.overview.completed')}</span>
                                         </div>
-                                        <span className="text-2xl font-serif text-[#1A1A1A]">38</span>
+                                        <span className="text-2xl font-serif text-[#1A1A1A]">{expectedCheckouts}</span>
                                     </div>
                                     <div className="flex justify-between items-center border-b border-[#1A1A1A]/10 pb-4">
                                         <div>
                                             <span className="text-sm font-serif text-[#6C6863] block">{t('admin.overview.stayOvers')}</span>
                                         </div>
-                                        <span className="text-2xl font-serif text-[#1A1A1A]">93</span>
+                                        <span className="text-2xl font-serif text-[#1A1A1A]">{expectedCheckouts}</span>
                                     </div>
                                 </div>
                             </div>
@@ -112,8 +148,8 @@ export const AdminDashboard: React.FC = () => {
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end border-b border-[#1A1A1A]/20 pb-4 mb-8 gap-4">
                             <h2 className="text-3xl font-serif text-[#1A1A1A]">{t('admin.reservations.title')} <span className="italic text-[#D4AF37]">{t('admin.reservations.titleItalic')}</span></h2>
                             <div className="flex gap-4">
-                                <Button variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase font-bold tracking-[0.1em] h-10 px-4 whitespace-nowrap">{t('admin.reservations.walkIn')}</Button>
-                                <Button variant="primary" className="bg-[#1A1A1A] text-white hover:bg-[#D4AF37] transition-colors text-[10px] uppercase font-bold tracking-[0.1em] h-10 px-4 whitespace-nowrap">{t('admin.reservations.calendar')}</Button>
+                                <Button onClick={() => alert('Available in v2.0')} variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase font-bold tracking-[0.1em] h-10 px-4 whitespace-nowrap">{t('admin.reservations.walkIn')}</Button>
+                                <Button onClick={() => alert('Available in v2.0')} variant="primary" className="bg-[#1A1A1A] text-white hover:bg-[#D4AF37] transition-colors text-[10px] uppercase font-bold tracking-[0.1em] h-10 px-4 whitespace-nowrap">{t('admin.reservations.calendar')}</Button>
                             </div>
                         </div>
 
@@ -141,27 +177,34 @@ export const AdminDashboard: React.FC = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {[1, 2, 3, 4, 5].map(i => (
-                                        <tr key={i} className="border-b border-[#1A1A1A]/5 hover:bg-[#F9F8F6]/50 transition-colors group">
-                                            <td className="py-4 px-6 text-sm font-bold text-[#1A1A1A] font-serif">Jane Doe</td>
-                                            <td className="py-4 px-6 text-xs text-[#6C6863]">RES-108{i}</td>
-                                            <td className="py-4 px-6 text-sm text-[#1A1A1A] font-serif italic text-[#D4AF37]">{i % 2 === 0 ? 'The Grand Suite' : 'Ocean Villa'}</td>
-                                            <td className="py-4 px-6 text-xs text-[#6C6863]">Oct 14 - Oct 18</td>
+                                    {bookings.map((booking: any, index: number) => (
+                                        <tr key={booking.id || index} className="border-b border-[#1A1A1A]/5 hover:bg-[#F9F8F6]/50 transition-colors group">
+                                            <td className="py-4 px-6 text-sm font-bold text-[#1A1A1A] font-serif">{getUserName(booking.userId)}</td>
+                                            <td className="py-4 px-6 text-xs text-[#6C6863]">BKG-{booking.id}</td>
+                                            <td className="py-4 px-6 text-sm text-[#1A1A1A] font-serif italic text-[#D4AF37]">Room {booking.roomId}</td>
+                                            <td className="py-4 px-6 text-xs text-[#6C6863]">{booking.checkInDate} to {booking.checkOutDate}</td>
                                             <td className="py-4 px-6">
-                                                <span className={`text-[9px] uppercase font-bold tracking-widest px-2 py-1 ${i === 1 ? 'bg-green-100/50 border border-green-200 text-green-700' : 'bg-blue-100/50 border border-blue-200 text-blue-700'}`}>
-                                                    {i === 1 ? t('admin.reservations.checkedIn') : t('admin.reservations.reserved')}
+                                                <span className={`text-[9px] uppercase font-bold tracking-widest px-2 py-1 ${booking.status === 'CHECKED_IN' ? 'bg-green-100/50 border border-green-200 text-green-700' : 'bg-blue-100/50 border border-blue-200 text-blue-700'}`}>
+                                                    {booking.status}
                                                 </span>
                                             </td>
                                             <td className="py-4 px-6 text-xs text-right space-x-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button className="text-[#D4AF37] hover:text-[#1A1A1A] uppercase tracking-widest font-bold text-[9px]">{t('admin.reservations.table.edit')}</button>
-                                                {i === 1 ? (
-                                                    <button className="text-[#1A1A1A] hover:text-red-600 uppercase tracking-widest font-bold text-[9px]">{t('admin.reservations.table.checkOut')}</button>
+                                                <button onClick={() => alert('Available in v2.0')} className="text-[#D4AF37] hover:text-[#1A1A1A] uppercase tracking-widest font-bold text-[9px]">{t('admin.reservations.table.edit')}</button>
+                                                {booking.status === 'CHECKED_IN' ? (
+                                                    <button onClick={() => alert('Available in v2.0')} className="text-[#1A1A1A] hover:text-red-600 uppercase tracking-widest font-bold text-[9px]">{t('admin.reservations.table.checkOut')}</button>
                                                 ) : (
-                                                    <button className="text-[#1A1A1A] hover:text-green-600 uppercase tracking-widest font-bold text-[9px]">{t('admin.reservations.table.checkIn')}</button>
+                                                    <button onClick={() => alert('Available in v2.0')} className="text-[#1A1A1A] hover:text-green-600 uppercase tracking-widest font-bold text-[9px]">{t('admin.reservations.table.checkIn')}</button>
                                                 )}
                                             </td>
                                         </tr>
                                     ))}
+                                    {bookings.length === 0 && (
+                                        <tr>
+                                            <td colSpan={6} className="py-8 text-center text-[#6C6863] font-serif italic">
+                                                {t('admin.reservations.noData', 'No reservations found.')}
+                                            </td>
+                                        </tr>
+                                    )}
                                 </tbody>
                             </table>
                         </div>
@@ -173,7 +216,7 @@ export const AdminDashboard: React.FC = () => {
                     <div className="animate-in fade-in duration-500">
                         <div className="flex justify-between items-end border-b border-[#1A1A1A]/20 pb-4 mb-8">
                             <h2 className="text-3xl font-serif text-[#1A1A1A]">{t('admin.inventory.title')} <span className="italic text-[#D4AF37]">{t('admin.inventory.titleItalic')}</span></h2>
-                            <Button variant="primary" className="bg-[#1A1A1A] hover:bg-[#D4AF37] transition-colors text-white text-[10px] uppercase tracking-widest font-bold h-10 px-6">{t('admin.inventory.addCategory')}</Button>
+                            <Button onClick={() => alert('Available in v2.0')} variant="primary" className="bg-[#1A1A1A] hover:bg-[#D4AF37] transition-colors text-white text-[10px] uppercase tracking-widest font-bold h-10 px-6">{t('admin.inventory.addCategory')}</Button>
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -234,7 +277,7 @@ export const AdminDashboard: React.FC = () => {
                                                 <span className="text-[10px] uppercase font-bold text-[#6C6863]">Free Category Up</span>
                                             </div>
                                         </div>
-                                        <Button variant="ghost" className="border border-[#1A1A1A]/20 w-full text-[10px] uppercase tracking-widest font-bold h-10 mt-4 border-dashed border-[#1A1A1A]/20">{t('admin.inventory.editPricing')}</Button>
+                                        <Button onClick={() => alert('Available in v2.0')} variant="ghost" className="border border-[#1A1A1A]/20 w-full text-[10px] uppercase tracking-widest font-bold h-10 mt-4 border-dashed border-[#1A1A1A]/20">{t('admin.inventory.editPricing')}</Button>
                                     </div>
                                 </Card>
                             </div>
@@ -247,7 +290,7 @@ export const AdminDashboard: React.FC = () => {
                     <div className="animate-in fade-in duration-500">
                         <div className="flex justify-between items-end border-b border-[#1A1A1A]/20 pb-4 mb-8">
                             <h2 className="text-3xl font-serif text-[#1A1A1A]">{t('admin.users.title')} <span className="italic text-[#D4AF37]">{t('admin.users.titleItalic')}</span></h2>
-                            <Button variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase tracking-widest font-bold h-10 px-6">{t('admin.users.addNew')}</Button>
+                            <Button onClick={() => alert('Available in v2.0')} variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase tracking-widest font-bold h-10 px-6">{t('admin.users.addNew')}</Button>
                         </div>
                         
                         <div className="overflow-x-auto border border-[#1A1A1A]/10 bg-white">
@@ -261,26 +304,30 @@ export const AdminDashboard: React.FC = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {[
-                                        { name: 'Sarah Jenkins', role: t('admin.users.roles.manager'), dept: 'Management' },
-                                        { name: 'Michael Chang', role: t('admin.users.roles.frontDesk'), dept: 'Front Desk' },
-                                        { name: 'Elena Rodriguez', role: t('admin.users.roles.cleaning'), dept: 'Services' }
-                                    ].map((staff, i) => (
-                                        <tr key={i} className="border-b border-[#1A1A1A]/5 hover:bg-[#F9F8F6] transition-colors group">
-                                            <td className="py-4 px-6">
-                                                <p className="text-sm font-bold text-[#1A1A1A]">{staff.name}</p>
-                                                <p className="text-xs text-[#6C6863] font-serif italic">ID: EMP-0{i+1}42</p>
-                                            </td>
-                                            <td className="py-4 px-6">
-                                                <span className="text-[10px] uppercase tracking-widest font-bold bg-[#1A1A1A] text-white px-2 py-1">{staff.role}</span>
-                                            </td>
-                                            <td className="py-4 px-6 text-sm text-[#1A1A1A] font-serif">{staff.dept}</td>
-                                            <td className="py-4 px-6 text-xs text-right opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button className="text-[#D4AF37] hover:text-[#1A1A1A] uppercase tracking-widest font-bold text-[9px] mr-4">{t('admin.users.actions.edit')}</button>
-                                                <button className="text-red-500 hover:text-red-800 uppercase tracking-widest font-bold text-[9px]">{t('admin.users.actions.suspend')}</button>
+                                    {users.length > 0 ? (
+                                        users.filter(u => u.role === 'ADMIN' || u.role === 'MANAGER' || u.role === 'STAFF').map((staff, i) => (
+                                            <tr key={i} className="border-b border-[#1A1A1A]/5 hover:bg-[#F9F8F6] transition-colors group">
+                                                <td className="py-4 px-6">
+                                                    <p className="text-sm font-bold text-[#1A1A1A]">{staff.firstName} {staff.lastName}</p>
+                                                    <p className="text-xs text-[#6C6863] font-serif italic">{staff.email}</p>
+                                                </td>
+                                                <td className="py-4 px-6">
+                                                    <span className="text-[10px] uppercase tracking-widest font-bold bg-[#1A1A1A] text-white px-2 py-1">{staff.role}</span>
+                                                </td>
+                                                <td className="py-4 px-6 text-sm text-[#1A1A1A] font-serif">{staff.phoneNumber || 'N/A'}</td>
+                                                <td className="py-4 px-6 text-xs text-right opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button onClick={() => alert('Available in v2.0')} className="text-[#D4AF37] hover:text-[#1A1A1A] uppercase tracking-widest font-bold text-[9px] mr-4">{t('admin.users.actions.edit')}</button>
+                                                    <button onClick={() => alert('Available in v2.0')} className="text-red-500 hover:text-red-800 uppercase tracking-widest font-bold text-[9px]">{t('admin.users.actions.suspend')}</button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={4} className="py-8 text-center text-sm font-serif italic text-[#6C6863]">
+                                                {t('admin.users.actions.suspend')}
                                             </td>
                                         </tr>
-                                    ))}
+                                    )}
                                 </tbody>
                             </table>
                         </div>
@@ -311,8 +358,8 @@ export const AdminDashboard: React.FC = () => {
                                     <p className="text-xs text-[#6C6863]">{t('admin.reports.financialDesc')}</p>
                                 </div>
                                 <div className="space-y-4 flex flex-col">
-                                    <Button variant="ghost" className="border border-[#1A1A1A]/20 justify-between text-[10px] h-12 uppercase tracking-widest font-bold border-[#1A1A1A]/20 hover:border-[#1A1A1A] group"><span>{t('admin.reports.revenueLedger')}</span> <span className="text-[#D4AF37] group-hover:text-[#1A1A1A]">{t('admin.reports.exportCSV')}</span></Button>
-                                    <Button variant="ghost" className="border border-[#1A1A1A]/20 justify-between text-[10px] h-12 uppercase tracking-widest font-bold border-[#1A1A1A]/20 hover:border-[#1A1A1A] group"><span>{t('admin.reports.taxRemittance')}</span> <span className="text-red-600 group-hover:text-[#1A1A1A]">{t('admin.reports.downloadPDF')}</span></Button>
+                                    <Button onClick={() => alert('Available in v2.0')} variant="ghost" className="border border-[#1A1A1A]/20 justify-between text-[10px] h-12 uppercase tracking-widest font-bold border-[#1A1A1A]/20 hover:border-[#1A1A1A] group"><span>{t('admin.reports.revenueLedger')}</span> <span className="text-[#D4AF37] group-hover:text-[#1A1A1A]">{t('admin.reports.exportCSV')}</span></Button>
+                                    <Button onClick={() => alert('Available in v2.0')} variant="ghost" className="border border-[#1A1A1A]/20 justify-between text-[10px] h-12 uppercase tracking-widest font-bold border-[#1A1A1A]/20 hover:border-[#1A1A1A] group"><span>{t('admin.reports.taxRemittance')}</span> <span className="text-red-600 group-hover:text-[#1A1A1A]">{t('admin.reports.downloadPDF')}</span></Button>
                                 </div>
                             </Card>
 
@@ -322,8 +369,8 @@ export const AdminDashboard: React.FC = () => {
                                     <p className="text-xs text-[#6C6863]">{t('admin.reports.operationalDesc')}</p>
                                 </div>
                                 <div className="space-y-4 flex flex-col">
-                                    <Button variant="ghost" className="border border-[#1A1A1A]/20 justify-between text-[10px] h-12 uppercase tracking-widest font-bold border-[#1A1A1A]/20 hover:border-[#1A1A1A] group"><span>{t('admin.reports.housekeepingRoute')}</span> <span className="text-red-600 group-hover:text-[#1A1A1A]">{t('admin.reports.printPDF')}</span></Button>
-                                    <Button variant="ghost" className="border border-[#1A1A1A]/20 justify-between text-[10px] h-12 uppercase tracking-widest font-bold border-[#1A1A1A]/20 hover:border-[#1A1A1A] group"><span>{t('admin.reports.occupancyForecast')}</span> <span className="text-[#D4AF37] group-hover:text-[#1A1A1A]">{t('admin.reports.exportCSV')}</span></Button>
+                                    <Button onClick={() => alert('Available in v2.0')} variant="ghost" className="border border-[#1A1A1A]/20 justify-between text-[10px] h-12 uppercase tracking-widest font-bold border-[#1A1A1A]/20 hover:border-[#1A1A1A] group"><span>{t('admin.reports.housekeepingRoute')}</span> <span className="text-red-600 group-hover:text-[#1A1A1A]">{t('admin.reports.printPDF')}</span></Button>
+                                    <Button onClick={() => alert('Available in v2.0')} variant="ghost" className="border border-[#1A1A1A]/20 justify-between text-[10px] h-12 uppercase tracking-widest font-bold border-[#1A1A1A]/20 hover:border-[#1A1A1A] group"><span>{t('admin.reports.occupancyForecast')}</span> <span className="text-[#D4AF37] group-hover:text-[#1A1A1A]">{t('admin.reports.exportCSV')}</span></Button>
                                 </div>
                             </Card>
                         </div>
@@ -372,20 +419,20 @@ export const AdminDashboard: React.FC = () => {
                                             <p className="text-sm font-bold text-white mb-1">Payment Gateway (Stripe)</p>
                                             <p className="text-[10px] uppercase tracking-widest text-[#D4AF37]">● {t('admin.settings.apiActive')}</p>
                                         </div>
-                                        <Button variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase tracking-widest font-bold h-8 border-white/20 hover:border-white text-white">{t('admin.settings.renewToken')}</Button>
+                                        <Button onClick={() => alert('Available in v2.0')} variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase tracking-widest font-bold h-8 border-white/20 hover:border-white text-white">{t('admin.settings.renewToken')}</Button>
                                     </div>
                                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 bg-white/5 p-6 border border-white/10">
                                         <div>
                                             <p className="text-sm font-bold text-white mb-1">SMS Notifications (Twilio)</p>
                                             <p className="text-[10px] uppercase tracking-widest text-red-500">○ {t('admin.settings.disconnected')}</p>
                                         </div>
-                                        <Button variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase tracking-widest font-bold h-8 border-white/20 hover:border-white text-white bg-white/10">{t('admin.settings.provideKey')}</Button>
+                                        <Button onClick={() => alert('Available in v2.0')} variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase tracking-widest font-bold h-8 border-white/20 hover:border-white text-white bg-white/10">{t('admin.settings.provideKey')}</Button>
                                     </div>
                                 </div>
                             </Card>
 
                             <div className="flex justify-end pt-4">
-                                <Button variant="primary" className="bg-[#D4AF37] hover:bg-[#1A1A1A] text-white text-[10px] uppercase tracking-[0.2em] font-bold h-12 px-12 transition-colors">{t('admin.settings.saveChanges')}</Button>
+                                <Button onClick={() => alert('Available in v2.0')} variant="primary" className="bg-[#D4AF37] hover:bg-[#1A1A1A] text-white text-[10px] uppercase tracking-[0.2em] font-bold h-12 px-12 transition-colors">{t('admin.settings.saveChanges')}</Button>
                             </div>
                         </div>
                     </div>

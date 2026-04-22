@@ -65,7 +65,7 @@ export const Header: React.FC = () => {
               </span>
               <div className="absolute top-full right-0 mt-0 w-40 bg-[#F9F8F6] border border-[#1A1A1A]/10 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50 flex flex-col">
                 <NavLink to={user.role === 'ADMIN' ? "/admin" : "/profile"} className="px-5 py-3 text-[10px] uppercase tracking-[0.25em] text-[#1A1A1A] hover:bg-[#D4AF37]/10 hover:text-[#D4AF37] transition-colors whitespace-nowrap text-left border-b border-[#1A1A1A]/5">
-                  Profile
+                    {user.role === 'ADMIN' ? 'Dashboard' : 'Profile'}
                 </NavLink>
                 <button onClick={handleLogout} className="px-5 py-3 text-[10px] uppercase tracking-[0.25em] text-[#1A1A1A] hover:bg-red-50 hover:text-red-600 transition-colors whitespace-nowrap text-left w-full">
                   Log out

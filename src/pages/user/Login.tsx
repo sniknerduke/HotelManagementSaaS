@@ -57,7 +57,7 @@ export const Login: React.FC = () => {
       setTimeout(() => setLoadingPhase('fading'), 2000);
 
       // 4. Redirect after welcome animation
-      setTimeout(() => navigate('/profile'), 2800);
+      setTimeout(() => navigate(userData?.role === 'ADMIN' ? '/admin' : '/profile'), 2800);
     } catch (err: any) {
       setError(err.message || 'Invalid email or password');
       setLoadingPhase('idle');

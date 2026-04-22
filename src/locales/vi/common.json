@@ -351,7 +351,8 @@
         "title": "CSDL Khách hàng CRM",
         "description": "Truy cập hồ sơ lịch sử khách hàng, thời gian lưu trú và ghi chú nội bộ.",
         "open": "Mở Module CRM"
-      }
+      },
+      "addNew": "+ Thêm nhân viên mới"
     },
     "reports": {
       "title": "Xuất dữ liệu",
@@ -467,30 +468,6 @@
       "shuttle": {
         "q": "Khách sạn có cung cấp dịch vụ đưa đón sân bay không?",
         "a": "Chúng tôi cung cấp dịch vụ đưa đón sang trọng có tài xế riêng từ Sân bay Quốc tế Metropolis. Dịch vụ này phải được đặt ít nhất 48 giờ trước khi đến."
-      }
-    }
-  },
-  "terms": {
-    "badge": "Thỏa thuận Pháp lý",
-    "title": "Điều khoản",
-    "titleItalic": "Dịch vụ.",
-    "lastUpdated": "Cập nhật lần cuối: tháng 4 năm 2026",
-    "sections": {
-      "acceptance": {
-        "title": "1. Chấp nhận các Điều khoản",
-        "content": "Bằng cách đặt phòng tại The Lumière Estate, truy cập các nền tảng kỹ thuật số của chúng tôi hoặc tham gia các dịch vụ của chúng tôi, bạn đồng ý tuân thủ và bị ràng buộc bởi các điều khoản sau đây. Việc không tuân thủ các điều khoản này cho phép ban quản lý của chúng tôi có quyền chấm dứt việc đặt phòng của bạn mà không hoàn lại tiền."
-      },
-      "reservations": {
-        "title": "2. Chính sách Đặt phòng & Thanh toán",
-        "content": "Thẻ tín dụng hợp lệ là bắt buộc để đảm bảo tất cả các đặt phòng. Một khoản phí ủy quyền trước tương đương với đêm đầu tiên cộng với thuế sẽ được xử lý 72 giờ trước khi đến. Nếu việc ủy quyền này thất bại, nhân viên hỗ trợ của chúng tôi sẽ cố gắng liên lạc với bạn; nếu không, việc đặt phòng có thể bị hủy một cách tôn trọng."
-      },
-      "liability": {
-        "title": "3. Giao thức Trách nhiệm",
-        "content": "Lumière không chịu trách nhiệm cho các vật phẩm cá nhân bị mất, hư hỏng hoặc bị mất cắp mà không có người trông coi bên trong phòng nghỉ hoặc khu vực công cộng. Chúng tôi đặc biệt khuyến khích sử dụng két sắt an toàn miễn phí trong phòng cho tất cả hàng hóa cao cấp, tiền mặt và các giấy tờ quan trọng."
-      },
-      "cancellation": {
-        "title": "4. Kiến trúc Hủy bỏ",
-        "content": "Để tránh phí phạt hủy phòng tương đương với một đêm đầy đủ cộng với thuế, các đặt phòng phải được hủy hoặc sửa đổi trước 4:00 chiều giờ địa phương của khách sạn ít nhất 48 giờ trước ngày dự kiến đến. Các đặt phòng không hoàn lại trong mùa cao điểm là ngoại lệ cho chính sách khoan hồng này."
       }
     }
   },

@@ -25,6 +25,22 @@ public class User extends PanacheEntityBase {
     @Column(name = "last_name", nullable = false)
     public String lastName;
 
+    @Column(name = "phone_number")
+    public String phoneNumber;
+
+    public String nationality;
+
+    @Column(name = "national_id")
+    public String nationalId;
+
+    @Column(name = "date_of_birth")
+    public java.time.LocalDate dateOfBirth;
+
+    public String address;
+
+    @Column(name = "avatar_url")
+    public String avatarUrl;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     public UserRole role = UserRole.GUEST;

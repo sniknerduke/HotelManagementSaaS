@@ -35,6 +35,15 @@ public class BookingResource {
 
     // --- Endpoints ---
 
+    @GET
+    public Response getAllBookings() {
+        List<BookingResponse> bookings = Reservation.<Reservation>listAll()
+                .stream()
+                .map(BookingResponse::from)
+                .toList();
+        return Response.ok(bookings).build();
+    }
+
     @POST
     @Transactional
     public Response createBooking(CreateBookingRequest req) {

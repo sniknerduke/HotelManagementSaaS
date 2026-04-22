@@ -1,0 +1,411 @@
+# 🏨 Hotel Management SaaS – Project Status Overview
+
+> **Project**: Lumiere Estate – Hotel Management & Booking Platform
+> **Stack**: React 19 + TypeScript (Vite) │ Quarkus 3 + Java 21 (Maven) │ PostgreSQL │ Kong Gateway │ Docker
+
+---
+
+## Architecture at a Glance
+
+```mermaid
+graph LR
+    subgraph Frontend["Frontend (React + Vite) :5173"]
+        FE_Pages["27 Pages/Components"]
+        FE_API["api/client.ts + index.ts"]
+        FE_Auth["AuthContext (in-memory)"]
+        FE_i18n["i18n (EN/VN)"]
+    end
+
+    subgraph Gateway["Kong API Gateway :8000"]
+        KG["Rate Limiting + Routing"]
+    end
+
+    subgraph Backend["Quarkus Microservices"]
+        US["user-service :8081"]
+        IS["inventory-service :8082"]
+        BS["booking-service :8083"]
+        PS["payment-service :8084"]
+    end
+
+    subgraph DBs["PostgreSQL Databases"]
+        UDB["hotel_user_db :5481"]
+        IDB["hotel_inventory_db :5482"]
+        BDB["hotel_booking_db :5483"]
+        PDB["hotel_payment_db :5484"]
+    end
+
+    FE_API -- "/api/*" --> KG
+    KG --> US
+    KG --> IS
+    KG --> BS
+    KG --> PS
+    US --> UDB
+    IS --> IDB
+    BS --> BDB
+    PS --> PDB
+```
+
+---
+
+## Project File Tree
+
+```
+📁 Java NC BTL/                     ← Root
+├── 📁 src/                         ← Frontend (React + Vite)
+│   ├── App.tsx                     ← Router & route definitions
+│   ├── main.tsx                    ← Entry point
+│   ├── index.css                   ← Global styles (Tailwind v4)
+│   ├── i18n.ts                     ← i18next config
+│   ├── 📁 api/
+│   │   ├── client.ts               ← Centralized fetch wrapper (auth headers, error handling)
+│   │   └── index.ts                ← Service modules (AuthService, InventoryService, BookingService, PaymentService)
+│   ├── 📁 context/
+│   │   └── AuthContext.tsx          ← In-memory auth state (role, session)
+│   ├── 📁 components/
+│   │   ├── 📁 layout/              ← Header, Footer, Layout, SplashScreen, GridLines, NoiseOverlay
+│   │   └── 📁 ui/                  ← Button, Card, Input primitives
+│   ├── 📁 pages/
+│   │   ├── Home.tsx                 ← Landing page with hero search
+│   │   ├── SearchResults.tsx        ← Room search + filters
+│   │   ├── Checkout.tsx             ← 3-step checkout flow
+│   │   ├── Amenities.tsx, Contact.tsx
+│   │   ├── 📁 user/                ← Login, Register, Profile, Dashboard, AuthCallback
+│   │   ├── 📁 admin/               ← AdminDashboard (KPIs, reservations, inventory, staff, reports)
+│   │   └── 📁 footer/              ← Experiences, FAQ, PrivacyPolicy, TermsOfService
+│   └── 📁 locales/                 ← en/common.json, vi/common.json
+│
+├── 📁 backend/                     ← Backend (Quarkus Multi-Module Maven)
+│   ├── pom.xml                     ← Parent POM (Java 21, Quarkus 3.17.7)
+│   ├── mvnw.cmd                    ← Maven wrapper
+│   ├── docker-compose.yml          ← Full stack: 4 DBs + 4 services + Kong
+│   ├── 📁 kong/
+│   │   └── kong.yml                ← Declarative routing config
+│   ├── 📁 user-service/
+│   │   ├── Dockerfile
+│   │   ├── pom.xml
+│   │   └── src/main/java/com/hotel/user/
+│   │       ├── entity/User.java                 ← JPA entity (UUID, email, roles)
+│   │       └── resource/
+│   │           ├── UserResource.java            ← /register, /login, /{id}
+│   │           └── SocialAuthResource.java      ← Google + Facebook OAuth
+│   ├── 📁 inventory-service/
+│   │   ├── Dockerfile
+│   │   ├── pom.xml
+│   │   └── src/main/java/com/hotel/inventory/
+│   │       ├── entity/Room.java, RoomType.java  ← JPA entities
+│   │       └── resource/InventoryResource.java  ← /rooms/availability, /room-types, /rooms
+│   ├── 📁 booking-service/
+│   │   ├── Dockerfile
+│   │   ├── pom.xml
+│   │   └── src/main/java/com/hotel/booking/
+│   │       ├── entity/Reservation.java          ← JPA entity
+│   │       └── resource/BookingResource.java    ← POST /, GET /user/{id}, PATCH /{id}/status
+│   └── 📁 payment-service/
+│       ├── Dockerfile
+│       ├── pom.xml
+│       └── src/main/java/com/hotel/payment/
+│           ├── entity/Payment.java              ← JPA entity
+│           └── resource/PaymentResource.java    ← POST /, GET /reservation/{id}
+│
+├── 📁 prompt/                      ← Design docs / specs
+│   ├── Objective.xml
+│   └── prompt.xml
+├── vite.config.ts                  ← Dev proxy: /api → localhost:8000 (Kong)
+├── package.json
+└── README.md
+```
+
+---
+
+## ✅ What's DONE
+
+| Area | Status | Details |
+|------|--------|---------|
+| **Frontend Pages** | ✅ Complete | 14 routes: Home, Search, Checkout, Amenities, Contact, Experiences, FAQ, Privacy, Terms, Login, Register, Profile, Dashboard, Admin |
+| **UI Design System** | ✅ Complete | Tailwind v4, Framer Motion animations, luxury editorial design, layout components |
+| **i18n** | ✅ Complete | English + Vietnamese, language toggle in header |
+| **Auth UI** | ✅ Complete | Login (demo role-based), Register, Profile portal with multi-tab layout |
+| **Admin Dashboard** | ✅ Complete | KPIs, reservations, inventory, staff management, reports, settings panels |
+| **Checkout Flow** | ✅ Complete | 3-step UX: guest info → payment → confirmation |
+| **API Client Layer** | ✅ Complete | `api/client.ts` with auth headers, `api/index.ts` with all 4 service modules |
+| **Backend Entities** | ✅ Complete | User, Room, RoomType, Reservation, Payment – all with Panache ORM |
+| **REST Endpoints** | ✅ Complete | 12+ endpoints across 4 services |
+| **Social Auth** | ✅ Complete | Google + Facebook OAuth flow in `SocialAuthResource.java` |
+| **Docker Compose** | ✅ Complete | 4 PostgreSQL DBs + 4 microservices + Kong gateway |
+| **Kong Gateway** | ✅ Complete | Declarative config routing all `/api/*` paths + rate limiting |
+| **Dev Mode Config** | ✅ Complete | Quarkus DevServices auto-starts PostgreSQL per service |
+| **Dockerfiles** | ✅ Complete | One per microservice |
+
+---
+
+## 📋 Step-by-Step Implementation Roadmap
+
+> Sequential order — **do Step 1 first, then Step 2, and so on**. Each step builds on the previous one.
+> Benchmarked against [the-wild-oasis](https://github.com/sudeepmahato16/the-wild-oasis), [Hotel-Booking-MERN](https://github.com/arnobt78/Hotel-Booking-Management-System--React-MERN-FullStack), [jsanhuo/HotelManagementSystem](https://github.com/jsanhuo/HotelManagementSystem), and industry HMS standards.
+
+```mermaid
+graph LR
+    S1["Step 1\nSeed Data"] --> S2["Step 2\nComplete CRUD"] --> S3["Step 3\nSecurity"] --> S4["Step 4\nService Links"] --> S5["Step 5\nFrontend Wiring"]
+    S5 --> S6["Step 6\nValidation"] --> S7["Step 7\nAnalytics"] --> S8["Step 8\nHousekeeping"] --> S9["Step 9\nTesting"] --> S10["Step 10\nDevOps"]
+```
+
+---
+
+### Step 1 — 🌱 Seed Data & Entity Improvements *(Do This First!)*
+
+> **Why first?** You can't test CRUD or anything else on empty databases. Get sample data in so every step after this has something to work with.
+
+- [ ] Add `import.sql` to **inventory-service** — sample room types (Deluxe, Suite, Standard) + sample rooms (101–110)
+- [ ] Add `import.sql` to **user-service** — demo admin user + demo guest user (with hashed password placeholder for now)
+- [ ] Add `import.sql` to **booking-service** — a few sample reservations
+- [ ] Add `import.sql` to **payment-service** — sample payments linked to sample reservations
+- [ ] Add `status` enum to `Room.java` — `AVAILABLE`, `OCCUPIED`, `CLEANING`, `MAINTENANCE`, `OUT_OF_ORDER`
+- [ ] Add `adultCount`, `childCount`, `guestNotes` fields to `Reservation.java`
+- [ ] Expand `Reservation.ReservationStatus` — full lifecycle: `PENDING` → `CONFIRMED` → `CHECKED_IN` → `CHECKED_OUT` → `CANCELLED` → `NO_SHOW`
+- [ ] Add `Payment.PaymentStatus` — `PENDING` → `COMPLETED` → `REFUNDED` → `FAILED`
+- [ ] Add extra `User` fields — `nationality`, `nationalId`, `dateOfBirth`, `address`, `avatarUrl`
+- [ ] Add `imageUrl` field to `RoomType.java`
+- [ ] Add `floor` field to `Room.java`
+
+---
+
+### Step 2 — 🔧 Complete All CRUD Operations *(Backend Core)*
+
+> **Why second?** The backend can only create a few things right now. Need full Create-Read-Update-Delete for every entity before anything else works.
+
+#### 2a. Room & Room Type CRUD (`InventoryResource.java`)
+- [ ] `GET /api/inventory/rooms` — list all rooms (with filters by status, type, floor)
+- [ ] `GET /api/inventory/rooms/{id}` — get single room
+- [ ] `PUT /api/inventory/rooms/{id}` — update room (number, type, status, floor)
+- [ ] `DELETE /api/inventory/rooms/{id}` — soft-delete or deactivate room
+- [ ] `PATCH /api/inventory/rooms/{id}/status` — change room status (for front desk / housekeeping)
+- [ ] `GET /api/inventory/room-types` — list all room types
+- [ ] `PUT /api/inventory/room-types/{id}` — update room type (name, price, capacity, description, image)
+- [ ] `DELETE /api/inventory/room-types/{id}` — delete room type (only if no rooms attached)
+
+#### 2b. Booking CRUD (`BookingResource.java`)
+- [ ] `GET /api/bookings/{id}` — get single booking with all details
+- [ ] `PUT /api/bookings/{id}` — update booking (dates, room, guest count, notes)
+- [ ] `DELETE /api/bookings/{id}` — cancel booking (set status to CANCELLED)
+- [ ] `POST /api/bookings/{id}/check-in` — check guest in → status=`CHECKED_IN`, room→`OCCUPIED`
+- [ ] `POST /api/bookings/{id}/check-out` — check guest out → status=`CHECKED_OUT`, room→`CLEANING`
+
+#### 2c. User CRUD (`UserResource.java`)
+- [ ] `PUT /api/users/{id}` — update profile (name, phone, nationality, address, avatar)
+- [ ] `DELETE /api/users/{id}` — deactivate account (soft delete)
+- [ ] `PATCH /api/users/{id}/role` — admin changes role (GUEST ↔ STAFF ↔ ADMIN)
+- [ ] `PUT /api/users/{id}/password` — change password (requires current password)
+
+#### 2d. Payment CRUD (`PaymentResource.java`)
+- [ ] `GET /api/payments` — list all payments (admin, with filters by status, date range)
+- [ ] `GET /api/payments/{id}` — get single payment details
+- [ ] `POST /api/payments/{id}/refund` — refund payment (partial or full)
+
+---
+
+### Step 3 — 🔐 Security & Authentication *(Lock It Down)*
+
+> **Why third?** CRUD must work first so you have endpoints to protect. Now add auth so only the right people can access them.
+
+- [ ] Add BCrypt dependency to `user-service/pom.xml`
+- [ ] Hash passwords in `UserResource.register()` using BCrypt
+- [ ] Verify hashed password in `UserResource.login()` using BCrypt
+- [ ] Enable `smallrye-jwt` in `application.properties`
+- [ ] Generate RSA key pair (`privateKey.pem` + `publicKey.pem`) for JWT signing
+- [ ] Create `JwtService.java` — generates JWT on login with userId, email, role claims
+- [ ] Return JWT token in login response body
+- [ ] Update `SocialAuthResource.java` — return real JWT instead of mock token string
+- [ ] Add `@RolesAllowed("ADMIN")` guards on admin-only endpoints (delete user, change role, list all payments, etc.)
+- [ ] Add `@RolesAllowed("GUEST")` or `@Authenticated` on user-specific endpoints (update own profile, view own bookings)
+- [ ] Add `POST /api/users/logout` — frontend clears token, backend can optionally blacklist
+- [ ] Update `AuthContext.tsx` — store JWT in `localStorage`, decode role from token, auto-attach to `api/client.ts`
+- [ ] Add frontend route guards — redirect to `/login` if no token, redirect from `/admin` if not ADMIN role
+
+---
+
+### Step 4 — 🔗 Service-to-Service Communication *(Connect the Microservices)*
+
+> **Why fourth?** With CRUD + auth done, now make the services talk to each other for real business logic.
+
+- [ ] Add Quarkus REST Client dependency to `booking-service/pom.xml`
+- [ ] Create `InventoryClient.java` interface — call `GET /api/inventory/rooms/{id}` to check availability
+- [ ] Update `BookingResource.createBooking()` — call inventory to verify room is `AVAILABLE`, then set room to `OCCUPIED`
+- [ ] Update `BookingResource.check-out()` — call inventory to set room back to `CLEANING`
+- [ ] Add Quarkus REST Client to `payment-service/pom.xml`
+- [ ] Create `BookingClient.java` interface — call `PATCH /api/bookings/{id}/status`
+- [ ] Update `PaymentResource.createPayment()` — after payment succeeds, call booking service to set status to `CONFIRMED`
+
+---
+
+### Step 5 — 🔌 Wire Frontend to Backend *(Make It Real)*
+
+> **Why fifth?** Backend is now complete and secure. Time to replace all frontend mock data with real API calls.
+
+- [ ] **Login.tsx** → call `AuthService.login()` → store JWT → redirect based on role
+- [ ] **Register.tsx** → call `AuthService.register()` → auto-login → redirect to profile
+- [ ] **AuthCallback.tsx** → handle OAuth callback → store token from URL params
+- [ ] **SearchResults.tsx** → call `InventoryService.getAvailability()` → render real room data
+- [ ] **Checkout.tsx** → call `BookingService.createBooking()` + `PaymentService.createPayment()`
+- [ ] **Profile.tsx** → call `AuthService.getProfile()` + `BookingService.getUserBookings()`
+- [ ] **AdminDashboard.tsx** — reservations tab → `BookingService.getAllBookings()`
+- [ ] **AdminDashboard.tsx** — inventory tab → `InventoryService` CRUD for rooms/room-types
+- [ ] **AdminDashboard.tsx** — user management tab → `AuthService.getAllUsers()` + role changes
+- [ ] Add loading spinners / skeleton states for all API-dependent views
+- [ ] Add error states (network failure, 401 redirect to login, 404 pages)
+- [ ] Add toast notifications — success/error feedback (e.g. "Booking created!", "Payment failed")
+
+---
+
+### Step 6 — ✅ Input Validation & Data Quality
+
+> **Why sixth?** Now that everything works end-to-end, harden it so bad data can't get in.
+
+- [ ] Add `@NotBlank`, `@Email`, `@Size` on all DTO record fields across all services
+- [ ] Add `@Min(1)` on numeric fields (guest count, prices)
+- [ ] Add date validation — check-in must be before check-out, can't book in the past
+- [ ] Create `GlobalExceptionMapper.java` in each service — catch `ConstraintViolationException` → return clean JSON errors
+- [ ] Add pagination to all list endpoints — `?page=0&size=20&sort=createdAt` using Panache `.page()` / `.range()`
+- [ ] Add unique constraints and proper indexes to all entities
+- [ ] Frontend form validation — match backend rules, show inline errors before submit
+
+---
+
+### Step 7 — 📊 Analytics & Dashboard *(Real Data!)*
+
+> **Why seventh?** With real bookings and payments flowing, now build analytics endpoints to power the admin dashboard.
+
+- [ ] Create `analytics-service` module **OR** add analytics endpoints to `booking-service` (simpler)
+- [ ] `GET /api/analytics/overview` — total revenue, total bookings, occupancy rate, ADR, RevPAR
+- [ ] `GET /api/analytics/bookings?period=7d|30d|90d` — booking count over time
+- [ ] `GET /api/analytics/revenue?period=7d|30d|90d` — daily revenue chart data
+- [ ] `GET /api/analytics/occupancy` — occupancy rate per day
+- [ ] `GET /api/analytics/today` — today's arrivals, departures, in-house guests
+- [ ] Wire `AdminDashboard.tsx` KPI cards to `GET /api/analytics/overview`
+- [ ] Wire dashboard charts to real analytics data
+
+---
+
+### Step 8 — 🧹 Housekeeping + ⚙️ Settings *(Bonus Features)*
+
+> **Why eighth?** These are the features that make it feel like a *real* hotel management system, not just a booking site.
+
+#### 8a. Housekeeping Module
+- [ ] Room cleaning status enum already added in Step 1 — now wire the logic
+- [ ] `GET /api/housekeeping/tasks` — list rooms where status = `DIRTY` or `CLEANING`
+- [ ] `PATCH /api/housekeeping/rooms/{id}/status` — staff marks room as `CLEAN` / `INSPECTED`
+- [ ] Auto-set room to `DIRTY` when check-out happens (from Step 4)
+- [ ] Staff assignment — link housekeeping tasks to specific STAFF users
+
+#### 8b. Application Settings
+- [ ] Create `HotelSettings` entity — breakfast price, min/max nights, max guests, check-in/check-out times
+- [ ] `GET /api/settings` — read current settings
+- [ ] `PUT /api/settings` — admin updates settings
+- [ ] Wire admin settings panel in `AdminDashboard.tsx` — the UI shell already exists, just connect it
+
+---
+
+### Step 9 — 🧪 Testing *(Prove It Works)*
+
+> **Why ninth?** Everything is built. Now write tests to make sure it stays working.
+
+- [ ] `UserResourceTest.java` — `@QuarkusTest`: register, login, get/update/delete user
+- [ ] `InventoryResourceTest.java` — `@QuarkusTest`: CRUD rooms, CRUD room types, check availability
+- [ ] `BookingResourceTest.java` — `@QuarkusTest`: create/get/update/cancel booking, check-in, check-out
+- [ ] `PaymentResourceTest.java` — `@QuarkusTest`: create payment, get payment, refund
+- [ ] Integration test — full flow: register → login → search → book → pay → check-in → check-out
+- [ ] Frontend tests — Login, Register, Checkout component tests (optional, vitest + testing-library)
+
+---
+
+### Step 10 — 🚀 DevOps & Production Polish *(Ship It)*
+
+> **Why last?** Only invest in CI/CD and production infra once the app is feature-complete and tested.
+
+- [ ] Create `.github/workflows/ci.yml` — build + test on push/PR
+- [ ] Add health check endpoints — `GET /api/health` per service
+- [ ] Production Docker Compose — SSL termination, real secrets, health probes
+- [ ] Lock down CORS — only allow your production domain
+- [ ] Frontend build optimization — code splitting, lazy route loading
+- [ ] Email notifications — booking confirmation, check-in reminder, receipts (Quarkus Mailer)
+- [ ] Structured JSON logging — centralized log aggregation
+
+---
+
+## Quick Reference – How to Run
+
+| Component | Command | URL |
+|-----------|---------|-----|
+| **Frontend** | `npm install && npm run dev` | http://localhost:5173 |
+| **User Service** | `.\mvnw.cmd -pl user-service quarkus:dev` | http://localhost:8081 |
+| **Inventory Service** | `.\mvnw.cmd -pl inventory-service quarkus:dev` | http://localhost:8082 |
+| **Booking Service** | `.\mvnw.cmd -pl booking-service quarkus:dev` | http://localhost:8083 |
+| **Payment Service** | `.\mvnw.cmd -pl payment-service quarkus:dev` | http://localhost:8084 |
+| **Full Stack (Docker)** | `docker compose up --build` | Kong: http://localhost:8000 |
+| **Backend Build** | `.\mvnw.cmd clean install` (from `backend/`) | – |
+
+---
+
+## API Endpoint Summary (Current vs. Needed)
+
+| Service | Method | Endpoint | Status |
+|---------|--------|----------|--------|
+| **User** | `POST` | `/api/users/register` | ✅ Works (no hashing) |
+| | `POST` | `/api/users/login` | ⚠️ Works (no JWT) |
+| | `GET` | `/api/users/{id}` | ✅ Works |
+| | `GET` | `/api/users` | ✅ Works |
+| | `PUT` | `/api/users/{id}` | ❌ Missing |
+| | `DELETE` | `/api/users/{id}` | ❌ Missing |
+| | `PATCH` | `/api/users/{id}/role` | ❌ Missing |
+| | `PUT` | `/api/users/{id}/password` | ❌ Missing |
+| | `POST` | `/api/users/logout` | ❌ Missing |
+| | `GET` | `/api/auth/google` | ✅ OAuth redirect |
+| | `GET` | `/api/auth/facebook` | ✅ OAuth redirect |
+| **Inventory** | `GET` | `/api/inventory/rooms/availability` | ✅ Works |
+| | `GET` | `/api/inventory/rooms` | ❌ Missing |
+| | `GET` | `/api/inventory/rooms/{id}` | ❌ Missing |
+| | `PUT` | `/api/inventory/rooms/{id}` | ❌ Missing |
+| | `DELETE` | `/api/inventory/rooms/{id}` | ❌ Missing |
+| | `PATCH` | `/api/inventory/rooms/{id}/status` | ❌ Missing |
+| | `GET` | `/api/inventory/room-types` | ❌ Missing |
+| | `GET` | `/api/inventory/room-types/{id}` | ✅ Works |
+| | `PUT` | `/api/inventory/room-types/{id}` | ❌ Missing |
+| | `DELETE` | `/api/inventory/room-types/{id}` | ❌ Missing |
+| | `POST` | `/api/inventory/rooms` | ✅ Works |
+| | `POST` | `/api/inventory/room-types` | ✅ Works |
+| **Booking** | `POST` | `/api/bookings` | ⚠️ Works (no inventory check) |
+| | `GET` | `/api/bookings` | ✅ Works |
+| | `GET` | `/api/bookings/{id}` | ❌ Missing |
+| | `PUT` | `/api/bookings/{id}` | ❌ Missing |
+| | `DELETE` | `/api/bookings/{id}` | ❌ Missing |
+| | `GET` | `/api/bookings/user/{userId}` | ✅ Works |
+| | `PATCH` | `/api/bookings/{id}/status` | ✅ Works |
+| | `POST` | `/api/bookings/{id}/check-in` | ❌ Missing |
+| | `POST` | `/api/bookings/{id}/check-out` | ❌ Missing |
+| **Payment** | `POST` | `/api/payments` | ⚠️ Works (mock txn) |
+| | `GET` | `/api/payments` | ❌ Missing |
+| | `GET` | `/api/payments/{id}` | ❌ Missing |
+| | `GET` | `/api/payments/reservation/{id}` | ✅ Works |
+| | `POST` | `/api/payments/{id}/refund` | ❌ Missing |
+| **Housekeeping** | `GET` | `/api/housekeeping/tasks` | ❌ Missing (whole module) |
+| | `PATCH` | `/api/housekeeping/rooms/{id}/status` | ❌ Missing |
+| **Analytics** | `GET` | `/api/analytics/overview` | ❌ Missing (whole module) |
+| | `GET` | `/api/analytics/bookings` | ❌ Missing |
+| | `GET` | `/api/analytics/revenue` | ❌ Missing |
+| **Settings** | `GET` | `/api/settings` | ❌ Missing |
+| | `PUT` | `/api/settings` | ❌ Missing |
+
+---
+
+## Overall Progress
+
+```mermaid
+pie title Project Completion
+    "Frontend UI" : 95
+    "Backend APIs" : 30
+    "Security (Auth/JWT)" : 10
+    "Frontend-Backend Integration" : 5
+    "Testing" : 0
+    "DevOps/CI" : 30
+```
+
+> **Bottom line**: The frontend shell is stunning, but the backend is only ~30% complete when measured against what a real hotel management system needs. The biggest priorities are **security**, **completing CRUD operations**, and **wiring the frontend to real data**. Follow the priority graph above and you'll have a fully functional, demonstrable system.

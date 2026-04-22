@@ -14,15 +14,20 @@ public class UserResource {
 
     // --- DTOs ---
 
-    public record RegisterRequest(String email, String password, String firstName, String lastName) {}
+    public record RegisterRequest(String email, String password, String firstName, String lastName, String phoneNumber) {}
     public record LoginRequest(String email, String password) {}
-    public record UserResponse(UUID id, String email, String firstName, String lastName, String role) {
+    public record UserResponse(UUID id, String email, String firstName, String lastName, String role, String phoneNumber) {
         public static UserResponse from(User u) {
-            return new UserResponse(u.id, u.email, u.firstName, u.lastName, u.role.name());
+            return new UserResponse(u.id, u.email, u.firstName, u.lastName, u.role.name(), u.phoneNumber);
         }
     }
 
     // --- Endpoints ---
+
+    @GET
+    public Response getAllUsers() {
+        return Response.ok(User.<User>listAll().stream().map(UserResponse::from).toList()).build();
+    }
 
     @POST
     @Path("/register")
@@ -40,6 +45,7 @@ public class UserResource {
         user.passwordHash = req.password();
         user.firstName = req.firstName();
         user.lastName = req.lastName();
+        user.phoneNumber = req.phoneNumber();
         user.persist();
 
         return Response.status(Response.Status.CREATED)

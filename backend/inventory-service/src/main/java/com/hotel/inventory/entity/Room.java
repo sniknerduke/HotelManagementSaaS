@@ -10,6 +10,9 @@ public class Room extends PanacheEntity {
     @Column(name = "room_number", unique = true, nullable = false)
     public String roomNumber;
 
+    @Column(name = "floor")
+    public Integer floor;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_type_id", nullable = false)
     public RoomType roomType;
@@ -19,7 +22,7 @@ public class Room extends PanacheEntity {
     public RoomStatus status = RoomStatus.AVAILABLE;
 
     public enum RoomStatus {
-        AVAILABLE, MAINTENANCE
+        AVAILABLE, OCCUPIED, CLEANING, MAINTENANCE, OUT_OF_ORDER
     }
 
     // --- Finders ---

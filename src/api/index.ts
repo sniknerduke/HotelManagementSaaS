@@ -4,6 +4,7 @@ export const AuthService = {
     register: (data: any) => api.post('/users/register', data),
     login: (data: any) => api.post('/users/login', data),
     getProfile: (userId: string) => api.get(`/users/${userId}`),
+    getAllUsers: () => api.get('/users'),
 };
 
 export const InventoryService = {
@@ -16,6 +17,7 @@ export const InventoryService = {
 
 export const BookingService = {
     createBooking: (data: any) => api.post('/bookings', data),
+    getAllBookings: () => api.get('/bookings'),
     getUserBookings: (userId: string) => api.get(`/bookings/user/${userId}`),
     updateStatus: (id: number, status: string) => api.patch(`/bookings/${id}/status`, { status }),
 };

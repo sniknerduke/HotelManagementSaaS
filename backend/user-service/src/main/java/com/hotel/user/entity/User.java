@@ -41,6 +41,9 @@ public class User extends PanacheEntityBase {
     @Column(name = "avatar_url")
     public String avatarUrl;
 
+    @Column(name = "is_active")
+    public boolean isActive = true;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     public UserRole role = UserRole.GUEST;

@@ -16,9 +16,15 @@ public class UserResource {
 
     public record RegisterRequest(String email, String password, String firstName, String lastName, String phoneNumber) {}
     public record LoginRequest(String email, String password) {}
-    public record UserResponse(UUID id, String email, String firstName, String lastName, String role, String phoneNumber) {
+    public record UpdateProfileRequest(String firstName, String lastName, String phoneNumber, String nationality, String nationalId, java.time.LocalDate dateOfBirth, String address, String avatarUrl) {}
+    public record UpdateRoleRequest(String role) {}
+    public record ChangePasswordRequest(String currentPassword, String newPassword) {}
+
+    public record UserResponse(UUID id, String email, String firstName, String lastName, String role, String phoneNumber,
+                               String nationality, String nationalId, java.time.LocalDate dateOfBirth, String address, String avatarUrl, boolean isActive) {
         public static UserResponse from(User u) {
-            return new UserResponse(u.id, u.email, u.firstName, u.lastName, u.role.name(), u.phoneNumber);
+            return new UserResponse(u.id, u.email, u.firstName, u.lastName, u.role.name(), u.phoneNumber,
+                    u.nationality, u.nationalId, u.dateOfBirth, u.address, u.avatarUrl, u.isActive);
         }
     }
 
@@ -26,7 +32,7 @@ public class UserResource {
 
     @GET
     public Response getAllUsers() {
-        return Response.ok(User.<User>listAll().stream().map(UserResponse::from).toList()).build();
+        return Response.ok(User.<User>list("isActive = true").stream().map(UserResponse::from).toList()).build();
     }
 
     @POST
@@ -72,9 +78,84 @@ public class UserResource {
     @Path("/{id}")
     public Response getUser(@PathParam("id") UUID id) {
         User user = User.findById(id);
-        if (user == null) {
+        if (user == null || !user.isActive) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         return Response.ok(UserResponse.from(user)).build();
+    }
+
+    @PUT
+    @Path("/{id}")
+    @Transactional
+    public Response updateProfile(@PathParam("id") UUID id, UpdateProfileRequest req) {
+        User user = User.findById(id);
+        if (user == null || !user.isActive) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        if (req.firstName() != null) user.firstName = req.firstName();
+        if (req.lastName() != null) user.lastName = req.lastName();
+        if (req.phoneNumber() != null) user.phoneNumber = req.phoneNumber();
+        if (req.nationality() != null) user.nationality = req.nationality();
+        if (req.nationalId() != null) user.nationalId = req.nationalId();
+        if (req.dateOfBirth() != null) user.dateOfBirth = req.dateOfBirth();
+        if (req.address() != null) user.address = req.address();
+        if (req.avatarUrl() != null) user.avatarUrl = req.avatarUrl();
+
+        return Response.ok(UserResponse.from(user)).build();
+    }
+
+    @DELETE
+    @Path("/{id}")
+    @Transactional
+    public Response deactivateAccount(@PathParam("id") UUID id) {
+        User user = User.findById(id);
+        if (user == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        user.isActive = false;
+        return Response.noContent().build();
+    }
+
+    @PATCH
+    @Path("/{id}/role")
+    @Transactional
+    public Response changeRole(@PathParam("id") UUID id, UpdateRoleRequest req) {
+        User user = User.findById(id);
+        if (user == null || !user.isActive) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        try {
+            user.role = User.UserRole.valueOf(req.role());
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"Invalid role: " + req.role() + "\"}")
+                    .build();
+        }
+
+        return Response.ok(UserResponse.from(user)).build();
+    }
+
+    @PUT
+    @Path("/{id}/password")
+    @Transactional
+    public Response changePassword(@PathParam("id") UUID id, ChangePasswordRequest req) {
+        User user = User.findById(id);
+        if (user == null || !user.isActive) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        // TODO: Will be replaced by actual BCrypt match in Step 3
+        if (!user.passwordHash.equals(req.currentPassword())) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"error\": \"Incorrect current password\"}")
+                    .build();
+        }
+
+        // TODO: Will be replaced by actual BCrypt hash in Step 3
+        user.passwordHash = req.newPassword();
+
+        return Response.ok("{\"message\": \"Password updated successfully\"}").build();
     }
 }

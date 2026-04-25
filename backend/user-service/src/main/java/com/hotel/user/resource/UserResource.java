@@ -1,7 +1,9 @@
 package com.hotel.user.resource;
 
 import com.hotel.user.entity.User;
+import com.hotel.user.service.JwtService;
 import io.quarkus.elytron.security.common.BcryptUtil;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -12,6 +14,9 @@ import java.util.UUID;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class UserResource {
+
+    @Inject
+    JwtService jwtService;
 
     // --- DTOs ---
 
@@ -68,9 +73,11 @@ public class UserResource {
                     .entity("{\"error\": \"Invalid credentials\"}")
                     .build();
         }
-        // TODO: Generate and return JWT token
+        
+        String token = jwtService.generateToken(user.id, user.email, user.role);
+        
         return Response.ok()
-                .entity("{\"message\": \"Login successful\", \"userId\": \"" + user.id + "\"}")
+                .entity("{\"message\": \"Login successful\", \"token\": \"" + token + "\", \"userId\": \"" + user.id + "\"}")
                 .build();
     }
 

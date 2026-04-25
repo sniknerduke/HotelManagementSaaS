@@ -3,6 +3,8 @@ package com.hotel.user.resource;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hotel.user.entity.User;
+import com.hotel.user.service.JwtService;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -21,6 +23,9 @@ import java.util.UUID;
 @Path("/api/auth")
 @Produces(MediaType.APPLICATION_JSON)
 public class SocialAuthResource {
+
+    @Inject
+    JwtService jwtService;
 
     @ConfigProperty(name = "QUARKUS_OIDC_GOOGLE_CLIENT_ID")
     String googleClientId;
@@ -110,8 +115,8 @@ public class SocialAuthResource {
                 user.persist();
             }
 
-            // Mock JWT Generation
-            String generatedToken = "jwt_token_from_google_" + user.id;
+            // Real JWT Generation
+            String generatedToken = jwtService.generateToken(user.id, user.email, user.role);
 
             return Response.temporaryRedirect(URI.create(FRONTEND_OAUTH_CALLBACK + "?token=" + generatedToken + "&userId=" + user.id)).build();
         } catch (Exception e) {
@@ -182,7 +187,8 @@ public class SocialAuthResource {
                 user.persist();
             }
 
-            String generatedToken = "jwt_token_from_facebook_" + user.id;
+            // Real JWT Generation
+            String generatedToken = jwtService.generateToken(user.id, user.email, user.role);
 
             return Response.temporaryRedirect(URI.create(FRONTEND_OAUTH_CALLBACK + "?token=" + generatedToken + "&userId=" + user.id)).build();
         } catch (Exception e) {

@@ -10,7 +10,9 @@ import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import jakarta.inject.Inject;
 import com.hotel.payment.client.BookingClient;
+import com.hotel.payment.vnpay.VNPayService;
 import java.math.BigDecimal;
+import java.net.URI;
 import java.util.UUID;
 
 @Path("/api/payments")
@@ -22,16 +24,23 @@ public class PaymentResource {
     @RestClient
     BookingClient bookingClient;
 
+    @Inject
+    VNPayService vnPayService;
+
     // --- DTOs ---
 
     public record CreatePaymentRequest(Long reservationId, String paymentMethod, BigDecimal amount) {}
     public record RefundRequest(BigDecimal amount) {}
 
     public record PaymentResponse(Long id, Long reservationId, BigDecimal amount,
-                                  String paymentMethod, String transactionId, String status) {
+                                  String paymentMethod, String transactionId, String status, String paymentUrl) {
         public static PaymentResponse from(Payment p) {
             return new PaymentResponse(p.id, p.reservationId, p.amount,
-                    p.paymentMethod, p.transactionId, p.status.name());
+                    p.paymentMethod, p.transactionId, p.status.name(), null);
+        }
+        public static PaymentResponse from(Payment p, String paymentUrl) {
+            return new PaymentResponse(p.id, p.reservationId, p.amount,
+                    p.paymentMethod, p.transactionId, p.status.name(), paymentUrl);
         }
     }
 
@@ -40,13 +49,24 @@ public class PaymentResource {
     @POST
     @RolesAllowed({"GUEST", "USER", "ADMIN"})
     @Transactional
-    public Response createPayment(CreatePaymentRequest req) {
+    public Response createPayment(CreatePaymentRequest req, @jakarta.ws.rs.core.Context jakarta.ws.rs.core.UriInfo uriInfo) {
         Payment payment = new Payment();
         payment.reservationId = req.reservationId();
         payment.paymentMethod = req.paymentMethod();
         payment.amount = req.amount();
-        // TODO: Integrate with actual payment gateway (Stripe/PayPal)
         payment.transactionId = "TXN-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        
+        if ("VNPAY".equalsIgnoreCase(req.paymentMethod())) {
+            payment.status = PaymentStatus.PENDING;
+            payment.persist();
+            
+            // Generate payment URL
+            String ipAddr = "127.0.0.1";
+            // Return to frontend instead of API, normally it's the frontend URL, but using configured returnUrl for now
+            String url = vnPayService.createOrder(req.amount().longValue(), "Payment for reservation " + req.reservationId(), null, ipAddr, payment.transactionId);
+            return Response.ok(PaymentResponse.from(payment, url)).build();
+        }
+
         payment.status = PaymentStatus.COMPLETED;
         payment.persist();
 
@@ -57,6 +77,70 @@ public class PaymentResource {
         }
 
         return Response.ok(PaymentResponse.from(payment)).build();
+    }
+
+    @GET
+    @Path("/vnpay-return")
+    @Transactional
+    public Response vnpayReturn(@jakarta.ws.rs.core.Context jakarta.ws.rs.core.UriInfo uriInfo) {
+        java.util.Map<String, String> params = new java.util.HashMap<>();
+        uriInfo.getQueryParameters().forEach((k, v) -> params.put(k, v.get(0)));
+        
+        if (vnPayService.verifyIPN(params)) {
+            String vnp_ResponseCode = params.get("vnp_ResponseCode");
+            String vnp_TxnRef = params.get("vnp_TxnRef");
+            
+            Payment payment = Payment.find("transactionId", vnp_TxnRef).firstResult();
+            if (payment != null && payment.status == PaymentStatus.PENDING) {
+                if ("00".equals(vnp_ResponseCode)) {
+                    payment.status = PaymentStatus.COMPLETED;
+                    try {
+                        bookingClient.updateBookingStatus(payment.reservationId, new BookingClient.UpdateStatusRequest("CONFIRMED"));
+                    } catch (Exception e) {
+                        // log error
+                    }
+                    // Redirect to frontend success page
+                    return Response.seeOther(URI.create("http://localhost:5173/payment/success?reservationId=" + payment.reservationId)).build();
+                } else {
+                    payment.status = PaymentStatus.FAILED;
+                    // Redirect to frontend failed page
+                    return Response.seeOther(URI.create("http://localhost:5173/payment/failed?reservationId=" + payment.reservationId)).build();
+                }
+            }
+        }
+        
+        return Response.seeOther(URI.create("http://localhost:5173/payment/failed")).build();
+    }
+
+    @GET
+    @Path("/vnpay-ipn")
+    @Transactional
+    public Response vnpayIpn(@jakarta.ws.rs.core.Context jakarta.ws.rs.core.UriInfo uriInfo) {
+        java.util.Map<String, String> params = new java.util.HashMap<>();
+        uriInfo.getQueryParameters().forEach((k, v) -> params.put(k, v.get(0)));
+
+        if (vnPayService.verifyIPN(params)) {
+            String vnp_ResponseCode = params.get("vnp_ResponseCode");
+            String vnp_TxnRef = params.get("vnp_TxnRef");
+            
+            Payment payment = Payment.find("transactionId", vnp_TxnRef).firstResult();
+            if (payment != null) {
+                if (payment.status == PaymentStatus.PENDING) {
+                    if ("00".equals(vnp_ResponseCode)) {
+                        payment.status = PaymentStatus.COMPLETED;
+                        try {
+                            bookingClient.updateBookingStatus(payment.reservationId, new BookingClient.UpdateStatusRequest("CONFIRMED"));
+                        } catch (Exception e) {}
+                    } else {
+                        payment.status = PaymentStatus.FAILED;
+                    }
+                }
+                return Response.ok("{\"RspCode\":\"00\",\"Message\":\"Confirm Success\"}").build();
+            } else {
+                return Response.ok("{\"RspCode\":\"01\",\"Message\":\"Order not found\"}").build();
+            }
+        }
+        return Response.ok("{\"RspCode\":\"97\",\"Message\":\"Invalid Checksum\"}").build();
     }
 
     @GET

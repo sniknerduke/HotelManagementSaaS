@@ -3,7 +3,7 @@ package com.hotel.user.resource;
 import com.hotel.user.entity.User;
 import com.hotel.user.service.JwtService;
 import io.quarkus.elytron.security.common.BcryptUtil;
-import jakarta.annotation.security.PermitAll;
+ import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;

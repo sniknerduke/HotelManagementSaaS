@@ -24,6 +24,7 @@ public class RoomType extends PanacheEntity {
     @Column(name = "image_url")
     public String imageUrl;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @OneToMany(mappedBy = "roomType", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     public List<Room> rooms;
 }

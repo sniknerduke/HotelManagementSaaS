@@ -3,13 +3,63 @@ import { useTranslation } from 'react-i18next';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
+import { BookingService, PaymentService } from '../api';
+import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import { useSearchParams } from 'react-router-dom';
 
 export const Checkout: React.FC = () => {
     const { t } = useTranslation();
+    const { user } = useAuth();
+    const { toast } = useToast();
+    const [searchParams] = useSearchParams();
     const [step, setStep] = useState<1 | 2 | 3>(1);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const [guestInfo, setGuestInfo] = useState({ firstName: user?.firstName || '', lastName: user?.lastName || '', email: user?.email || '', phone: user?.phoneNumber || '' });
+    const [paymentDetails, setPaymentDetails] = useState({ cardholder: '', cardNumber: '', expiry: '', cvc: '' });
+    
+    // Simulate mapping roomType to an actual room (in real scenario, backend finds an available roomId of the roomType)
+    const roomId = searchParams.get('roomType') || '1'; // Using mock roomId based on type
+    const roomPrice = parseInt(searchParams.get('price') || '450');
+    const totalAmount = (roomPrice * 3) + 142; // Taxes and fees
 
     const handleNext = () => setStep(s => Math.min(s + 1, 3) as 1 | 2 | 3);
     const handlePrev = () => setStep(s => Math.max(s - 1, 1) as 1 | 2 | 3);
+
+    const handleConfirmBooking = async () => {
+        setLoading(true);
+        setError('');
+        try {
+            // 1. Create Booking
+            const bookingRes = await BookingService.createBooking({
+                roomId: parseInt(roomId),
+                userId: user?.id,
+                checkInDate: "2026-05-12",
+                checkOutDate: "2026-05-15",
+                totalPrice: totalAmount,
+                adultCount: 2,
+                childCount: 0
+            });
+
+            // 2. Process Payment
+            await PaymentService.createPayment({
+                reservationId: bookingRes.id,
+                paymentMethod: "CREDIT_CARD",
+                amount: totalAmount
+            });
+
+            // Move to confirmation
+            handleNext(); 
+            toast("Reservation confirmed!", "success");
+        } catch (err: any) {
+            toast(err.message || 'Payment processing failed. Please try again.', "error");
+            setError(err.message || 'Payment processing failed. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="max-w-[1600px] mx-auto w-full px-8 md:px-16 pt-24 pb-40">
@@ -34,14 +84,14 @@ export const Checkout: React.FC = () => {
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                             <h2 className="text-2xl font-serif text-[#1A1A1A] mb-8 border-b border-[#1A1A1A]/10 pb-4">{t('checkout.guestInfo.title')}</h2>
                             <div className="grid grid-cols-2 gap-6">
-                                <Input label={t('checkout.guestInfo.firstName')} placeholder="John" />
-                                <Input label={t('checkout.guestInfo.lastName')} placeholder="Doe" />
+                                <Input label={t('checkout.guestInfo.firstName')} placeholder="John" value={guestInfo.firstName} onChange={e => setGuestInfo({...guestInfo, firstName: e.target.value})} />
+                                <Input label={t('checkout.guestInfo.lastName')} placeholder="Doe" value={guestInfo.lastName} onChange={e => setGuestInfo({...guestInfo, lastName: e.target.value})} />
                             </div>
-                            <Input label={t('checkout.guestInfo.email')} type="email" placeholder="john.doe@example.com" />
-                            <Input label={t('checkout.guestInfo.phone')} type="tel" placeholder="+1 (555) 000-0000" />
+                            <Input label={t('checkout.guestInfo.email')} type="email" placeholder="john.doe@example.com" value={guestInfo.email} onChange={e => setGuestInfo({...guestInfo, email: e.target.value})} />
+                            <Input label={t('checkout.guestInfo.phone')} type="tel" placeholder="+1 (555) 000-0000" value={guestInfo.phone} onChange={e => setGuestInfo({...guestInfo, phone: e.target.value})} />
                             
                             <div className="pt-8 flex justify-end">
-                                <Button onClick={handleNext} className="w-full sm:w-auto">{t('checkout.guestInfo.continue')}</Button>
+                                <Button onClick={handleNext} disabled={!guestInfo.firstName || !guestInfo.email} className="w-full sm:w-auto">{t('checkout.guestInfo.continue')}</Button>
                             </div>
                         </div>
                     )}
@@ -51,11 +101,11 @@ export const Checkout: React.FC = () => {
                             <h2 className="text-2xl font-serif text-[#1A1A1A] mb-8 border-b border-[#1A1A1A]/10 pb-4">{t('checkout.paymentDetails.title')}</h2>
                             <Card className="p-6 border border-[#1A1A1A]/20 shadow-[0_4px_16px_rgba(0,0,0,0.02)] bg-[#F9F8F6]/50">
                                <div className="space-y-6">
-                                  <Input label={t('checkout.paymentDetails.cardholder')} placeholder="John Doe" />
-                                  <Input label={t('checkout.paymentDetails.cardNumber')} placeholder="0000 0000 0000 0000" />
+                                  <Input label={t('checkout.paymentDetails.cardholder')} placeholder="John Doe" value={paymentDetails.cardholder} onChange={e => setPaymentDetails({...paymentDetails, cardholder: e.target.value})} />
+                                  <Input label={t('checkout.paymentDetails.cardNumber')} placeholder="0000 0000 0000 0000" value={paymentDetails.cardNumber} onChange={e => setPaymentDetails({...paymentDetails, cardNumber: e.target.value})} />
                                   <div className="grid grid-cols-2 gap-6">
-                                      <Input label={t('checkout.paymentDetails.expiry')} placeholder="MM/YY" />
-                                      <Input label={t('checkout.paymentDetails.cvc')} placeholder="CVC" />
+                                      <Input label={t('checkout.paymentDetails.expiry')} placeholder="MM/YY" value={paymentDetails.expiry} onChange={e => setPaymentDetails({...paymentDetails, expiry: e.target.value})} />
+                                      <Input label={t('checkout.paymentDetails.cvc')} placeholder="CVC" value={paymentDetails.cvc} onChange={e => setPaymentDetails({...paymentDetails, cvc: e.target.value})} />
                                   </div>
                                </div>
                             </Card>
@@ -64,9 +114,13 @@ export const Checkout: React.FC = () => {
                                 {t('checkout.paymentDetails.secure')}
                             </p>
                             
+                            {error && <div className="text-red-500 text-sm text-center mb-4">{error}</div>}
+
                             <div className="pt-8 flex justify-between">
-                                <Button variant="ghost" onClick={handlePrev} className="hidden sm:flex text-[#6C6863] hover:text-[#1A1A1A]">{t('checkout.paymentDetails.back')}</Button>
-                                <Button onClick={handleNext} className="w-full sm:w-auto bg-[#D4AF37] hover:bg-[#1A1A1A] text-white">{t('checkout.paymentDetails.confirm')}</Button>
+                                <Button variant="ghost" onClick={handlePrev} disabled={loading} className="hidden sm:flex text-[#6C6863] hover:text-[#1A1A1A]">{t('checkout.paymentDetails.back')}</Button>
+                                <Button onClick={handleConfirmBooking} disabled={loading || !paymentDetails.cardNumber} className="w-full sm:w-auto bg-[#D4AF37] hover:bg-[#1A1A1A] text-white">
+                                    {loading ? 'Processing...' : t('checkout.paymentDetails.confirm')}
+                                </Button>
                             </div>
                         </div>
                     )}
@@ -95,13 +149,13 @@ export const Checkout: React.FC = () => {
                             <div className="absolute inset-0 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)] pointer-events-none"></div>
                          </div>
                          
-                         <h4 className="text-2xl font-serif text-[#1A1A1A] mb-2">The Grand Suite</h4>
-                         <p className="text-xs text-[#6C6863] mb-6 pb-6 border-b border-[#1A1A1A]/10">Oct 12 - Oct 15, 2026 • 2 Guests</p>
+                         <h4 className="text-2xl font-serif text-[#1A1A1A] mb-2">{searchParams.get('roomType') === '2' ? 'Ocean Villa' : 'The Grand Suite'}</h4>
+                         <p className="text-xs text-[#6C6863] mb-6 pb-6 border-b border-[#1A1A1A]/10">May 12 - May 15, 2026 • 2 Guests</p>
 
                          <div className="space-y-4 text-sm font-medium">
                              <div className="flex justify-between items-center text-[#6C6863]">
-                                 <span>{t('checkout.summary.nights', { count: 3, price: 450 })}</span>
-                                 <span className="text-[#1A1A1A] font-serif">$1,350</span>
+                                 <span>{t('checkout.summary.nights', { count: 3, price: roomPrice })}</span>
+                                 <span className="text-[#1A1A1A] font-serif">${roomPrice * 3}</span>
                              </div>
                              <div className="flex justify-between items-center text-[#6C6863]">
                                  <span>{t('checkout.summary.taxes')}</span>
@@ -111,7 +165,7 @@ export const Checkout: React.FC = () => {
 
                          <div className="mt-8 pt-6 border-t border-[#1A1A1A]/20 flex justify-between items-end">
                              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#1A1A1A]">{t('checkout.summary.total')}</span>
-                             <span className="text-3xl font-serif text-[#D4AF37]">$1,492</span>
+                             <span className="text-3xl font-serif text-[#D4AF37]">${totalAmount.toLocaleString()}</span>
                          </div>
                     </Card>
                 </div>

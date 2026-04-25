@@ -10,9 +10,18 @@ type Tab = 'active' | 'bookings' | 'profile' | 'payment' | 'preferences';
 
 export const Profile: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const { user, logout } = useAuth();
+  const { user, login, logout } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>('active');
+
+  // Profile update state
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [profileData, setProfileData] = useState({
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    phoneNumber: user?.phoneNumber || ''
+  });
+  const [updateMsg, setUpdateMsg] = useState('');
 
   const handleLogout = () => {
     logout();
@@ -45,6 +54,30 @@ export const Profile: React.FC = () => {
   const savedPayments = [
     { id: 'pm_1', card: 'Visa', last4: '1234', exp: '12/28' }
   ];
+
+  const handleUpdateProfile = async () => {
+    if (!user?.id) return;
+    setIsUpdating(true);
+    setUpdateMsg('');
+    try {
+      // Intentionally not handling token manually since client.ts attaches it securely
+      // and we just call our newly added `updateProfile` in `AuthService`
+      const { AuthService } = await import('../../api');
+      await AuthService.updateProfile(user.id, profileData);
+      
+      // Update global context
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+          await login(token, user.id);
+      }
+      setUpdateMsg(t('profile.accountSettings.updateSuccess') || "Profile updated successfully!");
+    } catch (err: any) {
+      setUpdateMsg(err.message || "Failed to update profile.");
+    } finally {
+      setIsUpdating(false);
+      setTimeout(() => setUpdateMsg(''), 3000);
+    }
+  };
 
   return (
     <div className="max-w-[1600px] mx-auto w-full px-8 md:px-16 pt-24 pb-40">
@@ -230,21 +263,21 @@ export const Profile: React.FC = () => {
                <div>
                  <h2 className="text-3xl font-serif text-[#1A1A1A] border-b border-[#1A1A1A]/20 pb-4 mb-8">{t('profile.personalDetails.title')} <span className="italic text-[#D4AF37]">{t('profile.personalDetails.titleItalic')}</span></h2>
                  <form className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
+                     <div>
                       <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">{t('profile.personalDetails.firstName')}</label>
-                      <input type="text" defaultValue={user?.firstName || ""} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-serif text-lg text-[#1A1A1A] transition-colors" />
+                      <input type="text" value={profileData.firstName} onChange={e => setProfileData({...profileData, firstName: e.target.value})} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-serif text-lg text-[#1A1A1A] transition-colors" />
                     </div>
                     <div>
                       <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">{t('profile.personalDetails.lastName')}</label>
-                      <input type="text" defaultValue={user?.lastName || ""} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-serif text-lg text-[#1A1A1A] transition-colors" />
+                      <input type="text" value={profileData.lastName} onChange={e => setProfileData({...profileData, lastName: e.target.value})} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-serif text-lg text-[#1A1A1A] transition-colors" />
                     </div>
                     <div className="md:col-span-2">
                       <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">{t('profile.personalDetails.email')}</label>
-                      <input type="email" defaultValue={user?.email || ""} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-serif text-lg text-[#1A1A1A] transition-colors" readOnly />
+                      <input type="email" value={user?.email || ""} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-serif text-lg text-[#1A1A1A] transition-colors" readOnly />
                     </div>
                     <div className="md:col-span-2">
                       <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">{t('profile.personalDetails.phone')}</label>
-                      <input type="tel" defaultValue={user?.phoneNumber || ""} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-serif text-lg text-[#1A1A1A] transition-colors" />
+                      <input type="tel" value={profileData.phoneNumber} onChange={e => setProfileData({...profileData, phoneNumber: e.target.value})} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-serif text-lg text-[#1A1A1A] transition-colors" />
                     </div>
                  </form>
                </div>
@@ -276,8 +309,11 @@ export const Profile: React.FC = () => {
                     </div>
                  </div>
 
-                 <div className="mt-12 flex justify-end">
-                   <Button onClick={() => alert('Available in v2.0')} variant="primary" className="bg-[#D4AF37] text-white py-4 hover:bg-[#D4AF37]/90 px-8">{t('profile.accountSettings.saveChanges')}</Button>
+                 <div className="mt-12 flex justify-end items-center gap-4">
+                   {updateMsg && <span className="text-sm italic">{updateMsg}</span>}
+                   <Button disabled={isUpdating} onClick={handleUpdateProfile} variant="primary" className="bg-[#D4AF37] text-white py-4 hover:bg-[#D4AF37]/90 px-8">
+                     {isUpdating ? 'Saving...' : t('profile.accountSettings.saveChanges')}
+                   </Button>
                  </div>
                </div>
             </div>

@@ -241,17 +241,6 @@ graph LR
 
 > **Why fifth?** Backend is now complete and secure. Time to replace all frontend mock data with real API calls.
 
-- [ ] **Login.tsx** → call `AuthService.login()` → store JWT → redirect based on role
-- [ ] **Register.tsx** → call `AuthService.register()` → auto-login → redirect to profile
-- [ ] **AuthCallback.tsx** → handle OAuth callback → store token from URL params
-- [ ] **SearchResults.tsx** → call `InventoryService.getAvailability()` → render real room data
-- [ ] **Checkout.tsx** → call `BookingService.createBooking()` + `PaymentService.createPayment()`
-- [ ] **Profile.tsx** → call `AuthService.getProfile()` + `BookingService.getUserBookings()`
-- [ ] **AdminDashboard.tsx** — reservations tab → `BookingService.getAllBookings()`
-- [ ] **AdminDashboard.tsx** — inventory tab → `InventoryService` CRUD for rooms/room-types
-- [ ] **AdminDashboard.tsx** — user management tab → `AuthService.getAllUsers()` + role changes
-- [ ] Add loading spinners / skeleton states for all API-dependent views
-- [ ] Add error states (network failure, 401 redirect to login, 404 pages)
 - [ ] Add toast notifications — success/error feedback (e.g. "Booking created!", "Payment failed")
 
 ---

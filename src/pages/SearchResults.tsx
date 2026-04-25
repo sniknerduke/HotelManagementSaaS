@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
-import { Input } from '../components/ui/Input';
 
-const mockRooms = [
-    { id: 1, name: "The Grand Suite", price: 450, guests: 2, image: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800&auto=format&fit=crop&q=60" },
-    { id: 2, name: "Ocean Villa", price: 750, guests: 4, image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800&auto=format&fit=crop&q=60" },
-    { id: 3, name: "Standard King", price: 250, guests: 2, image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&auto=format&fit=crop&q=60" }
-];
+import { InventoryService } from '../api';
+
+// Removed static mockRooms in favor of live API data
 
 export const SearchResults: React.FC = () => {
     const { t } = useTranslation();
-    const [searchQuery, setSearchQuery] = useState('');
     
     // Luxury Bar State
     const [activeDatePicker, setActiveDatePicker] = useState<'sticky' | 'normal' | null>(null);
@@ -26,6 +21,9 @@ export const SearchResults: React.FC = () => {
 
     const [isScrolled, setIsScrolled] = useState(false);
 
+    const [roomsData, setRoomsData] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+
     useEffect(() => {
       const handleScroll = () => {
         const scrolled = window.scrollY > window.innerHeight * 0.2; // Lower threshold for search page
@@ -37,6 +35,25 @@ export const SearchResults: React.FC = () => {
       window.addEventListener('scroll', handleScroll);
       return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    useEffect(() => {
+        const fetchAvailability = async () => {
+            setIsLoading(true);
+            try {
+                // Ensure dates are parsed properly for API (Using mock 2026-05 dates to fit UI schema)
+                const checkInDate = checkIn ? `2026-05-${checkIn.toString().padStart(2, '0')}` : '2026-05-12';
+                const checkOutDate = checkOut ? `2026-05-${checkOut.toString().padStart(2, '0')}` : '2026-05-15';
+                
+                const data = await InventoryService.getAvailability(checkInDate, checkOutDate, totalGuests);
+                setRoomsData(data);
+            } catch (err) {
+                console.error("Failed to fetch rooms", err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchAvailability();
+    }, [checkIn, checkOut, totalGuests]);
 
     const SearchBarContent = ({ isSticky = false }: { isSticky?: boolean }) => (
       <>
@@ -260,13 +277,17 @@ export const SearchResults: React.FC = () => {
 
                 {/* Right Main Column: Rooms */}
                 <div className="md:col-span-8 lg:col-span-8 lg:col-start-5 space-y-16">
-                    <p className="text-[#6C6863] font-serif italic text-sm">{t('search.residencesAvailable', { count: mockRooms.length })}</p>
+                    <p className="text-[#6C6863] font-serif italic text-sm">{t('search.residencesAvailable', { count: roomsData.length })}</p>
 
-                    {mockRooms.map((room, idx) => (
-                        <div key={idx} className="group grid grid-cols-1 lg:grid-cols-2 gap-8 border-t border-[#1A1A1A]/10 pt-16 mt-16 first:mt-4 first:pt-4">
+                    {isLoading ? (
+                        <div className="py-20 flex justify-center items-center">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D4AF37]"></div>
+                        </div>
+                    ) : roomsData.map((room) => (
+                        <div key={room.id} className="group grid grid-cols-1 lg:grid-cols-2 gap-8 border-t border-[#1A1A1A]/10 pt-16 mt-16 first:mt-4 first:pt-4">
                             <div className="overflow-hidden aspect-[4/5] relative">
                                 <img 
-                                    src={room.image} 
+                                    src={room.imageUrl || "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800&auto=format&fit=crop&q=60"} 
                                     alt={room.name} 
                                     className="w-full h-full object-cover grayscale opacity-90 transition-all duration-[2000ms] group-hover:grayscale-0 group-hover:scale-105"
                                 />
@@ -276,19 +297,19 @@ export const SearchResults: React.FC = () => {
                                 <div>
                                     <h2 className="text-3xl lg:text-4xl font-serif text-[#1A1A1A] group-hover:text-[#D4AF37] transition-colors duration-700">{room.name}</h2>
                                     <div className="mt-6 space-y-2 text-[#6C6863] text-sm leading-relaxed">
-                                        <p>{t('search.accommodates', { count: room.guests })}</p>
-                                        <p>{t('search.roomDescription')}</p>
+                                        <p>{t('search.accommodates', { count: room.maxGuests })}</p>
+                                        <p>{room.description || t('search.roomDescription')}</p>
                                     </div>
                                 </div>
                                 <div className="mt-12 flex justify-between items-end">
                                     <div>
                                         <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-1">{t('search.startingFrom')}</p>
-                                        <p className="text-2xl font-serif">${room.price} <span className="text-sm italic text-[#6C6863]">/ {t('search.night')}</span></p>
+                                        <p className="text-2xl font-serif">${room.basePrice} <span className="text-sm italic text-[#6C6863]">/ {t('search.night')}</span></p>
                                     </div>
                                     <Button 
                                         variant="secondary" 
                                         className="group-hover:bg-[#1A1A1A] group-hover:text-white transition-all duration-700"
-                                        onClick={() => window.location.href = '/checkout'}
+                                        onClick={() => window.location.href = `/checkout?roomType=${room.id}&price=${room.basePrice}`}
                                     >
                                         {t('search.reserve')}
                                     </Button>

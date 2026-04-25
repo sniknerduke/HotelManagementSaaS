@@ -259,12 +259,12 @@
   "admin": {
     "sidebar": {
       "title": "Admin",
-      "overview": "1. Global Overview",
-      "reservations": "2. Reservations",
-      "inventory": "3. Inventory & Rooms",
-      "users": "4. Users & Staff",
-      "reports": "5. Reports Analytics",
-      "settings": "6. System Settings"
+      "overview": "Global Overview",
+      "reservations": "Reservations",
+      "inventory": "Inventory & Rooms",
+      "users": "Users & Staff",
+      "reports": "Reports Analytics",
+      "settings": "System Settings"
     },
     "overview": {
       "title": "Main",

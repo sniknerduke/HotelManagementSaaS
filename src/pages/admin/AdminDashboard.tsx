@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { BookingService, AuthService } from '../../api';
+import { BookingService, AuthService, InventoryService } from '../../api';
 
 type AdminTab = 'overview' | 'reservations' | 'inventory' | 'users' | 'reports' | 'settings';
 
@@ -12,16 +12,19 @@ export const AdminDashboard: React.FC = () => {
     
     const [bookings, setBookings] = useState<any[]>([]);
     const [users, setUsers] = useState<any[]>([]);
+    const [rooms, setRooms] = useState<any[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [bookingsRes, usersRes] = await Promise.all([
+                const [bookingsRes, usersRes, roomsRes] = await Promise.all([
                     BookingService.getAllBookings(),
-                    AuthService.getAllUsers()
+                    AuthService.getAllUsers(),
+                    InventoryService.getAllRooms()
                 ]);
                 setBookings(bookingsRes);
                 setUsers(usersRes);
+                setRooms(roomsRes);
             } catch (error) {
                 console.error('Error fetching admin data', error);
             }
@@ -30,7 +33,7 @@ export const AdminDashboard: React.FC = () => {
     }, []);
 
     // Calculate metrics
-    const totalRooms = 24; // we can hardcode total capacity for now until inventory gets a total
+    const totalRooms = rooms.length || 24; // fallback to 24 if no rooms
     const bookedRooms = bookings.filter(b => ['CONFIRMED', 'CHECKED_IN'].includes(b.status)).length;
     const occupancyRate = totalRooms > 0 ? Math.round((bookedRooms / totalRooms) * 100) : 0;
     const availableRooms = totalRooms - bookedRooms;
@@ -223,31 +226,35 @@ export const AdminDashboard: React.FC = () => {
                             <div className="lg:col-span-8">
                                 <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#1A1A1A] mb-6">{t('admin.inventory.roomStatus')}</h3>
                                 <div className="space-y-4">
-                                    {[
-                                        { num: '101', type: 'Standard King', status: t('admin.inventory.available'), statusColor: 'border-l-green-500' },
-                                        { num: '102', type: 'Standard King', status: t('admin.inventory.occupied'), statusColor: 'border-l-blue-500' },
-                                        { num: '201', type: 'Ocean Villa', status: t('admin.inventory.cleaning'), statusColor: 'border-l-yellow-500' },
-                                        { num: '405', type: 'The Grand Suite', status: t('admin.inventory.maintenance'), statusColor: 'border-l-red-500' }
-                                    ].map(room => (
-                                        <Card key={room.num} className={`p-0 border border-[#1A1A1A]/10 border-l-4 bg-white ${room.statusColor} shadow-sm`}>
+                                    {rooms.slice(0, 10).map((room, idx) => {
+                                        const statusColors: any = {
+                                            'AVAILABLE': 'border-l-green-500 text-green-700',
+                                            'OCCUPIED': 'border-l-blue-500 text-blue-700',
+                                            'CLEANING': 'border-l-yellow-500 text-yellow-700',
+                                            'OUT_OF_ORDER': 'border-l-red-500 text-red-700',
+                                        };
+                                        const colorClass = statusColors[room.status] || 'border-l-gray-500';
+
+                                        return (
+                                        <Card key={idx} className={`p-0 border border-[#1A1A1A]/10 border-l-4 bg-white ${colorClass.split(' ')[0]} shadow-sm`}>
                                             <div className="flex flex-col sm:flex-row justify-between sm:items-center p-6 gap-4">
                                                 <div className="flex items-baseline gap-4">
-                                                    <span className="font-serif text-3xl text-[#1A1A1A]">{room.num}</span>
-                                                    <span className="text-sm font-serif italic text-[#6C6863]">{room.type}</span>
+                                                    <span className="font-serif text-3xl text-[#1A1A1A]">{room.roomNumber}</span>
+                                                    <span className="text-sm font-serif italic text-[#6C6863]">Type {room.roomType?.id}</span>
                                                 </div>
                                                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                                                    <span className={`text-[10px] uppercase tracking-widest font-bold`}>{room.status}</span>
-                                                    <select className="text-[10px] uppercase font-bold tracking-widest border border-[#1A1A1A]/20 p-2 bg-[#F9F8F6] outline-none hover:border-[#D4AF37] transition-colors cursor-pointer">
-                                                        <option>{t('admin.inventory.setStatus')}</option>
-                                                        <option>{t('admin.inventory.available')}</option>
-                                                        <option>{t('admin.inventory.occupied')}</option>
-                                                        <option>{t('admin.inventory.cleaning')}</option>
-                                                        <option>{t('admin.inventory.maintenance')}</option>
+                                                    <span className={`text-[10px] uppercase tracking-widest font-bold ${colorClass.split(' ')[1]}`}>{room.status}</span>
+                                                    <select className="text-[10px] uppercase font-bold tracking-widest border border-[#1A1A1A]/20 p-2 bg-[#F9F8F6] outline-none hover:border-[#D4AF37] transition-colors cursor-pointer" defaultValue={room.status}>
+                                                        <option value="AVAILABLE">{t('admin.inventory.available')}</option>
+                                                        <option value="OCCUPIED">{t('admin.inventory.occupied')}</option>
+                                                        <option value="CLEANING">{t('admin.inventory.cleaning')}</option>
+                                                        <option value="OUT_OF_ORDER">{t('admin.inventory.maintenance')}</option>
                                                     </select>
                                                 </div>
                                             </div>
                                         </Card>
-                                    ))}
+                                    )})}
+                                    {rooms.length === 0 && <p className="text-sm italic text-[#6C6863]">No rooms managed yet.</p>}
                                 </div>
                             </div>
 
@@ -411,7 +418,7 @@ export const AdminDashboard: React.FC = () => {
                             </Card>
 
                             {/* Integrations */}
-                            <Card className="p-8 border border-[#1A1A1A]/10 bg-[#1A1A1A] text-white">
+                            <Card className="p-8 border border-[#1A1A1A]/10 bg-[#1A1A1A] hover:!bg-[#2A2A2A] text-white transition-colors duration-300">
                                 <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#F9F8F6]/50 mb-8 pb-4 border-b border-white/10">{t('admin.settings.integrations')}</h3>
                                 <div className="space-y-6">
                                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 bg-white/5 p-6 border border-white/10">
@@ -419,14 +426,14 @@ export const AdminDashboard: React.FC = () => {
                                             <p className="text-sm font-bold text-white mb-1">Payment Gateway (Stripe)</p>
                                             <p className="text-[10px] uppercase tracking-widest text-[#D4AF37]">● {t('admin.settings.apiActive')}</p>
                                         </div>
-                                        <Button onClick={() => alert('Available in v2.0')} variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase tracking-widest font-bold h-8 border-white/20 hover:border-white text-white">{t('admin.settings.renewToken')}</Button>
+                                        <Button onClick={() => alert('Available in v2.0')} variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase tracking-widest font-bold h-8 border-white/20 hover:border-white text-white hover:text-[#1A1A1A] hover:bg-white transition-colors">{t('admin.settings.renewToken')}</Button>
                                     </div>
                                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 bg-white/5 p-6 border border-white/10">
                                         <div>
                                             <p className="text-sm font-bold text-white mb-1">SMS Notifications (Twilio)</p>
                                             <p className="text-[10px] uppercase tracking-widest text-red-500">○ {t('admin.settings.disconnected')}</p>
                                         </div>
-                                        <Button onClick={() => alert('Available in v2.0')} variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase tracking-widest font-bold h-8 border-white/20 hover:border-white text-white bg-white/10">{t('admin.settings.provideKey')}</Button>
+                                        <Button onClick={() => alert('Available in v2.0')} variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase tracking-widest font-bold h-8 border-white/20 hover:border-white text-white bg-white/10 hover:text-[#1A1A1A] hover:bg-white transition-colors">{t('admin.settings.provideKey')}</Button>
                                     </div>
                                 </div>
                             </Card>

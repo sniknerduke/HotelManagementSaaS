@@ -25,7 +25,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(localStorage.getItem('auth_token'));
   const [isLoading, setIsLoading] = useState(true);
 
-  const initAuth = Object.useCallback ? Object.useCallback : null;
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -39,6 +38,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } catch (error) {
           console.error("Failed to restore session", error);
           logout();
+        } finally {
+          setIsLoading(false);
         }
       } else {
         setIsLoading(false);

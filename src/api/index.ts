@@ -3,12 +3,15 @@ import { api } from './client';
 export const AuthService = {
     register: (data: any) => api.post('/users/register', data),
     login: (data: any) => api.post('/users/login', data),
-    logout: () => api.post('/users/logout'),
+    logout: () => api.post('/users/logout', {}),
     getProfile: (userId: string) => api.get(`/users/${userId}`),
+    updateProfile: (userId: string, data: any) => api.put(`/users/${userId}`, data),
     getAllUsers: () => api.get('/users'),
 };
 
 export const InventoryService = {
+    getAllRooms: () => api.get('/inventory/rooms'),
+    getAllRoomTypes: () => api.get('/inventory/room-types'),
     getAvailability: (checkIn: string, checkOut: string, guests: number) => 
         api.get(`/inventory/rooms/availability?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`),
     getRoomType: (id: number) => api.get(`/inventory/room-types/${id}`),

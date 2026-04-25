@@ -155,17 +155,17 @@ graph LR
 
 > **Why first?** You can't test CRUD or anything else on empty databases. Get sample data in so every step after this has something to work with.
 
-- [ ] Add `import.sql` to **inventory-service** — sample room types (Deluxe, Suite, Standard) + sample rooms (101–110)
-- [ ] Add `import.sql` to **user-service** — demo admin user + demo guest user (with hashed password placeholder for now)
-- [ ] Add `import.sql` to **booking-service** — a few sample reservations
-- [ ] Add `import.sql` to **payment-service** — sample payments linked to sample reservations
-- [ ] Add `status` enum to `Room.java` — `AVAILABLE`, `OCCUPIED`, `CLEANING`, `MAINTENANCE`, `OUT_OF_ORDER`
-- [ ] Add `adultCount`, `childCount`, `guestNotes` fields to `Reservation.java`
-- [ ] Expand `Reservation.ReservationStatus` — full lifecycle: `PENDING` → `CONFIRMED` → `CHECKED_IN` → `CHECKED_OUT` → `CANCELLED` → `NO_SHOW`
-- [ ] Add `Payment.PaymentStatus` — `PENDING` → `COMPLETED` → `REFUNDED` → `FAILED`
-- [ ] Add extra `User` fields — `nationality`, `nationalId`, `dateOfBirth`, `address`, `avatarUrl`
-- [ ] Add `imageUrl` field to `RoomType.java`
-- [ ] Add `floor` field to `Room.java`
+- [x] Add `import.sql` to **inventory-service** — sample room types (Deluxe, Suite, Standard) + sample rooms (101–110)
+- [x] Add `import.sql` to **user-service** — demo admin user + demo guest user (with hashed password placeholder for now)
+- [x] Add `import.sql` to **booking-service** — a few sample reservations
+- [x] Add `import.sql` to **payment-service** — sample payments linked to sample reservations
+- [x] Add `status` enum to `Room.java` — `AVAILABLE`, `OCCUPIED`, `CLEANING`, `MAINTENANCE`, `OUT_OF_ORDER`
+- [x] Add `adultCount`, `childCount`, `guestNotes` fields to `Reservation.java`
+- [x] Expand `Reservation.ReservationStatus` — full lifecycle: `PENDING` → `CONFIRMED` → `CHECKED_IN` → `CHECKED_OUT` → `CANCELLED` → `NO_SHOW`
+- [x] Add `Payment.PaymentStatus` — `PENDING` → `COMPLETED` → `REFUNDED` → `FAILED`
+- [x] Add extra `User` fields — `nationality`, `nationalId`, `dateOfBirth`, `address`, `avatarUrl`
+- [x] Add `imageUrl` field to `RoomType.java`
+- [x] Add `floor` field to `Room.java`
 
 ---
 
@@ -174,32 +174,32 @@ graph LR
 > **Why second?** The backend can only create a few things right now. Need full Create-Read-Update-Delete for every entity before anything else works.
 
 #### 2a. Room & Room Type CRUD (`InventoryResource.java`)
-- [ ] `GET /api/inventory/rooms` — list all rooms (with filters by status, type, floor)
-- [ ] `GET /api/inventory/rooms/{id}` — get single room
-- [ ] `PUT /api/inventory/rooms/{id}` — update room (number, type, status, floor)
-- [ ] `DELETE /api/inventory/rooms/{id}` — soft-delete or deactivate room
-- [ ] `PATCH /api/inventory/rooms/{id}/status` — change room status (for front desk / housekeeping)
-- [ ] `GET /api/inventory/room-types` — list all room types
-- [ ] `PUT /api/inventory/room-types/{id}` — update room type (name, price, capacity, description, image)
-- [ ] `DELETE /api/inventory/room-types/{id}` — delete room type (only if no rooms attached)
+- [x] `GET /api/inventory/rooms` — list all rooms (with filters by status, type, floor)
+- [x] `GET /api/inventory/rooms/{id}` — get single room
+- [x] `PUT /api/inventory/rooms/{id}` — update room (number, type, status, floor)
+- [x] `DELETE /api/inventory/rooms/{id}` — soft-delete or deactivate room
+- [x] `PATCH /api/inventory/rooms/{id}/status` — change room status (for front desk / housekeeping)
+- [x] `GET /api/inventory/room-types` — list all room types
+- [x] `PUT /api/inventory/room-types/{id}` — update room type (name, price, capacity, description, image)
+- [x] `DELETE /api/inventory/room-types/{id}` — delete room type (only if no rooms attached)
 
 #### 2b. Booking CRUD (`BookingResource.java`)
-- [ ] `GET /api/bookings/{id}` — get single booking with all details
-- [ ] `PUT /api/bookings/{id}` — update booking (dates, room, guest count, notes)
-- [ ] `DELETE /api/bookings/{id}` — cancel booking (set status to CANCELLED)
-- [ ] `POST /api/bookings/{id}/check-in` — check guest in → status=`CHECKED_IN`, room→`OCCUPIED`
-- [ ] `POST /api/bookings/{id}/check-out` — check guest out → status=`CHECKED_OUT`, room→`CLEANING`
+- [x] `GET /api/bookings/{id}` — get single booking with all details
+- [x] `PUT /api/bookings/{id}` — update booking (dates, room, guest count, notes)
+- [x] `DELETE /api/bookings/{id}` — cancel booking (set status to CANCELLED)
+- [x] `POST /api/bookings/{id}/check-in` — check guest in → status=`CHECKED_IN`, room→`OCCUPIED`
+- [x] `POST /api/bookings/{id}/check-out` — check guest out → status=`CHECKED_OUT`, room→`CLEANING`
 
 #### 2c. User CRUD (`UserResource.java`)
-- [ ] `PUT /api/users/{id}` — update profile (name, phone, nationality, address, avatar)
-- [ ] `DELETE /api/users/{id}` — deactivate account (soft delete)
-- [ ] `PATCH /api/users/{id}/role` — admin changes role (GUEST ↔ STAFF ↔ ADMIN)
-- [ ] `PUT /api/users/{id}/password` — change password (requires current password)
+- [x] `PUT /api/users/{id}` — update profile (name, phone, nationality, address, avatar)
+- [x] `DELETE /api/users/{id}` — deactivate account (soft delete)
+- [x] `PATCH /api/users/{id}/role` — admin changes role (GUEST ↔ STAFF ↔ ADMIN)
+- [x] `PUT /api/users/{id}/password` — change password (requires current password)
 
 #### 2d. Payment CRUD (`PaymentResource.java`)
-- [ ] `GET /api/payments` — list all payments (admin, with filters by status, date range)
-- [ ] `GET /api/payments/{id}` — get single payment details
-- [ ] `POST /api/payments/{id}/refund` — refund payment (partial or full)
+- [x] `GET /api/payments` — list all payments (admin, with filters by status, date range)
+- [x] `GET /api/payments/{id}` — get single payment details
+- [x] `POST /api/payments/{id}/refund` — refund payment (partial or full)
 
 ---
 
@@ -207,19 +207,19 @@ graph LR
 
 > **Why third?** CRUD must work first so you have endpoints to protect. Now add auth so only the right people can access them.
 
-- [ ] Add BCrypt dependency to `user-service/pom.xml`
-- [ ] Hash passwords in `UserResource.register()` using BCrypt
-- [ ] Verify hashed password in `UserResource.login()` using BCrypt
-- [ ] Enable `smallrye-jwt` in `application.properties`
-- [ ] Generate RSA key pair (`privateKey.pem` + `publicKey.pem`) for JWT signing
-- [ ] Create `JwtService.java` — generates JWT on login with userId, email, role claims
-- [ ] Return JWT token in login response body
-- [ ] Update `SocialAuthResource.java` — return real JWT instead of mock token string
-- [ ] Add `@RolesAllowed("ADMIN")` guards on admin-only endpoints (delete user, change role, list all payments, etc.)
-- [ ] Add `@RolesAllowed("GUEST")` or `@Authenticated` on user-specific endpoints (update own profile, view own bookings)
-- [ ] Add `POST /api/users/logout` — frontend clears token, backend can optionally blacklist
-- [ ] Update `AuthContext.tsx` — store JWT in `localStorage`, decode role from token, auto-attach to `api/client.ts`
-- [ ] Add frontend route guards — redirect to `/login` if no token, redirect from `/admin` if not ADMIN role
+- [x] Add BCrypt dependency to `user-service/pom.xml`
+- [x] Hash passwords in `UserResource.register()` using BCrypt
+- [x] Verify hashed password in `UserResource.login()` using BCrypt
+- [x] Enable `smallrye-jwt` in `application.properties`
+- [x] Generate RSA key pair (`privateKey.pem` + `publicKey.pem`) for JWT signing
+- [x] Create `JwtService.java` — generates JWT on login with userId, email, role claims
+- [x] Return JWT token in login response body
+- [x] Update `SocialAuthResource.java` — return real JWT instead of mock token string
+- [x] Add `@RolesAllowed("ADMIN")` guards on admin-only endpoints (delete user, change role, list all payments, etc.)
+- [x] Add `@RolesAllowed("GUEST")` or `@Authenticated` on user-specific endpoints (update own profile, view own bookings)
+- [x] Add `POST /api/users/logout` — frontend clears token, backend can optionally blacklist
+- [x] Update `AuthContext.tsx` — store JWT in `localStorage`, decode role from token, auto-attach to `api/client.ts`
+- [x] Add frontend route guards — redirect to `/login` if no token, redirect from `/admin` if not ADMIN role
 
 ---
 

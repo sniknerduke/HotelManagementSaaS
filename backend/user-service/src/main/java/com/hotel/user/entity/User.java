@@ -42,7 +42,7 @@ public class User extends PanacheEntityBase {
     public String avatarUrl;
 
     @Column(name = "is_active")
-    public boolean isActive = true;
+    public Boolean isActive = true;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

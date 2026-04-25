@@ -1,6 +1,7 @@
 package com.hotel.user.resource;
 
 import com.hotel.user.entity.User;
+import io.quarkus.elytron.security.common.BcryptUtil;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -47,8 +48,7 @@ public class UserResource {
 
         User user = new User();
         user.email = req.email();
-        // TODO: Replace with proper BCrypt hashing (e.g. quarkus-elytron-security)
-        user.passwordHash = req.password();
+        user.passwordHash = BcryptUtil.bcryptHash(req.password());
         user.firstName = req.firstName();
         user.lastName = req.lastName();
         user.phoneNumber = req.phoneNumber();
@@ -63,7 +63,7 @@ public class UserResource {
     @Path("/login")
     public Response login(LoginRequest req) {
         User user = User.findByEmail(req.email());
-        if (user == null || !user.passwordHash.equals(req.password())) {
+        if (user == null || !BcryptUtil.matches(req.password(), user.passwordHash)) {
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity("{\"error\": \"Invalid credentials\"}")
                     .build();
@@ -146,15 +146,13 @@ public class UserResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        // TODO: Will be replaced by actual BCrypt match in Step 3
-        if (!user.passwordHash.equals(req.currentPassword())) {
+        if (!BcryptUtil.matches(req.currentPassword(), user.passwordHash)) {
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity("{\"error\": \"Incorrect current password\"}")
                     .build();
         }
 
-        // TODO: Will be replaced by actual BCrypt hash in Step 3
-        user.passwordHash = req.newPassword();
+        user.passwordHash = BcryptUtil.bcryptHash(req.newPassword());
 
         return Response.ok("{\"message\": \"Password updated successfully\"}").build();
     }

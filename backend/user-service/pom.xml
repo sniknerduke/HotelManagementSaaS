@@ -46,6 +46,12 @@
             <artifactId>quarkus-smallrye-jwt-build</artifactId>
         </dependency>
 
+        <!-- Provide Bcrypt support -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-elytron-security</artifactId>
+        </dependency>
+
         <!-- Bean Validation -->
         <dependency>
             <groupId>io.quarkus</groupId>

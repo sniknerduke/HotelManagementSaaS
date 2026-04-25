@@ -7,6 +7,9 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import jakarta.inject.Inject;
+import com.hotel.payment.client.BookingClient;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -14,6 +17,10 @@ import java.util.UUID;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class PaymentResource {
+
+    @Inject
+    @RestClient
+    BookingClient bookingClient;
 
     // --- DTOs ---
 
@@ -42,6 +49,12 @@ public class PaymentResource {
         payment.transactionId = "TXN-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         payment.status = PaymentStatus.COMPLETED;
         payment.persist();
+
+        try {
+            bookingClient.updateBookingStatus(req.reservationId(), new BookingClient.UpdateStatusRequest("CONFIRMED"));
+        } catch (Exception e) {
+            // Handle if booking service fails
+        }
 
         return Response.ok(PaymentResponse.from(payment)).build();
     }

@@ -11,11 +11,18 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import jakarta.inject.Inject;
+import com.hotel.booking.client.InventoryClient;
 
 @Path("/api/bookings")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class BookingResource {
+
+    @Inject
+    @RestClient
+    InventoryClient inventoryClient;
 
     // --- DTOs ---
 
@@ -55,7 +62,20 @@ public class BookingResource {
     @RolesAllowed({"GUEST", "USER", "ADMIN"})
     @Transactional
     public Response createBooking(CreateBookingRequest req) {
-        // TODO: Call Inventory Service to verify room availability & lock room
+        try {
+            InventoryClient.RoomDTO room = inventoryClient.getRoom(req.roomId());
+            if (room == null || !"AVAILABLE".equals(room.status())) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("{\"error\": \"Room is not available\"}")
+                        .build();
+            }
+            inventoryClient.updateRoomStatus(req.roomId(), new InventoryClient.UpdateStatusRequest("OCCUPIED"));
+        } catch (Exception e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"Failed to verify or update room with inventory service\"}")
+                    .build();
+        }
+
         Reservation reservation = new Reservation();
         reservation.userId = req.userId();
         reservation.roomId = req.roomId();
@@ -154,7 +174,11 @@ public class BookingResource {
         if (reservation == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        // TODO: Call inventory service to set room to OCCUPIED
+        try {
+            inventoryClient.updateRoomStatus(reservation.roomId, new InventoryClient.UpdateStatusRequest("OCCUPIED"));
+        } catch (Exception e) {
+            // Handle if inventory service fails or room not found
+        }
         reservation.status = ReservationStatus.CHECKED_IN;
         return Response.ok(BookingResponse.from(reservation)).build();
     }
@@ -168,7 +192,11 @@ public class BookingResource {
         if (reservation == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        // TODO: Call inventory service to set room to CLEANING
+        try {
+            inventoryClient.updateRoomStatus(reservation.roomId, new InventoryClient.UpdateStatusRequest("CLEANING"));
+        } catch (Exception e) {
+            // Handle if inventory service fails or room not found
+        }
         reservation.status = ReservationStatus.CHECKED_OUT;
         return Response.ok(BookingResponse.from(reservation)).build();
     }

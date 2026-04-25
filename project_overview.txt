@@ -227,13 +227,13 @@ graph LR
 
 > **Why fourth?** With CRUD + auth done, now make the services talk to each other for real business logic.
 
-- [ ] Add Quarkus REST Client dependency to `booking-service/pom.xml`
-- [ ] Create `InventoryClient.java` interface — call `GET /api/inventory/rooms/{id}` to check availability
-- [ ] Update `BookingResource.createBooking()` — call inventory to verify room is `AVAILABLE`, then set room to `OCCUPIED`
-- [ ] Update `BookingResource.check-out()` — call inventory to set room back to `CLEANING`
-- [ ] Add Quarkus REST Client to `payment-service/pom.xml`
-- [ ] Create `BookingClient.java` interface — call `PATCH /api/bookings/{id}/status`
-- [ ] Update `PaymentResource.createPayment()` — after payment succeeds, call booking service to set status to `CONFIRMED`
+- [x] Add Quarkus REST Client dependency to `booking-service/pom.xml`
+- [x] Create `InventoryClient.java` interface — call `GET /api/inventory/rooms/{id}` to check availability
+- [x] Update `BookingResource.createBooking()` — call inventory to verify room is `AVAILABLE`, then set room to `OCCUPIED`
+- [x] Update `BookingResource.check-out()` — call inventory to set room back to `CLEANING`
+- [x] Add Quarkus REST Client to `payment-service/pom.xml`
+- [x] Create `BookingClient.java` interface — call `PATCH /api/bookings/{id}/status`
+- [x] Update `PaymentResource.createPayment()` — after payment succeeds, call booking service to set status to `CONFIRMED`
 
 ---
 

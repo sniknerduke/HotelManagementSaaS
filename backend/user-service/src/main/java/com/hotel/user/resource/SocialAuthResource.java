@@ -7,6 +7,7 @@ import com.hotel.user.service.JwtService;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.GET;
+import jakarta.annotation.security.PermitAll;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
@@ -47,6 +48,7 @@ public class SocialAuthResource {
 
     @GET
     @Path("/google")
+    @PermitAll
     public Response loginWithGoogle() {
         String redirectUri = "http://localhost:8000/api/auth/google/callback";
         String googleAuthUrl = "https://accounts.google.com/o/oauth2/v2/auth" +
@@ -60,6 +62,7 @@ public class SocialAuthResource {
 
     @GET
     @Path("/google/callback")
+    @PermitAll
     @Transactional
     public Response googleCallback(@QueryParam("code") String code) {
         if (code == null || code.isEmpty()) {
@@ -129,6 +132,7 @@ public class SocialAuthResource {
 
     @GET
     @Path("/facebook")
+    @PermitAll
     public Response loginWithFacebook() {
         String redirectUri = "http://localhost:8000/api/auth/facebook/callback";
         String facebookAuthUrl = "https://www.facebook.com/v18.0/dialog/oauth" +
@@ -141,6 +145,7 @@ public class SocialAuthResource {
 
     @GET
     @Path("/facebook/callback")
+    @PermitAll
     @Transactional
     public Response facebookCallback(@QueryParam("code") String code) {
         if (code == null || code.isEmpty()) {

@@ -2,6 +2,8 @@ package com.hotel.inventory.resource;
 
 import com.hotel.inventory.entity.Room;
 import com.hotel.inventory.entity.RoomType;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -35,6 +37,7 @@ public class InventoryResource {
 
     @GET
     @Path("/rooms/availability")
+    @PermitAll
     public Response checkAvailability(
             @QueryParam("checkIn") String checkIn,
             @QueryParam("checkOut") String checkOut,
@@ -51,6 +54,7 @@ public class InventoryResource {
 
     @GET
     @Path("/rooms")
+    @PermitAll
     public Response getRooms(
             @QueryParam("status") Room.RoomStatus status,
             @QueryParam("type") Long typeId,
@@ -87,6 +91,7 @@ public class InventoryResource {
 
     @GET
     @Path("/rooms/{id}")
+    @PermitAll
     public Response getRoom(@PathParam("id") Long id) {
         Room room = Room.findById(id);
         if (room == null) {
@@ -97,6 +102,7 @@ public class InventoryResource {
 
     @PUT
     @Path("/rooms/{id}")
+    @RolesAllowed("ADMIN")
     @Transactional
     public Response updateRoom(@PathParam("id") Long id, UpdateRoomRequest req) {
         Room room = Room.findById(id);
@@ -123,6 +129,7 @@ public class InventoryResource {
 
     @DELETE
     @Path("/rooms/{id}")
+    @RolesAllowed("ADMIN")
     @Transactional
     public Response deleteRoom(@PathParam("id") Long id) {
         Room room = Room.findById(id);
@@ -136,6 +143,7 @@ public class InventoryResource {
 
     @PATCH
     @Path("/rooms/{id}/status")
+    @RolesAllowed("ADMIN")
     @Transactional
     public Response updateRoomStatus(@PathParam("id") Long id, UpdateRoomStatusRequest req) {
         Room room = Room.findById(id);
@@ -150,6 +158,7 @@ public class InventoryResource {
 
     @GET
     @Path("/room-types")
+    @PermitAll
     public Response getRoomTypes() {
         List<RoomType> types = RoomType.listAll();
         List<RoomTypeResponse> result = types.stream()
@@ -160,6 +169,7 @@ public class InventoryResource {
 
     @GET
     @Path("/room-types/{id}")
+    @PermitAll
     public Response getRoomType(@PathParam("id") Long id) {
         RoomType rt = RoomType.findById(id);
         if (rt == null) {
@@ -170,6 +180,7 @@ public class InventoryResource {
 
     @POST
     @Path("/rooms")
+    @RolesAllowed("ADMIN")
     @Transactional
     public Response createRoom(CreateRoomRequest req) {
         RoomType rt = RoomType.findById(req.roomTypeId());
@@ -191,6 +202,7 @@ public class InventoryResource {
 
     @POST
     @Path("/room-types")
+    @RolesAllowed("ADMIN")
     @Transactional
     public Response createRoomType(RoomType roomType) {
         roomType.persist();

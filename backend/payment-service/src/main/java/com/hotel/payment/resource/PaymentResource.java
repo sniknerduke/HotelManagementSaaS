@@ -2,6 +2,7 @@ package com.hotel.payment.resource;
 
 import com.hotel.payment.entity.Payment;
 import com.hotel.payment.entity.Payment.PaymentStatus;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -30,6 +31,7 @@ public class PaymentResource {
     // --- Endpoints ---
 
     @POST
+    @RolesAllowed({"GUEST", "USER", "ADMIN"})
     @Transactional
     public Response createPayment(CreatePaymentRequest req) {
         Payment payment = new Payment();
@@ -46,6 +48,7 @@ public class PaymentResource {
 
     @GET
     @Path("/reservation/{reservationId}")
+    @RolesAllowed({"GUEST", "USER", "ADMIN"})
     public Response getByReservation(@PathParam("reservationId") Long reservationId) {
         Payment payment = Payment.findByReservationId(reservationId);
         if (payment == null) {
@@ -55,6 +58,7 @@ public class PaymentResource {
     }
 
     @GET
+    @RolesAllowed("ADMIN")
     public Response getAllPayments(
             @QueryParam("status") PaymentStatus status,
             @QueryParam("startDate") String startDate,
@@ -86,6 +90,7 @@ public class PaymentResource {
 
     @GET
     @Path("/{id}")
+    @RolesAllowed({"GUEST", "USER", "ADMIN"})
     public Response getPayment(@PathParam("id") Long id) {
         Payment payment = Payment.findById(id);
         if (payment == null) {
@@ -96,6 +101,7 @@ public class PaymentResource {
 
     @POST
     @Path("/{id}/refund")
+    @RolesAllowed("ADMIN")
     @Transactional
     public Response refundPayment(@PathParam("id") Long id, RefundRequest req) {
         Payment payment = Payment.findById(id);

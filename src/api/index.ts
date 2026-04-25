@@ -3,6 +3,7 @@ import { api } from './client';
 export const AuthService = {
     register: (data: any) => api.post('/users/register', data),
     login: (data: any) => api.post('/users/login', data),
+    logout: () => api.post('/users/logout'),
     getProfile: (userId: string) => api.get(`/users/${userId}`),
     getAllUsers: () => api.get('/users'),
 };

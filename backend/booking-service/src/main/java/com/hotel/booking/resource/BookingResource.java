@@ -2,6 +2,7 @@ package com.hotel.booking.resource;
 
 import com.hotel.booking.entity.Reservation;
 import com.hotel.booking.entity.Reservation.ReservationStatus;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -41,6 +42,7 @@ public class BookingResource {
     // --- Endpoints ---
 
     @GET
+    @RolesAllowed("ADMIN")
     public Response getAllBookings() {
         List<BookingResponse> bookings = Reservation.<Reservation>listAll()
                 .stream()
@@ -50,6 +52,7 @@ public class BookingResource {
     }
 
     @POST
+    @RolesAllowed({"GUEST", "USER", "ADMIN"})
     @Transactional
     public Response createBooking(CreateBookingRequest req) {
         // TODO: Call Inventory Service to verify room availability & lock room
@@ -68,6 +71,7 @@ public class BookingResource {
 
     @GET
     @Path("/user/{userId}")
+    @RolesAllowed({"GUEST", "USER", "ADMIN"})
     public Response getUserBookings(@PathParam("userId") UUID userId) {
         List<BookingResponse> bookings = Reservation.findByUserId(userId)
                 .stream()
@@ -78,6 +82,7 @@ public class BookingResource {
 
     @PATCH
     @Path("/{id}/status")
+    @RolesAllowed("ADMIN")
     @Transactional
     public Response updateStatus(@PathParam("id") Long id, UpdateStatusRequest req) {
         Reservation reservation = Reservation.findById(id);
@@ -98,6 +103,7 @@ public class BookingResource {
 
     @GET
     @Path("/{id}")
+    @RolesAllowed({"GUEST", "USER", "ADMIN"})
     public Response getBooking(@PathParam("id") Long id) {
         Reservation reservation = Reservation.findById(id);
         if (reservation == null) {
@@ -108,6 +114,7 @@ public class BookingResource {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed({"GUEST", "USER", "ADMIN"})
     @Transactional
     public Response updateBooking(@PathParam("id") Long id, UpdateBookingRequest req) {
         Reservation reservation = Reservation.findById(id);
@@ -127,6 +134,7 @@ public class BookingResource {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed({"GUEST", "USER", "ADMIN"})
     @Transactional
     public Response cancelBooking(@PathParam("id") Long id) {
         Reservation reservation = Reservation.findById(id);
@@ -139,6 +147,7 @@ public class BookingResource {
 
     @POST
     @Path("/{id}/check-in")
+    @RolesAllowed("ADMIN")
     @Transactional
     public Response checkIn(@PathParam("id") Long id) {
         Reservation reservation = Reservation.findById(id);
@@ -152,6 +161,7 @@ public class BookingResource {
 
     @POST
     @Path("/{id}/check-out")
+    @RolesAllowed("ADMIN")
     @Transactional
     public Response checkOut(@PathParam("id") Long id) {
         Reservation reservation = Reservation.findById(id);

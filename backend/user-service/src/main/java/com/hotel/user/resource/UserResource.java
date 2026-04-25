@@ -3,6 +3,8 @@ package com.hotel.user.resource;
 import com.hotel.user.entity.User;
 import com.hotel.user.service.JwtService;
 import io.quarkus.elytron.security.common.BcryptUtil;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -37,12 +39,14 @@ public class UserResource {
     // --- Endpoints ---
 
     @GET
+    @RolesAllowed("ADMIN")
     public Response getAllUsers() {
         return Response.ok(User.<User>list("isActive = true").stream().map(UserResponse::from).toList()).build();
     }
 
     @POST
     @Path("/register")
+    @PermitAll
     @Transactional
     public Response register(RegisterRequest req) {
         if (User.findByEmail(req.email()) != null) {
@@ -66,6 +70,7 @@ public class UserResource {
 
     @POST
     @Path("/login")
+    @PermitAll
     public Response login(LoginRequest req) {
         User user = User.findByEmail(req.email());
         if (user == null || !BcryptUtil.matches(req.password(), user.passwordHash)) {
@@ -83,6 +88,7 @@ public class UserResource {
 
     @GET
     @Path("/{id}")
+    @RolesAllowed({"GUEST", "USER", "ADMIN"})
     public Response getUser(@PathParam("id") UUID id) {
         User user = User.findById(id);
         if (user == null || !user.isActive) {
@@ -93,6 +99,7 @@ public class UserResource {
 
     @PUT
     @Path("/{id}")
+    @RolesAllowed({"GUEST", "USER", "ADMIN"})
     @Transactional
     public Response updateProfile(@PathParam("id") UUID id, UpdateProfileRequest req) {
         User user = User.findById(id);
@@ -114,6 +121,7 @@ public class UserResource {
 
     @DELETE
     @Path("/{id}")
+    @RolesAllowed("ADMIN")
     @Transactional
     public Response deactivateAccount(@PathParam("id") UUID id) {
         User user = User.findById(id);
@@ -126,6 +134,7 @@ public class UserResource {
 
     @PATCH
     @Path("/{id}/role")
+    @RolesAllowed("ADMIN")
     @Transactional
     public Response changeRole(@PathParam("id") UUID id, UpdateRoleRequest req) {
         User user = User.findById(id);
@@ -146,6 +155,7 @@ public class UserResource {
 
     @PUT
     @Path("/{id}/password")
+    @RolesAllowed({"GUEST", "USER", "ADMIN"})
     @Transactional
     public Response changePassword(@PathParam("id") UUID id, ChangePasswordRequest req) {
         User user = User.findById(id);
@@ -162,5 +172,12 @@ public class UserResource {
         user.passwordHash = BcryptUtil.bcryptHash(req.newPassword());
 
         return Response.ok("{\"message\": \"Password updated successfully\"}").build();
+    }
+
+    @POST
+    @Path("/logout")
+    @RolesAllowed({"GUEST", "USER", "ADMIN"})
+    public Response logout() {
+        return Response.ok("{\"message\": \"Logged out successfully\"}").build();
     }
 }

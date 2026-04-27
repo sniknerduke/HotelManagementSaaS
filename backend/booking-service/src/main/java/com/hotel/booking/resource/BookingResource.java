@@ -35,7 +35,9 @@ public class BookingResource {
             @FutureOrPresent(message = "Check-in date cannot be in the past") LocalDate checkInDate, 
             @NotNull(message = "Check-out date is required") LocalDate checkOutDate,
             @NotNull(message = "Total price is required") 
-            @Positive(message = "Total price must be positive") BigDecimal totalPrice) {
+            @Positive(message = "Total price must be positive") BigDecimal totalPrice,
+            @Min(value = 1, message = "At least 1 adult is required") Integer adultCount,
+            @Min(value = 0, message = "Child count cannot be negative") Integer childCount) {
 
         @AssertTrue(message = "Check-out date must be after check-in date")
         public boolean isValidDates() {
@@ -97,8 +99,9 @@ public class BookingResource {
             }
             inventoryClient.updateRoomStatus(req.roomId(), new InventoryClient.UpdateStatusRequest("OCCUPIED"));
         } catch (Exception e) {
+            e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"error\": \"Failed to verify or update room with inventory service\"}")
+                    .entity("{\"error\": \"Failed to verify or update room with inventory service: " + e.getMessage() + "\"}")
                     .build();
         }
 
@@ -106,6 +109,8 @@ public class BookingResource {
         reservation.userId = req.userId();
         reservation.roomId = req.roomId();
         reservation.checkInDate = req.checkInDate();
+        if (req.adultCount() != null) reservation.adultCount = req.adultCount();
+        if (req.childCount() != null) reservation.childCount = req.childCount();
         reservation.checkOutDate = req.checkOutDate();
         reservation.totalPrice = req.totalPrice();
         reservation.persist();

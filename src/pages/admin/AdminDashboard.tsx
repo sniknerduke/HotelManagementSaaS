@@ -46,6 +46,24 @@ export const AdminDashboard: React.FC = () => {
         currency: 'USD'
     });
 
+    const [coupons, setCoupons] = useState([
+        { id: 1, code: 'SUMMER20', discount: '-20% Off' },
+        { id: 2, code: 'VIPUPGRADE', discount: 'Free Category Up' }
+    ]);
+    const [newCoupon, setNewCoupon] = useState({ code: '', discount: '' });
+
+    const handleAddCoupon = () => {
+        if (!newCoupon.code || !newCoupon.discount) return;
+        setCoupons([...coupons, { id: Date.now(), code: newCoupon.code, discount: newCoupon.discount }]);
+        setNewCoupon({ code: '', discount: '' });
+        toast('Coupon added', 'success');
+    };
+
+    const handleDeleteCoupon = (id: number) => {
+        setCoupons(coupons.filter(c => c.id !== id));
+        toast('Coupon removed', 'success');
+    };
+
     const refreshData = async () => {
         try {
             const [bookingsRes, usersRes, roomsRes, roomTypesRes, paymentsRes] = await Promise.all([
@@ -203,7 +221,9 @@ export const AdminDashboard: React.FC = () => {
         try {
             await InventoryService.updateRoom(editingRoom.id, {
                 roomNumber: editingRoom.roomNumber,
-                roomTypeId: editingRoom.roomTypeId
+                roomTypeId: editingRoom.roomTypeId || editingRoom.roomType?.id,
+                status: editingRoom.status || 'AVAILABLE',
+                floor: editingRoom.floor || 1
             });
             toast('Room updated.', 'success');
             setEditingRoom(null);
@@ -544,13 +564,34 @@ export const AdminDashboard: React.FC = () => {
 
                                         <div className="pt-4">
                                             <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#6C6863] mb-2 block">{t('admin.inventory.activePromotions')}</label>
-                                            <div className="flex items-center justify-between bg-[#1A1A1A] text-white p-3 mb-2 rounded-sm">
-                                                <span className="font-mono text-sm tracking-widest">SUMMER20</span>
-                                                <span className="text-xs font-bold text-[#D4AF37]">-20% Off</span>
+                                            
+                                            <div className="flex gap-2 mb-4">
+                                                <Input 
+                                                    placeholder="CODE" 
+                                                    value={newCoupon.code} 
+                                                    onChange={e => setNewCoupon({...newCoupon, code: e.target.value.toUpperCase()})}
+                                                    className="w-1/2 uppercase font-mono text-sm"
+                                                />
+                                                <Input 
+                                                    placeholder="-10% Off / $50 Off" 
+                                                    value={newCoupon.discount} 
+                                                    onChange={e => setNewCoupon({...newCoupon, discount: e.target.value})}
+                                                    className="w-1/2 text-sm"
+                                                />
+                                                <Button type="button" onClick={handleAddCoupon} variant="primary" className="bg-[#1A1A1A] hover:bg-[#D4AF37] text-white text-[10px] uppercase px-4 h-10">Add</Button>
                                             </div>
-                                            <div className="flex items-center justify-between bg-[#F9F8F6] border border-[#1A1A1A]/10 p-3 rounded-sm">
-                                                <span className="font-mono text-sm tracking-widest font-bold">VIPUPGRADE</span>
-                                                <span className="text-[10px] uppercase font-bold text-[#6C6863]">Free Category Up</span>
+
+                                            <div className="space-y-2">
+                                                {coupons.map((c, i) => (
+                                                    <div key={c.id} className={`flex items-center justify-between p-3 rounded-sm ${i % 2 === 0 ? 'bg-[#1A1A1A] text-white' : 'bg-[#F9F8F6] border border-[#1A1A1A]/10 text-[#1A1A1A]'}`}>
+                                                        <span className="font-mono text-sm tracking-widest font-bold">{c.code}</span>
+                                                        <div className="flex items-center gap-4">
+                                                            <span className={`text-[10px] uppercase font-bold ${i % 2 === 0 ? 'text-[#D4AF37]' : 'text-[#6C6863]'}`}>{c.discount}</span>
+                                                            <button onClick={() => handleDeleteCoupon(c.id)} className="text-[10px] uppercase text-red-500 hover:text-red-700 font-bold ml-2">Del</button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                                {coupons.length === 0 && <p className="text-xs text-[#6C6863] italic">No active promotions</p>}
                                             </div>
                                         </div>
 
@@ -849,7 +890,7 @@ export const AdminDashboard: React.FC = () => {
                     <Input type="text" label="Description" value={addCategoryForm.description} onChange={(e) => setAddCategoryForm({ ...addCategoryForm, description: e.target.value })} required />
                     <div className="grid grid-cols-2 gap-4">
                         <Input type="number" label="Base Price (USD)" value={addCategoryForm.basePrice} onChange={(e) => setAddCategoryForm({ ...addCategoryForm, basePrice: Number(e.target.value) })} required />
-                        <Input type="number" label="Capacity (Guests)" value={addCategoryForm.defaultCapacity} onChange={(e) => setAddCategoryForm({ ...addCategoryForm, defaultCapacity: Number(e.target.value) })} required />
+                        <Input type="number" label="Capacity (Guests)" value={addCategoryForm.maxGuests} onChange={(e) => setAddCategoryForm({ ...addCategoryForm, maxGuests: Number(e.target.value) })} required />
                     </div>
                     <Button type="submit" variant="primary" className="w-full mt-4 bg-[#1A1A1A] text-white">Add Category</Button>
                 </form>
@@ -919,7 +960,7 @@ export const AdminDashboard: React.FC = () => {
                         <Input type="text" label="Room Number" value={editingRoom.roomNumber} onChange={(e) => setEditingRoom({ ...editingRoom, roomNumber: e.target.value })} required />
                         <div>
                             <label className="text-[10px] uppercase font-bold text-[#6C6863] block mb-1">Room Category</label>
-                            <select className="w-full p-3 border border-[#1A1A1A]/20 bg-[#F9F8F6] text-sm" value={editingRoom.roomTypeId} onChange={(e) => setEditingRoom({ ...editingRoom, roomTypeId: e.target.value })} required>
+                            <select className="w-full p-3 border border-[#1A1A1A]/20 bg-[#F9F8F6] text-sm" value={editingRoom.roomTypeId || editingRoom.roomType?.id || ''} onChange={(e) => setEditingRoom({ ...editingRoom, roomTypeId: e.target.value })} required>
                                 <option value="">-- Choose Category --</option>
                                 {roomTypes.map(rt => <option key={rt.id} value={rt.id}>{rt.name}</option>)}
                             </select>

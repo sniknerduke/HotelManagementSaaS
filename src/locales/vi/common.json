@@ -13,7 +13,7 @@
     "nav": {
       "overview": "Tổng quan",
       "reservations": "Đặt phòng",
-      "inventory": "Kho hàng",
+      "inventory": "Quản lý phòng",
       "guests": "Khách hàng",
       "settings": "Cài đặt"
     },
@@ -261,8 +261,8 @@
       "title": "Quản trị",
       "overview": "1. Tổng quan Toàn cầu",
       "reservations": "2. Đặt phòng",
-      "inventory": "3. Kho & Phòng",
-      "users": "4. Người dùng & Nhân viên",
+      "inventory": "3. Quản lý phòng",
+      "users": "4. Người dùng & Nhân lực",
       "reports": "5. Báo cáo & Phân tích",
       "settings": "6. Cài đặt Hệ thống"
     },
@@ -314,7 +314,7 @@
     },
     "inventory": {
       "title": "Quản lý",
-      "titleItalic": "Kho",
+      "titleItalic": "Phòng",
       "addCategory": "+ Thêm Danh mục",
       "roomStatus": "Kiểm soát Trạng thái Phòng",
       "setStatus": "Đặt Trạng thái",

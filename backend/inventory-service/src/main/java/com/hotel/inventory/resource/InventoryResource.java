@@ -157,7 +157,7 @@ public class InventoryResource {
 
     @PATCH
     @Path("/rooms/{id}/status")
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"ADMIN", "USER", "GUEST"})
     @Transactional
     public Response updateRoomStatus(@PathParam("id") Long id, @Valid UpdateRoomStatusRequest req) {
         Room room = Room.findById(id);

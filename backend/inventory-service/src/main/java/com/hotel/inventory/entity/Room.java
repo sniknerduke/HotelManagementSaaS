@@ -1,5 +1,6 @@
 package com.hotel.inventory.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.*;
 
@@ -15,6 +16,7 @@ public class Room extends PanacheEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_type_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     public RoomType roomType;
 
     @Enumerated(EnumType.STRING)

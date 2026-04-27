@@ -3,14 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 import { useNavigate } from 'react-router-dom';
-import { BookingService } from '../../api';
+import { BookingService, AuthService, PaymentService } from '../../api';
 
 type Tab = 'active' | 'bookings' | 'profile' | 'payment' | 'preferences';
 
 export const Profile: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { user, login, logout } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>('active');
 
@@ -22,6 +24,13 @@ export const Profile: React.FC = () => {
     phoneNumber: user?.phoneNumber || ''
   });
   const [updateMsg, setUpdateMsg] = useState('');
+
+  // Password update state
+  const [pwdData, setPwdData] = useState({ oldPassword: '', newPassword: '' });
+  const [isChangingPwd, setIsChangingPwd] = useState(false);
+  
+  // Deactivate account state
+  const [isDeactivating, setIsDeactivating] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -60,9 +69,6 @@ export const Profile: React.FC = () => {
     setIsUpdating(true);
     setUpdateMsg('');
     try {
-      // Intentionally not handling token manually since client.ts attaches it securely
-      // and we just call our newly added `updateProfile` in `AuthService`
-      const { AuthService } = await import('../../api');
       await AuthService.updateProfile(user.id, profileData);
       
       // Update global context
@@ -70,13 +76,65 @@ export const Profile: React.FC = () => {
       if (token) {
           await login(token, user.id);
       }
+      toast(t('profile.accountSettings.updateSuccess') || "Profile updated successfully!", 'success');
       setUpdateMsg(t('profile.accountSettings.updateSuccess') || "Profile updated successfully!");
     } catch (err: any) {
+      toast(err.message || "Failed to update profile.", 'error');
       setUpdateMsg(err.message || "Failed to update profile.");
     } finally {
       setIsUpdating(false);
       setTimeout(() => setUpdateMsg(''), 3000);
     }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user?.id) return;
+    setIsChangingPwd(true);
+    try {
+        await AuthService.changePassword(user.id, pwdData);
+        toast('Password changed successfully!', 'success');
+        setPwdData({ oldPassword: '', newPassword: '' });
+    } catch (err: any) {
+        toast(err.message || 'Failed to change password.', 'error');
+    } finally {
+        setIsChangingPwd(false);
+    }
+  };
+
+  const handleDeactivateAccount = async () => {
+    if (!window.confirm("Are you sure you want to deactivate your account? This action cannot be undone.")) return;
+    if (!user?.id) return;
+    setIsDeactivating(true);
+    try {
+        await AuthService.deleteUser(user.id);
+        toast('Account deactivated successfully.', 'info');
+        logout();
+        navigate('/');
+    } catch(err: any) {
+        toast(err.message || 'Failed to deactivate account', 'error');
+        setIsDeactivating(false);
+    }
+  };
+
+  const handleCancelReservation = async (id: number) => {
+    if (!window.confirm("Are you sure you want to cancel this reservation?")) return;
+    try {
+        await BookingService.cancelBooking(id);
+        toast('Reservation cancelled successfully', 'success');
+        setDbBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'CANCELLED' } : b));
+    } catch (err: any) {
+        toast(err.message || 'Failed to cancel reservation.', 'error');
+    }
+  };
+
+  const handleViewReceipt = async (reservationId: number) => {
+      try {
+          const receipt = await PaymentService.getPaymentByReservation(reservationId);
+          alert(`Receipt for BKG-${reservationId}\n\nAmount: $${receipt.amount}\nStatus: ${receipt.status}\nMethod: ${receipt.paymentMethod || 'Credit Card'}\nDate: ${new Date(receipt.createdAt || Date.now()).toLocaleDateString()}`);
+      } catch (err: any) {
+          toast(err.message || 'Receipt not found', 'error');
+      }
   };
 
   return (
@@ -222,7 +280,7 @@ export const Profile: React.FC = () => {
 
                         <div className="mt-8 pt-6 border-t border-[#1A1A1A]/10 flex flex-col sm:flex-row gap-4">
                           <Button onClick={() => alert('Available in v2.0')} variant="secondary" className="w-full sm:w-auto h-10 px-6">{t('profile.manageBookings.modify')}</Button>
-                          <Button onClick={() => alert('Available in v2.0')} variant="ghost" className="w-full sm:w-auto h-10 px-6 border border-[#1A1A1A]/20 text-red-700 hover:bg-red-50 hover:border-red-200">{t('profile.manageBookings.cancel')}</Button>
+                          <Button onClick={() => handleCancelReservation(booking.id)} variant="ghost" className="w-full sm:w-auto h-10 px-6 border border-[#1A1A1A]/20 text-red-700 hover:bg-red-50 hover:border-red-200">{t('profile.manageBookings.cancel')}</Button>
                         </div>
                       </div>
                     </div>
@@ -246,7 +304,7 @@ export const Profile: React.FC = () => {
                         <p className="text-xs text-[#6C6863] mt-2">{booking.checkInDate} to {booking.checkOutDate}</p>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-3">
-                      <Button onClick={() => alert('Available in v2.0')} variant="ghost" className="border border-[#1A1A1A]/20 text-xs h-9">{t('profile.manageBookings.downloadInvoice')}</Button>
+                      <Button onClick={() => handleViewReceipt(booking.id)} variant="ghost" className="border border-[#1A1A1A]/20 text-xs h-9">{t('profile.manageBookings.downloadInvoice')}</Button>
                       <Button onClick={() => alert('Available in v2.0')} variant="primary" className="text-xs h-9 bg-[#1A1A1A] text-white">{t('profile.manageBookings.leaveReview')}</Button>
                     </div>
                   </Card>
@@ -287,12 +345,27 @@ export const Profile: React.FC = () => {
                  
                  <div className="space-y-8">
                     {/* Password */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 border border-[#1A1A1A]/10 bg-white">
-                      <div>
-                        <p className="font-serif text-[#1A1A1A] text-lg">{t('profile.accountSettings.password')}</p>
-                        <p className="text-xs text-[#6C6863] mt-1">{t('profile.accountSettings.lastChanged', { count: 3 })}</p>
+                    <div className="flex flex-col gap-4 p-6 border border-[#1A1A1A]/10 bg-white">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between">
+                        <div>
+                          <p className="font-serif text-[#1A1A1A] text-lg">{t('profile.accountSettings.password')}</p>
+                          <p className="text-xs text-[#6C6863] mt-1">{t('profile.accountSettings.lastChanged', { count: 3 })}</p>
+                        </div>
                       </div>
-                      <Button onClick={() => alert('Available in v2.0')} variant="ghost" className="border border-[#1A1A1A]/20 text-xs bg-transparent">{t('profile.accountSettings.resetPassword')}</Button>
+                      
+                      <form onSubmit={handleChangePassword} className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-[#1A1A1A]/10 mt-2">
+                          <div>
+                              <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">Current Password</label>
+                              <input required type="password" value={pwdData.oldPassword} onChange={e => setPwdData({...pwdData, oldPassword: e.target.value})} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-serif text-lg text-[#1A1A1A] transition-colors" />
+                          </div>
+                          <div>
+                              <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">New Password</label>
+                              <input required type="password" minLength={6} value={pwdData.newPassword} onChange={e => setPwdData({...pwdData, newPassword: e.target.value})} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-serif text-lg text-[#1A1A1A] transition-colors" />
+                          </div>
+                          <div className="md:col-span-2 flex justify-end mt-2">
+                             <Button disabled={isChangingPwd} type="submit" variant="ghost" className="border border-[#1A1A1A]/20 text-xs bg-transparent">{isChangingPwd ? 'Updating...' : t('profile.accountSettings.resetPassword') || 'Change Password'}</Button>
+                          </div>
+                      </form>
                     </div>
 
                     {/* Language Toggle */}
@@ -314,6 +387,18 @@ export const Profile: React.FC = () => {
                    <Button disabled={isUpdating} onClick={handleUpdateProfile} variant="primary" className="bg-[#D4AF37] text-white py-4 hover:bg-[#D4AF37]/90 px-8">
                      {isUpdating ? 'Saving...' : t('profile.accountSettings.saveChanges')}
                    </Button>
+                 </div>
+
+                 {/* Danger Zone */}
+                 <div className="mt-16 pt-8 border-t border-red-500/20">
+                     <h3 className="text-xl font-serif text-red-700 mb-4">Danger Zone</h3>
+                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 border border-red-500/20 bg-red-50/50">
+                        <div>
+                          <p className="font-serif text-[#1A1A1A] text-lg">Deactivate Account</p>
+                          <p className="text-xs text-[#6C6863] mt-1">Once you deactivate your account, there is no going back. Please be certain.</p>
+                        </div>
+                        <Button disabled={isDeactivating} onClick={handleDeactivateAccount} variant="ghost" className="border border-red-700 text-red-700 text-xs bg-transparent hover:bg-red-700 hover:text-white transition-colors">{isDeactivating ? 'Deactivating...' : 'Deactivate Account'}</Button>
+                     </div>
                  </div>
                </div>
             </div>

@@ -1,9 +1,48 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../../components/ui/Card';
+import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
+import { BookingService, PaymentService } from '../../api';
 
 export const Dashboard: React.FC = () => {
     const { t } = useTranslation();
+    const { user } = useAuth();
+    const { toast } = useToast();
+    
+    const [bookings, setBookings] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (user?.id) {
+            BookingService.getUserBookings(user.id)
+                .then((res: any[]) => setBookings(res))
+                .catch((err) => console.error('Failed to fetch bookings', err));
+        }
+    }, [user]);
+
+    const handleCancelReservation = async (id: number) => {
+        if (!window.confirm("Cancel this reservation?")) return;
+        try {
+            await BookingService.cancelBooking(id);
+            toast('Reservation cancelled successfully', 'success');
+            setBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'CANCELLED' } : b));
+        } catch (err: any) {
+            toast(err.message || 'Failed to cancel reservation.', 'error');
+        }
+    };
+
+    const handleViewReceipt = async (reservationId: number) => {
+        try {
+            const receipt = await PaymentService.getPaymentByReservation(reservationId);
+            alert(`Receipt for BKG-${reservationId}\n\nAmount: $${receipt.amount}\nStatus: ${receipt.status}\nMethod: ${receipt.paymentMethod || 'Credit Card'}\nDate: ${new Date(receipt.createdAt || Date.now()).toLocaleDateString()}`);
+        } catch (err: any) {
+            toast(err.message || 'Receipt not found', 'error');
+        }
+    };
+
+    const totalStays = bookings.filter(b => b.status === 'COMPLETED').length;
+    const upcoming = bookings.filter(b => b.status === 'PENDING' || b.status === 'CONFIRMED').length;
+    const totalSpent = bookings.filter(b => b.status !== 'CANCELLED').reduce((sum, b) => sum + (b.totalPrice || 0), 0);
 
     return (
         <div className="max-w-[1600px] mx-auto w-full pt-16 md:pt-32 pb-40 px-8 md:px-16 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-x-12">
@@ -31,16 +70,16 @@ export const Dashboard: React.FC = () => {
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
                         <Card className="py-8 border-t border-[#1A1A1A]/20 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-shadow duration-[700ms]">
-                            <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-4">{t('dashboard.metrics.occupancy')}</p>
-                            <p className="text-4xl md:text-6xl font-serif">84<span className="text-xl italic text-[#6C6863]">%</span></p>
+                            <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-4">Total Stays</p>
+                            <p className="text-4xl md:text-6xl font-serif">{totalStays}</p>
                         </Card>
                         <Card className="py-8 border-t border-[#1A1A1A]/20 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-shadow duration-[700ms]">
-                            <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-4">{t('dashboard.metrics.checkIns')}</p>
-                            <p className="text-4xl md:text-6xl font-serif text-[#D4AF37]">12</p>
+                            <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-4">Upcoming</p>
+                            <p className="text-4xl md:text-6xl font-serif text-[#D4AF37]">{upcoming}</p>
                         </Card>
                         <Card className="py-8 border-t border-[#1A1A1A]/20 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-shadow duration-[700ms]">
-                            <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-4">{t('dashboard.metrics.revenue')}</p>
-                            <p className="text-4xl md:text-6xl font-serif">$42<span className="text-xl italic text-[#6C6863]">k</span></p>
+                            <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-4">Total Spent</p>
+                            <p className="text-4xl md:text-6xl font-serif">${totalSpent}</p>
                         </Card>
                     </div>
                 </div>
@@ -54,7 +93,7 @@ export const Dashboard: React.FC = () => {
                     <table className="w-full text-left font-sans text-sm text-[#1A1A1A] border-collapse">
                         <thead>
                             <tr className="border-b border-[#1A1A1A]/10 text-[10px] uppercase tracking-[0.25em] text-[#6C6863]">
-                                <th className="pb-4 font-normal">{t('dashboard.table.guest')}</th>
+                                <th className="pb-4 font-normal">Booking</th>
                                 <th className="pb-4 font-normal">{t('dashboard.table.dates')}</th>
                                 <th className="pb-4 font-normal">{t('dashboard.table.residence')}</th>
                                 <th className="pb-4 font-normal">{t('dashboard.table.status')}</th>
@@ -62,20 +101,27 @@ export const Dashboard: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[#1A1A1A]/5">
-                            <tr className="group hover:bg-[#F9F8F6]/80 transition-colors duration-[700ms]">
-                                <td className="py-6 font-serif italic group-hover:text-[#D4AF37] transition-colors duration-500">Eleanor Vance</td>
-                                <td className="py-6 text-[#6C6863]">Apr 22 - Apr 26</td>
-                                <td className="py-6 text-[#6C6863]">{t('dashboard.rooms.grandSuite')}</td>
-                                <td className="py-6"><span className="px-3 py-1 bg-[#1A1A1A] text-white text-[10px] uppercase tracking-[0.1em]">{t('dashboard.table.confirmed')}</span></td>
-                                <td className="py-6 text-right"><button className="text-[10px] uppercase tracking-[0.2em] text-[#6C6863] hover:text-[#1A1A1A] underline underline-offset-4">{t('dashboard.table.manage')}</button></td>
-                            </tr>
-                            <tr className="group hover:bg-[#F9F8F6]/80 transition-colors duration-[700ms]">
-                                <td className="py-6 font-serif italic group-hover:text-[#D4AF37] transition-colors duration-500">Julien Crain</td>
-                                <td className="py-6 text-[#6C6863]">Apr 23 - Apr 24</td>
-                                <td className="py-6 text-[#6C6863]">{t('dashboard.rooms.oceanVilla')}</td>
-                                <td className="py-6"><span className="px-3 py-1 bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20 text-[10px] uppercase tracking-[0.1em]">{t('dashboard.table.pending')}</span></td>
-                                <td className="py-6 text-right"><button className="text-[10px] uppercase tracking-[0.2em] text-[#6C6863] hover:text-[#1A1A1A] underline underline-offset-4">{t('dashboard.table.manage')}</button></td>
-                            </tr>
+                            {bookings.map(b => (
+                                <tr key={b.id} className="group hover:bg-[#F9F8F6]/80 transition-colors duration-[700ms]">
+                                    <td className="py-6 font-serif italic group-hover:text-[#D4AF37] transition-colors duration-500">BKG-{b.id}</td>
+                                    <td className="py-6 text-[#6C6863]">{b.checkInDate} to {b.checkOutDate}</td>
+                                    <td className="py-6 text-[#6C6863]">Room {b.roomId}</td>
+                                    <td className="py-6"><span className={`px-3 py-1 text-[10px] uppercase tracking-[0.1em] ${b.status === 'PENDING' ? 'bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20' : 'bg-[#1A1A1A] text-white'}`}>{b.status}</span></td>
+                                    <td className="py-6 text-right space-x-3">
+                                        {['PENDING', 'CONFIRMED'].includes(b.status) && (
+                                            <button onClick={() => handleCancelReservation(b.id)} className="text-[10px] uppercase tracking-[0.2em] text-red-600 hover:text-red-800 underline underline-offset-4">Cancel</button>
+                                        )}
+                                        {['COMPLETED', 'CONFIRMED', 'CHECKED_IN'].includes(b.status) && (
+                                            <button onClick={() => handleViewReceipt(b.id)} className="text-[10px] uppercase tracking-[0.2em] text-[#6C6863] hover:text-[#1A1A1A] underline underline-offset-4">Receipt</button>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                            {bookings.length === 0 && (
+                                <tr>
+                                    <td colSpan={5} className="py-8 text-center text-[#6C6863] italic">No reservations found.</td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>

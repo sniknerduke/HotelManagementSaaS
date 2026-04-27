@@ -5,6 +5,8 @@ import com.hotel.inventory.entity.RoomType;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -25,13 +27,25 @@ public class InventoryResource {
         }
     }
 
-    public record CreateRoomRequest(String roomNumber, Long roomTypeId) {}
+    public record CreateRoomRequest(
+            @NotBlank(message = "Room number is required") String roomNumber, 
+            @NotNull(message = "Room type ID is required") Long roomTypeId) {}
 
-    public record UpdateRoomTypeRequest(String name, String description, java.math.BigDecimal basePrice, Integer maxGuests, String imageUrl) {}
+    public record UpdateRoomTypeRequest(
+            @NotBlank(message = "Name is required") String name, 
+            String description, 
+            @NotNull(message = "Base price is required") @Positive(message = "Base price must be positive") java.math.BigDecimal basePrice, 
+            @NotNull(message = "Max guests is required") @Min(value = 1, message = "Max guests must be at least 1") Integer maxGuests, 
+            String imageUrl) {}
 
-    public record UpdateRoomRequest(String roomNumber, Long roomTypeId, Room.RoomStatus status, Integer floor) {}
+    public record UpdateRoomRequest(
+            @NotBlank(message = "Room number is required") String roomNumber, 
+            @NotNull(message = "Room type ID is required") Long roomTypeId, 
+            @NotNull(message = "Status is required") Room.RoomStatus status, 
+            @NotNull(message = "Floor is required") Integer floor) {}
 
-    public record UpdateRoomStatusRequest(Room.RoomStatus status) {}
+    public record UpdateRoomStatusRequest(
+            @NotNull(message = "Status is required") Room.RoomStatus status) {}
 
     // --- Endpoints ---
 
@@ -104,7 +118,7 @@ public class InventoryResource {
     @Path("/rooms/{id}")
     @RolesAllowed("ADMIN")
     @Transactional
-    public Response updateRoom(@PathParam("id") Long id, UpdateRoomRequest req) {
+    public Response updateRoom(@PathParam("id") Long id, @Valid UpdateRoomRequest req) {
         Room room = Room.findById(id);
         if (room == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -145,7 +159,7 @@ public class InventoryResource {
     @Path("/rooms/{id}/status")
     @RolesAllowed("ADMIN")
     @Transactional
-    public Response updateRoomStatus(@PathParam("id") Long id, UpdateRoomStatusRequest req) {
+    public Response updateRoomStatus(@PathParam("id") Long id, @Valid UpdateRoomStatusRequest req) {
         Room room = Room.findById(id);
         if (room == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -182,7 +196,7 @@ public class InventoryResource {
     @Path("/rooms")
     @RolesAllowed("ADMIN")
     @Transactional
-    public Response createRoom(CreateRoomRequest req) {
+    public Response createRoom(@Valid CreateRoomRequest req) {
         RoomType rt = RoomType.findById(req.roomTypeId());
         if (rt == null) {
             return Response.status(Response.Status.BAD_REQUEST)
@@ -204,7 +218,7 @@ public class InventoryResource {
     @Path("/room-types")
     @RolesAllowed("ADMIN")
     @Transactional
-    public Response createRoomType(RoomType roomType) {
+    public Response createRoomType(@Valid RoomType roomType) {
         roomType.persist();
         return Response.status(Response.Status.CREATED)
                 .entity(RoomTypeResponse.from(roomType))
@@ -214,7 +228,7 @@ public class InventoryResource {
     @PUT
     @Path("/room-types/{id}")
     @Transactional
-    public Response updateRoomType(@PathParam("id") Long id, UpdateRoomTypeRequest req) {
+    public Response updateRoomType(@PathParam("id") Long id, @Valid UpdateRoomTypeRequest req) {
         RoomType rt = RoomType.findById(id);
         if (rt == null) {
             return Response.status(Response.Status.NOT_FOUND).build();

@@ -9,6 +9,7 @@ import { Login } from './pages/user/Login';
 import { Register } from './pages/user/Register';
 import { Profile } from './pages/user/Profile';
 import { AuthCallback } from './pages/user/AuthCallback';
+import { VNPayCallback } from './pages/user/VNPayCallback';
 import { Checkout } from './pages/Checkout';
 import { Amenities } from './pages/Amenities';
 import { Contact } from './pages/Contact';
@@ -50,6 +51,7 @@ function App() {
                 <Route path='login' element={<Login />} />
                 <Route path='register' element={<Register />} />
                 <Route path='oauth/callback' element={<AuthCallback />} />
+                <Route path='vnpay/callback' element={<VNPayCallback />} />
                 
                 {/* Authenticated Routes */}
                 <Route element={<ProtectedRoute />}>

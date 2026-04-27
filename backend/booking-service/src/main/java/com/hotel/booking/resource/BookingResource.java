@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.UUID;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import com.hotel.booking.client.InventoryClient;
 
 @Path("/api/bookings")
@@ -26,14 +28,38 @@ public class BookingResource {
 
     // --- DTOs ---
 
-    public record CreateBookingRequest(Long roomId, UUID userId,
-                                       LocalDate checkInDate, LocalDate checkOutDate,
-                                       BigDecimal totalPrice) {}
+    public record CreateBookingRequest(
+            @NotNull(message = "Room ID is required") Long roomId, 
+            @NotNull(message = "User ID is required") UUID userId,
+            @NotNull(message = "Check-in date is required") 
+            @FutureOrPresent(message = "Check-in date cannot be in the past") LocalDate checkInDate, 
+            @NotNull(message = "Check-out date is required") LocalDate checkOutDate,
+            @NotNull(message = "Total price is required") 
+            @Positive(message = "Total price must be positive") BigDecimal totalPrice) {
 
-    public record UpdateStatusRequest(String status) {}
+        @AssertTrue(message = "Check-out date must be after check-in date")
+        public boolean isValidDates() {
+            if (checkInDate == null || checkOutDate == null) return true;
+            return checkOutDate.isAfter(checkInDate);
+        }
+    }
 
-    public record UpdateBookingRequest(LocalDate checkInDate, LocalDate checkOutDate, Long roomId,
-                                       Integer adultCount, Integer childCount, String guestNotes) {}
+    public record UpdateStatusRequest(@NotBlank(message = "Status cannot be blank") String status) {}
+
+    public record UpdateBookingRequest(
+            @FutureOrPresent(message = "Check-in date cannot be in the past") LocalDate checkInDate, 
+            LocalDate checkOutDate, 
+            Long roomId,
+            @Min(value = 1, message = "At least 1 adult is required") Integer adultCount, 
+            @Min(value = 0, message = "Child count cannot be negative") Integer childCount, 
+            @Size(max = 500, message = "Guest notes cannot exceed 500 characters") String guestNotes) {
+
+        @AssertTrue(message = "Check-out date must be after check-in date")
+        public boolean isValidDates() {
+            if (checkInDate == null || checkOutDate == null) return true;
+            return checkOutDate.isAfter(checkInDate);
+        }
+    }
 
     public record BookingResponse(Long id, UUID userId, Long roomId,
                                   LocalDate checkInDate, LocalDate checkOutDate,
@@ -61,7 +87,7 @@ public class BookingResource {
     @POST
     @RolesAllowed({"GUEST", "USER", "ADMIN"})
     @Transactional
-    public Response createBooking(CreateBookingRequest req) {
+    public Response createBooking(@Valid CreateBookingRequest req) {
         try {
             InventoryClient.RoomDTO room = inventoryClient.getRoom(req.roomId());
             if (room == null || !"AVAILABLE".equals(room.status())) {
@@ -104,7 +130,7 @@ public class BookingResource {
     @Path("/{id}/status")
     @RolesAllowed("ADMIN")
     @Transactional
-    public Response updateStatus(@PathParam("id") Long id, UpdateStatusRequest req) {
+    public Response updateStatus(@PathParam("id") Long id, @Valid UpdateStatusRequest req) {
         Reservation reservation = Reservation.findById(id);
         if (reservation == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -136,7 +162,7 @@ public class BookingResource {
     @Path("/{id}")
     @RolesAllowed({"GUEST", "USER", "ADMIN"})
     @Transactional
-    public Response updateBooking(@PathParam("id") Long id, UpdateBookingRequest req) {
+    public Response updateBooking(@PathParam("id") Long id, @Valid UpdateBookingRequest req) {
         Reservation reservation = Reservation.findById(id);
         if (reservation == null) {
             return Response.status(Response.Status.NOT_FOUND).build();

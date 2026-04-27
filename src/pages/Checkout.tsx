@@ -18,7 +18,6 @@ export const Checkout: React.FC = () => {
     const [error, setError] = useState('');
 
     const [guestInfo, setGuestInfo] = useState({ firstName: user?.firstName || '', lastName: user?.lastName || '', email: user?.email || '', phone: user?.phoneNumber || '' });
-    const [paymentDetails, setPaymentDetails] = useState({ cardholder: '', cardNumber: '', expiry: '', cvc: '' });
     
     // Simulate mapping roomType to an actual room (in real scenario, backend finds an available roomId of the roomType)
     const roomId = searchParams.get('roomType') || '1'; // Using mock roomId based on type
@@ -43,20 +42,24 @@ export const Checkout: React.FC = () => {
                 childCount: 0
             });
 
-            // 2. Process Payment
-            await PaymentService.createPayment({
+            // 2. Process Payment via VNPay
+            const paymentRes = await PaymentService.createPayment({
                 reservationId: bookingRes.id,
-                paymentMethod: "CREDIT_CARD",
+                paymentMethod: "VNPAY",
                 amount: totalAmount
             });
 
-            // Move to confirmation
-            handleNext(); 
-            toast("Reservation confirmed!", "success");
+            // Assuming paymentRes contains a paymentUrl to redirect to VNPay
+            if (paymentRes.paymentUrl) {
+                window.location.href = paymentRes.paymentUrl;
+            } else {
+                toast("Payment initialized, but no redirect URL provided.", "error");
+                setLoading(false);
+            }
+
         } catch (err: any) {
             toast(err.message || 'Payment processing failed. Please try again.', "error");
             setError(err.message || 'Payment processing failed. Please try again.');
-        } finally {
             setLoading(false);
         }
     };
@@ -100,12 +103,9 @@ export const Checkout: React.FC = () => {
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                             <h2 className="text-2xl font-serif text-[#1A1A1A] mb-8 border-b border-[#1A1A1A]/10 pb-4">{t('checkout.paymentDetails.title')}</h2>
                             <Card className="p-6 border border-[#1A1A1A]/20 shadow-[0_4px_16px_rgba(0,0,0,0.02)] bg-[#F9F8F6]/50">
-                               <div className="space-y-6">
-                                  <Input label={t('checkout.paymentDetails.cardholder')} placeholder="John Doe" value={paymentDetails.cardholder} onChange={e => setPaymentDetails({...paymentDetails, cardholder: e.target.value})} />
-                                  <Input label={t('checkout.paymentDetails.cardNumber')} placeholder="0000 0000 0000 0000" value={paymentDetails.cardNumber} onChange={e => setPaymentDetails({...paymentDetails, cardNumber: e.target.value})} />
-                                  <div className="grid grid-cols-2 gap-6">
-                                      <Input label={t('checkout.paymentDetails.expiry')} placeholder="MM/YY" value={paymentDetails.expiry} onChange={e => setPaymentDetails({...paymentDetails, expiry: e.target.value})} />
-                                      <Input label={t('checkout.paymentDetails.cvc')} placeholder="CVC" value={paymentDetails.cvc} onChange={e => setPaymentDetails({...paymentDetails, cvc: e.target.value})} />
+                               <div className="space-y-6 flex flex-col items-center py-6">
+                                  <div className="px-12 py-8 bg-white border border-[#1A1A1A]/10 rounded-lg shadow-sm w-full max-w-sm flex flex-col items-center space-y-4">
+                                      <p className="text-sm text-[#6C6863] text-center">You will be redirected to VNPay to complete your transaction securely.</p>
                                   </div>
                                </div>
                             </Card>
@@ -118,8 +118,8 @@ export const Checkout: React.FC = () => {
 
                             <div className="pt-8 flex justify-between">
                                 <Button variant="ghost" onClick={handlePrev} disabled={loading} className="hidden sm:flex text-[#6C6863] hover:text-[#1A1A1A]">{t('checkout.paymentDetails.back')}</Button>
-                                <Button onClick={handleConfirmBooking} disabled={loading || !paymentDetails.cardNumber} className="w-full sm:w-auto bg-[#D4AF37] hover:bg-[#1A1A1A] text-white">
-                                    {loading ? 'Processing...' : t('checkout.paymentDetails.confirm')}
+                                <Button onClick={handleConfirmBooking} disabled={loading} className="w-full sm:w-auto bg-[#D4AF37] hover:bg-[#1A1A1A] text-white">
+                                    {loading ? 'Processing...' : 'Pay with VNPay'}
                                 </Button>
                             </div>
                         </div>

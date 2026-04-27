@@ -3,10 +3,12 @@ package com.hotel.user.resource;
 import com.hotel.user.entity.User;
 import com.hotel.user.service.JwtService;
 import io.quarkus.elytron.security.common.BcryptUtil;
- import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -22,11 +24,33 @@ public class UserResource {
 
     // --- DTOs ---
 
-    public record RegisterRequest(String email, String password, String firstName, String lastName, String phoneNumber) {}
-    public record LoginRequest(String email, String password) {}
-    public record UpdateProfileRequest(String firstName, String lastName, String phoneNumber, String nationality, String nationalId, java.time.LocalDate dateOfBirth, String address, String avatarUrl) {}
-    public record UpdateRoleRequest(String role) {}
-    public record ChangePasswordRequest(String currentPassword, String newPassword) {}
+    public record RegisterRequest(
+            @NotBlank(message = "Email is required") @Email(message = "Invalid email format") String email, 
+            @NotBlank(message = "Password is required") @Size(min = 6, message = "Password must be at least 6 characters") String password, 
+            @NotBlank(message = "First name is required") String firstName, 
+            @NotBlank(message = "Last name is required") String lastName, 
+            @NotBlank(message = "Phone number is required") String phoneNumber) {}
+
+    public record LoginRequest(
+            @NotBlank(message = "Email is required") @Email(message = "Invalid email format") String email, 
+            @NotBlank(message = "Password is required") String password) {}
+
+    public record UpdateProfileRequest(
+            @NotBlank(message = "First name is required") String firstName, 
+            @NotBlank(message = "Last name is required") String lastName, 
+            @NotBlank(message = "Phone number is required") String phoneNumber, 
+            String nationality, 
+            @Size(min = 9, max = 12, message = "National ID must be between 9 and 12 characters") String nationalId, 
+            @Past(message = "Date of birth must be in the past") java.time.LocalDate dateOfBirth, 
+            @Size(max = 255, message = "Address length must be less than 255") String address, 
+            String avatarUrl) {}
+
+    public record UpdateRoleRequest(
+            @NotBlank(message = "Role is required") String role) {}
+
+    public record ChangePasswordRequest(
+            @NotBlank(message = "Current password is required") String currentPassword, 
+            @NotBlank(message = "New password is required") @Size(min = 6, message = "New password must be at least 6 characters") String newPassword) {}
 
     public record UserResponse(UUID id, String email, String firstName, String lastName, String role, String phoneNumber,
                                String nationality, String nationalId, java.time.LocalDate dateOfBirth, String address, String avatarUrl, boolean isActive) {
@@ -48,7 +72,7 @@ public class UserResource {
     @Path("/register")
     @PermitAll
     @Transactional
-    public Response register(RegisterRequest req) {
+    public Response register(@Valid RegisterRequest req) {
         if (User.findByEmail(req.email()) != null) {
             return Response.status(Response.Status.CONFLICT)
                     .entity("{\"error\": \"Email already registered\"}")
@@ -71,7 +95,7 @@ public class UserResource {
     @POST
     @Path("/login")
     @PermitAll
-    public Response login(LoginRequest req) {
+    public Response login(@Valid LoginRequest req) {
         User user = User.findByEmail(req.email());
         if (user == null || !BcryptUtil.matches(req.password(), user.passwordHash)) {
             return Response.status(Response.Status.UNAUTHORIZED)
@@ -101,7 +125,7 @@ public class UserResource {
     @Path("/{id}")
     @RolesAllowed({"GUEST", "USER", "ADMIN"})
     @Transactional
-    public Response updateProfile(@PathParam("id") UUID id, UpdateProfileRequest req) {
+    public Response updateProfile(@PathParam("id") UUID id, @Valid UpdateProfileRequest req) {
         User user = User.findById(id);
         if (user == null || !user.isActive) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -136,7 +160,7 @@ public class UserResource {
     @Path("/{id}/role")
     @RolesAllowed("ADMIN")
     @Transactional
-    public Response changeRole(@PathParam("id") UUID id, UpdateRoleRequest req) {
+    public Response changeRole(@PathParam("id") UUID id, @Valid UpdateRoleRequest req) {
         User user = User.findById(id);
         if (user == null || !user.isActive) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -157,7 +181,7 @@ public class UserResource {
     @Path("/{id}/password")
     @RolesAllowed({"GUEST", "USER", "ADMIN"})
     @Transactional
-    public Response changePassword(@PathParam("id") UUID id, ChangePasswordRequest req) {
+    public Response changePassword(@PathParam("id") UUID id, @Valid ChangePasswordRequest req) {
         User user = User.findById(id);
         if (user == null || !user.isActive) {
             return Response.status(Response.Status.NOT_FOUND).build();

@@ -242,6 +242,13 @@ graph LR
 > **Why fifth?** Backend is now complete and secure. Time to replace all frontend mock data with real API calls.
 
 - [ ] Add toast notifications — success/error feedback (e.g. "Booking created!", "Payment failed")
+- [ ] **Admin UI - Payments:** Build out a Payment Management view (List all `GET /api/payments`, View details `GET /api/payments/{id}`, Process refunds `POST /api/payments/{id}/refund`).
+- [ ] **Admin UI - Bookings:** Add ability to Cancel Bookings (`DELETE /api/bookings/{id}`) and update arbitrary booking statuses.
+- [ ] **Admin UI - Inventory:** Wire up Edit/Delete Room buttons (`PUT|DELETE /api/inventory/rooms/{id}`) and Edit/Delete Room Category buttons, especially pricing config (`PUT|DELETE /api/inventory/room-types/{id}`).
+- [ ] **Admin UI - Users:** Add forms/modals to edit staff and guest details beyond just role changes (`PUT /api/users/{id}`).
+- [ ] **User UI - Profile (`Profile.tsx`):** Add "Change Password" form (`PUT /api/users/{id}/password`) and a "Danger Zone" to deactivate account (`DELETE /api/users/{id}`).
+- [ ] **User UI - Reservations:** Allow users to cancel their own pending reservations (`DELETE /api/bookings/{id}`) and view their payment receipts (`GET /api/payments/reservation/{reservationId}`).
+- [ ] **User UI - Checkout (`Checkout.tsx`):** Replace the mocked `CREDIT_CARD` success flow with the actual **VNPay integration**. Needs to handle the redirect from backend and create a UI route to catch the `GET /api/payments/vnpay-return` callback to confirm the payment.
 
 ---
 

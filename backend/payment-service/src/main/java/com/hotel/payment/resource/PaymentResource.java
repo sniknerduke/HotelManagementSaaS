@@ -4,6 +4,8 @@ import com.hotel.payment.entity.Payment;
 import com.hotel.payment.entity.Payment.PaymentStatus;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -29,8 +31,13 @@ public class PaymentResource {
 
     // --- DTOs ---
 
-    public record CreatePaymentRequest(Long reservationId, String paymentMethod, BigDecimal amount) {}
-    public record RefundRequest(BigDecimal amount) {}
+    public record CreatePaymentRequest(
+            @NotNull(message = "Reservation ID is required") Long reservationId, 
+            @NotBlank(message = "Payment method is required") String paymentMethod, 
+            @NotNull(message = "Amount is required") @Positive(message = "Amount must be positive") BigDecimal amount) {}
+            
+    public record RefundRequest(
+            @NotNull(message = "Amount is required") @Positive(message = "Amount must be positive") BigDecimal amount) {}
 
     public record PaymentResponse(Long id, Long reservationId, BigDecimal amount,
                                   String paymentMethod, String transactionId, String status, String paymentUrl) {
@@ -49,7 +56,7 @@ public class PaymentResource {
     @POST
     @RolesAllowed({"GUEST", "USER", "ADMIN"})
     @Transactional
-    public Response createPayment(CreatePaymentRequest req, @jakarta.ws.rs.core.Context jakarta.ws.rs.core.UriInfo uriInfo) {
+    public Response createPayment(@Valid CreatePaymentRequest req, @jakarta.ws.rs.core.Context jakarta.ws.rs.core.UriInfo uriInfo) {
         Payment payment = new Payment();
         payment.reservationId = req.reservationId();
         payment.paymentMethod = req.paymentMethod();
@@ -200,7 +207,7 @@ public class PaymentResource {
     @Path("/{id}/refund")
     @RolesAllowed("ADMIN")
     @Transactional
-    public Response refundPayment(@PathParam("id") Long id, RefundRequest req) {
+    public Response refundPayment(@PathParam("id") Long id, @Valid RefundRequest req) {
         Payment payment = Payment.findById(id);
         if (payment == null) {
             return Response.status(Response.Status.NOT_FOUND).build();

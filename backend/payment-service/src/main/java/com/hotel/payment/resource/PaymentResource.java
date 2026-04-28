@@ -13,6 +13,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import jakarta.inject.Inject;
 import com.hotel.payment.client.BookingClient;
 import com.hotel.payment.vnpay.VNPayService;
+import jakarta.annotation.security.PermitAll;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.UUID;
@@ -54,7 +55,7 @@ public class PaymentResource {
     // --- Endpoints ---
 
     @POST
-    @RolesAllowed({"GUEST", "USER", "ADMIN"})
+    @RolesAllowed({"GUEST", "STAFF", "ADMIN"})
     @Transactional
     public Response createPayment(@Valid CreatePaymentRequest req, @jakarta.ws.rs.core.Context jakarta.ws.rs.core.UriInfo uriInfo) {
         Payment payment = new Payment();
@@ -80,7 +81,8 @@ public class PaymentResource {
         try {
             bookingClient.updateBookingStatus(req.reservationId(), new BookingClient.UpdateStatusRequest("CONFIRMED"));
         } catch (Exception e) {
-            // Handle if booking service fails
+            System.err.println("Failed to update booking status after payment: " + e.getMessage());
+            e.printStackTrace();
         }
 
         return Response.ok(PaymentResponse.from(payment)).build();
@@ -88,6 +90,7 @@ public class PaymentResource {
 
     @GET
     @Path("/vnpay-return")
+    @PermitAll
     @Transactional
     public Response vnpayReturn(@jakarta.ws.rs.core.Context jakarta.ws.rs.core.UriInfo uriInfo) {
         java.util.Map<String, String> params = new java.util.HashMap<>();
@@ -104,7 +107,8 @@ public class PaymentResource {
                     try {
                         bookingClient.updateBookingStatus(payment.reservationId, new BookingClient.UpdateStatusRequest("CONFIRMED"));
                     } catch (Exception e) {
-                        // log error
+                        System.err.println("Failed to update booking status after VNPay payment: " + e.getMessage());
+                        e.printStackTrace();
                     }
                     // Redirect to frontend success page
                     return Response.seeOther(URI.create("http://localhost:5173/payment/success?reservationId=" + payment.reservationId)).build();
@@ -121,6 +125,7 @@ public class PaymentResource {
 
     @GET
     @Path("/vnpay-ipn")
+    @PermitAll
     @Transactional
     public Response vnpayIpn(@jakarta.ws.rs.core.Context jakarta.ws.rs.core.UriInfo uriInfo) {
         java.util.Map<String, String> params = new java.util.HashMap<>();
@@ -137,7 +142,10 @@ public class PaymentResource {
                         payment.status = PaymentStatus.COMPLETED;
                         try {
                             bookingClient.updateBookingStatus(payment.reservationId, new BookingClient.UpdateStatusRequest("CONFIRMED"));
-                        } catch (Exception e) {}
+                        } catch (Exception e) {
+                            System.err.println("Failed to update booking after VNPay IPN: " + e.getMessage());
+                            e.printStackTrace();
+                        }
                     } else {
                         payment.status = PaymentStatus.FAILED;
                     }
@@ -152,7 +160,7 @@ public class PaymentResource {
 
     @GET
     @Path("/reservation/{reservationId}")
-    @RolesAllowed({"GUEST", "USER", "ADMIN"})
+    @RolesAllowed({"GUEST", "STAFF", "ADMIN"})
     public Response getByReservation(@PathParam("reservationId") Long reservationId) {
         Payment payment = Payment.findByReservationId(reservationId);
         if (payment == null) {
@@ -194,7 +202,7 @@ public class PaymentResource {
 
     @GET
     @Path("/{id}")
-    @RolesAllowed({"GUEST", "USER", "ADMIN"})
+    @RolesAllowed({"GUEST", "STAFF", "ADMIN"})
     public Response getPayment(@PathParam("id") Long id) {
         Payment payment = Payment.findById(id);
         if (payment == null) {

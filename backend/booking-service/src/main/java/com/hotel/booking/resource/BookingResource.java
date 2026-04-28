@@ -87,7 +87,7 @@ public class BookingResource {
     }
 
     @POST
-    @RolesAllowed({"GUEST", "USER", "ADMIN"})
+    @RolesAllowed({"GUEST", "STAFF", "ADMIN"})
     @Transactional
     public Response createBooking(@Valid CreateBookingRequest req) {
         try {
@@ -122,7 +122,7 @@ public class BookingResource {
 
     @GET
     @Path("/user/{userId}")
-    @RolesAllowed({"GUEST", "USER", "ADMIN"})
+    @RolesAllowed({"GUEST", "STAFF", "ADMIN"})
     public Response getUserBookings(@PathParam("userId") UUID userId) {
         List<BookingResponse> bookings = Reservation.findByUserId(userId)
                 .stream()
@@ -154,7 +154,7 @@ public class BookingResource {
 
     @GET
     @Path("/{id}")
-    @RolesAllowed({"GUEST", "USER", "ADMIN"})
+    @RolesAllowed({"GUEST", "STAFF", "ADMIN"})
     public Response getBooking(@PathParam("id") Long id) {
         Reservation reservation = Reservation.findById(id);
         if (reservation == null) {
@@ -165,7 +165,7 @@ public class BookingResource {
 
     @PUT
     @Path("/{id}")
-    @RolesAllowed({"GUEST", "USER", "ADMIN"})
+    @RolesAllowed({"GUEST", "STAFF", "ADMIN"})
     @Transactional
     public Response updateBooking(@PathParam("id") Long id, @Valid UpdateBookingRequest req) {
         Reservation reservation = Reservation.findById(id);
@@ -185,7 +185,7 @@ public class BookingResource {
 
     @DELETE
     @Path("/{id}")
-    @RolesAllowed({"GUEST", "USER", "ADMIN"})
+    @RolesAllowed({"GUEST", "STAFF", "ADMIN"})
     @Transactional
     public Response cancelBooking(@PathParam("id") Long id) {
         Reservation reservation = Reservation.findById(id);
@@ -208,7 +208,8 @@ public class BookingResource {
         try {
             inventoryClient.updateRoomStatus(reservation.roomId, new InventoryClient.UpdateStatusRequest("OCCUPIED"));
         } catch (Exception e) {
-            // Handle if inventory service fails or room not found
+            System.err.println("Failed to update room status for check-in: " + e.getMessage());
+            e.printStackTrace();
         }
         reservation.status = ReservationStatus.CHECKED_IN;
         return Response.ok(BookingResponse.from(reservation)).build();
@@ -226,7 +227,8 @@ public class BookingResource {
         try {
             inventoryClient.updateRoomStatus(reservation.roomId, new InventoryClient.UpdateStatusRequest("CLEANING"));
         } catch (Exception e) {
-            // Handle if inventory service fails or room not found
+            System.err.println("Failed to update room status for check-out: " + e.getMessage());
+            e.printStackTrace();
         }
         reservation.status = ReservationStatus.CHECKED_OUT;
         return Response.ok(BookingResponse.from(reservation)).build();

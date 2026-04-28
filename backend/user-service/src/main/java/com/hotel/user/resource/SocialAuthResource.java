@@ -28,16 +28,16 @@ public class SocialAuthResource {
     @Inject
     JwtService jwtService;
 
-    @ConfigProperty(name = "QUARKUS_OIDC_GOOGLE_CLIENT_ID")
+    @ConfigProperty(name = "QUARKUS_OIDC_GOOGLE_CLIENT_ID", defaultValue = "")
     String googleClientId;
 
-    @ConfigProperty(name = "QUARKUS_OIDC_GOOGLE_CLIENT_SECRET")
+    @ConfigProperty(name = "QUARKUS_OIDC_GOOGLE_CLIENT_SECRET", defaultValue = "")
     String googleClientSecret;
 
-    @ConfigProperty(name = "QUARKUS_OIDC_FACEBOOK_CLIENT_ID")
+    @ConfigProperty(name = "QUARKUS_OIDC_FACEBOOK_CLIENT_ID", defaultValue = "")
     String facebookClientId;
 
-    @ConfigProperty(name = "QUARKUS_OIDC_FACEBOOK_CLIENT_SECRET")
+    @ConfigProperty(name = "QUARKUS_OIDC_FACEBOOK_CLIENT_SECRET", defaultValue = "")
     String facebookClientSecret;
 
     private static final String FRONTEND_OAUTH_CALLBACK = "http://localhost:5173/oauth/callback";

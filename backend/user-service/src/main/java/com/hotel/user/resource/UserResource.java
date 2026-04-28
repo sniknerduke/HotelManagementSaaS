@@ -36,9 +36,9 @@ public class UserResource {
             @NotBlank(message = "Password is required") String password) {}
 
     public record UpdateProfileRequest(
-            @NotBlank(message = "First name is required") String firstName, 
-            @NotBlank(message = "Last name is required") String lastName, 
-            @NotBlank(message = "Phone number is required") String phoneNumber, 
+            String firstName, 
+            String lastName, 
+            String phoneNumber, 
             String nationality, 
             @Size(min = 9, max = 12, message = "National ID must be between 9 and 12 characters") String nationalId, 
             @Past(message = "Date of birth must be in the past") java.time.LocalDate dateOfBirth, 
@@ -112,7 +112,7 @@ public class UserResource {
 
     @GET
     @Path("/{id}")
-    @RolesAllowed({"GUEST", "USER", "ADMIN"})
+    @RolesAllowed({"GUEST", "STAFF", "ADMIN"})
     public Response getUser(@PathParam("id") UUID id) {
         User user = User.findById(id);
         if (user == null || !user.isActive) {
@@ -123,7 +123,7 @@ public class UserResource {
 
     @PUT
     @Path("/{id}")
-    @RolesAllowed({"GUEST", "USER", "ADMIN"})
+    @RolesAllowed({"GUEST", "STAFF", "ADMIN"})
     @Transactional
     public Response updateProfile(@PathParam("id") UUID id, @Valid UpdateProfileRequest req) {
         User user = User.findById(id);
@@ -179,7 +179,7 @@ public class UserResource {
 
     @PUT
     @Path("/{id}/password")
-    @RolesAllowed({"GUEST", "USER", "ADMIN"})
+    @RolesAllowed({"GUEST", "STAFF", "ADMIN"})
     @Transactional
     public Response changePassword(@PathParam("id") UUID id, @Valid ChangePasswordRequest req) {
         User user = User.findById(id);
@@ -200,7 +200,7 @@ public class UserResource {
 
     @POST
     @Path("/logout")
-    @RolesAllowed({"GUEST", "USER", "ADMIN"})
+    @RolesAllowed({"GUEST", "STAFF", "ADMIN"})
     public Response logout() {
         return Response.ok("{\"message\": \"Logged out successfully\"}").build();
     }

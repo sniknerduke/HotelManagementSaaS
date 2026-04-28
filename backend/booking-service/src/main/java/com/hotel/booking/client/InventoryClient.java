@@ -12,7 +12,6 @@ import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 
 @Path("/api/inventory")
 @RegisterRestClient(configKey = "inventory-api")
-@RegisterClientHeaders
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public interface InventoryClient {

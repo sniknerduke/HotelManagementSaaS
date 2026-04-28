@@ -46,10 +46,10 @@ public class InventoryResource {
             String imageUrl) {}
 
     public record UpdateRoomRequest(
-            @NotBlank(message = "Room number is required") String roomNumber, 
-            @NotNull(message = "Room type ID is required") Long roomTypeId, 
-            @NotNull(message = "Status is required") Room.RoomStatus status, 
-            @NotNull(message = "Floor is required") Integer floor) {}
+            String roomNumber, 
+            Long roomTypeId, 
+            Room.RoomStatus status, 
+            Integer floor) {}
 
     public record UpdateRoomStatusRequest(
             @NotBlank(message = "Status is required") String status) {}
@@ -117,7 +117,7 @@ public class InventoryResource {
 
     @PUT
     @Path("/rooms/{id}")
-    @PermitAll
+    @RolesAllowed("ADMIN")
     @Transactional
     public Response updateRoom(@PathParam("id") Long id, @Valid UpdateRoomRequest req) {
         Room room = Room.findById(id);
@@ -144,7 +144,7 @@ public class InventoryResource {
 
     @DELETE
     @Path("/rooms/{id}")
-    @PermitAll
+    @RolesAllowed("ADMIN")
     @Transactional
     public Response deleteRoom(@PathParam("id") Long id) {
         Room room = Room.findById(id);
@@ -158,7 +158,7 @@ public class InventoryResource {
 
     @PATCH
     @Path("/rooms/{id}/status")
-    @PermitAll
+    @RolesAllowed({"ADMIN", "STAFF"})
     @Transactional
     public Response updateRoomStatus(@PathParam("id") Long id, @Valid UpdateRoomStatusRequest req) {
         Room room = Room.findById(id);
@@ -200,7 +200,7 @@ public class InventoryResource {
 
     @POST
     @Path("/rooms")
-    @PermitAll
+    @RolesAllowed("ADMIN")
     @Transactional
     public Response createRoom(@Valid CreateRoomRequest req) {
         RoomType rt = RoomType.findById(req.roomTypeId());
@@ -222,7 +222,7 @@ public class InventoryResource {
 
     @POST
     @Path("/room-types")
-    @PermitAll
+    @RolesAllowed("ADMIN")
     @Transactional
     public Response createRoomType(@Valid RoomType roomType) {
         roomType.persist();
@@ -233,6 +233,7 @@ public class InventoryResource {
 
     @PUT
     @Path("/room-types/{id}")
+    @RolesAllowed("ADMIN")
     @Transactional
     public Response updateRoomType(@PathParam("id") Long id, @Valid UpdateRoomTypeRequest req) {
         RoomType rt = RoomType.findById(id);
@@ -251,6 +252,7 @@ public class InventoryResource {
 
     @DELETE
     @Path("/room-types/{id}")
+    @RolesAllowed("ADMIN")
     @Transactional
     public Response deleteRoomType(@PathParam("id") Long id) {
         RoomType rt = RoomType.findById(id);

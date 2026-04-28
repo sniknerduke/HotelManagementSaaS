@@ -81,15 +81,6 @@ public class InventoryResource {
             @QueryParam("type") Long typeId,
             @QueryParam("floor") Integer floor) {
         
-        io.quarkus.hibernate.orm.panache.PanacheQuery<Room> query = Room.findAll();
-        
-        if (status != null) {
-            query.filter("status", io.quarkus.panache.common.Parameters.with("status", status));
-            // Actually it's easier to build the query dynamically or just fetch all and filter for simple cases
-            // But we can just use string concatenation with Panache
-        }
-        
-        // Let's just build it this way
         StringBuilder q = new StringBuilder("1 = 1");
         java.util.Map<String, Object> params = new java.util.HashMap<>();
         
@@ -106,6 +97,7 @@ public class InventoryResource {
             params.put("floor", floor);
         }
         
+        List<Room> rooms = Room.list(q.toString(), params);
         List<RoomResponse> result = rooms.stream()
                 .map(RoomResponse::from)
                 .toList();

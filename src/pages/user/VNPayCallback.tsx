@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useToast } from '../../context/ToastContext';
 import { Button } from '../../components/ui/Button';
 
 export const VNPayCallback: React.FC = () => {
-    const { t } = useTranslation();
     const [searchParams] = useSearchParams();
     const { toast } = useToast();
     const navigate = useNavigate();

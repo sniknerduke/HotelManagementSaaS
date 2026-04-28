@@ -4,8 +4,9 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Modal } from '../../components/ui/Modal';
-import { BookingService, AuthService, InventoryService, PaymentService } from '../../api';
+import { BookingService, AuthService, InventoryService, PaymentService, AnalyticsService } from '../../api';
 import { useToast } from '../../context/ToastContext';
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 type AdminTab = 'overview' | 'reservations' | 'inventory' | 'users' | 'reports' | 'settings' | 'payments';
 
@@ -19,6 +20,11 @@ export const AdminDashboard: React.FC = () => {
     const [rooms, setRooms] = useState<any[]>([]);
     const [roomTypes, setRoomTypes] = useState<any[]>([]);
     const [payments, setPayments] = useState<any[]>([]);
+
+    const [analyticsOverview, setAnalyticsOverview] = useState<any>(null);
+    const [todayStats, setTodayStats] = useState<any>(null);
+    const [revenueData, setRevenueData] = useState<any[]>([]);
+    const [occupancyData, setOccupancyData] = useState<any[]>([]);
 
     const [isWalkInModalOpen, setWalkInModalOpen] = useState(false);
     const [walkInForm, setWalkInForm] = useState({ userId: '', roomId: '', checkInDate: '', checkOutDate: '', totalPrice: 0 });
@@ -78,6 +84,21 @@ export const AdminDashboard: React.FC = () => {
             setRooms(roomsRes);
             setRoomTypes(roomTypesRes);
             setPayments(paymentsRes);
+            
+            try {
+                const [overview, today, revenueChart, occupancyChart] = await Promise.all([
+                    AnalyticsService.getOverview(),
+                    AnalyticsService.getTodayStats(),
+                    AnalyticsService.getRevenue('30d'),
+                    AnalyticsService.getOccupancy()
+                ]);
+                setAnalyticsOverview(overview);
+                setTodayStats(today);
+                setRevenueData(revenueChart);
+                setOccupancyData(occupancyChart);
+            } catch (analyticsError) {
+                console.error('Analytics fetching error', analyticsError);
+            }
         } catch (error) {
             console.error('Error fetching admin data', error);
         }
@@ -90,13 +111,16 @@ export const AdminDashboard: React.FC = () => {
     // Calculate metrics
     const totalRooms = rooms.length || 24; // fallback to 24 if no rooms
     const bookedRooms = bookings.filter(b => ['CONFIRMED', 'CHECKED_IN'].includes(b.status)).length;
-    const occupancyRate = totalRooms > 0 ? Math.round((bookedRooms / totalRooms) * 100) : 0;
-    const availableRooms = totalRooms - bookedRooms;
-    const dailyRevenue = bookings.reduce((acc, curr) => acc + (Number(curr.totalPrice) || 0), 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    
+    const displayOccupancy = analyticsOverview ? Math.round(analyticsOverview.occupancyRate) : (totalRooms > 0 ? Math.round((bookedRooms / totalRooms) * 100) : 0);
+    const displayRevenue = analyticsOverview ? analyticsOverview.totalRevenue.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : bookings.reduce((acc, curr) => acc + (Number(curr.totalPrice) || 0), 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    const displayAdr = analyticsOverview ? analyticsOverview.adr.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : '$0.00';
+    const displayRevPar = analyticsOverview ? analyticsOverview.revPar.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : '$0.00';
     
     // Additional Operations Metrics
-    const expectedCheckins = bookings.filter(b => b.status === 'CONFIRMED').length;
-    const expectedCheckouts = bookings.filter(b => b.status === 'CHECKED_IN').length; // simple approximation
+    const expectedCheckins = todayStats ? todayStats.arrivals : bookings.filter(b => b.status === 'CONFIRMED').length;
+    const expectedCheckouts = todayStats ? todayStats.departures : bookings.filter(b => b.status === 'CHECKED_IN').length; // simple approximation
+    const inHouseGuests = todayStats ? todayStats.inHouseGuests : bookings.filter(b => b.status === 'CHECKED_IN').length;
 
     const getUserName = (userId: string) => {
         const u = users.find(u => u.id === userId);
@@ -360,25 +384,30 @@ export const AdminDashboard: React.FC = () => {
                             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#6C6863]">{t('admin.overview.metrics')}</p>
                         </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
                             <Card className="p-8 border border-[#1A1A1A]/10 bg-white">
                                 <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#6C6863] mb-2">{t('admin.overview.occupancy')}</p>
-                                <p className="text-4xl font-serif text-[#1A1A1A]">{occupancyRate}%</p>
+                                <p className="text-4xl font-serif text-[#1A1A1A]">{displayOccupancy}%</p>
                                 <p className="text-xs text-green-600 mt-3 flex items-center gap-1 font-medium"><svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeWidth="2" d="M5 15l7-7 7 7"></path></svg> {t('admin.overview.occupancyChange')}</p>
                             </Card>
                             <Card className="p-8 border border-[#1A1A1A]/10 bg-white">
-                                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#6C6863] mb-2">{t('admin.overview.availableRooms')}</p>
-                                <p className="text-4xl font-serif text-[#1A1A1A]">{availableRooms}</p>
-                                <p className="text-xs text-[#6C6863] mt-3 font-serif italic">{t('admin.overview.totalRooms')}</p>
+                                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#6C6863] mb-2">RevPAR</p>
+                                <p className="text-4xl font-serif text-[#1A1A1A]">{displayRevPar}</p>
+                                <p className="text-xs text-[#6C6863] mt-3 font-serif italic">Per available room</p>
+                            </Card>
+                            <Card className="p-8 border border-[#1A1A1A]/10 bg-white">
+                                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#6C6863] mb-2">ADR</p>
+                                <p className="text-4xl font-serif text-[#1A1A1A]">{displayAdr}</p>
+                                <p className="text-xs text-[#6C6863] mt-3 font-serif italic">Average Daily Rate</p>
                             </Card>
                             <Card className="p-8 border-none bg-[#1A1A1A] text-white">
-                                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/50 mb-2">{t('admin.overview.dailyRevenue')}</p>
-                                <p className="text-4xl font-serif text-[#D4AF37]">{dailyRevenue || "$0.00"}</p>
+                                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/50 mb-2">Total Revenue</p>
+                                <p className="text-4xl font-serif text-[#D4AF37]">{displayRevenue || "$0.00"}</p>
                                 <p className="text-xs text-green-400 mt-3 font-medium">{t('admin.overview.revenueChange')}</p>
                             </Card>
                         </div>
 
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
                             <div>
                                 <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#1A1A1A] mb-6">{t('admin.overview.operations')}</h3>
                                 <div className="space-y-4">
@@ -398,9 +427,9 @@ export const AdminDashboard: React.FC = () => {
                                     </div>
                                     <div className="flex justify-between items-center border-b border-[#1A1A1A]/10 pb-4">
                                         <div>
-                                            <span className="text-sm font-serif text-[#6C6863] block">{t('admin.overview.stayOvers')}</span>
+                                            <span className="text-sm font-serif text-[#6C6863] block">{t('admin.overview.stayOvers', 'In-House Guests')}</span>
                                         </div>
-                                        <span className="text-2xl font-serif text-[#1A1A1A]">{expectedCheckouts}</span>
+                                        <span className="text-2xl font-serif text-[#1A1A1A]">{inHouseGuests}</span>
                                     </div>
                                 </div>
                             </div>
@@ -420,6 +449,37 @@ export const AdminDashboard: React.FC = () => {
                                         <p className="text-sm font-bold text-[#1A1A1A] mb-1">{t('admin.overview.pendingRequest')}</p>
                                         <p className="text-xs text-blue-900/70 font-serif">{t('admin.overview.pendingRequestDesc')}</p>
                                     </Card>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                            <div>
+                                <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#1A1A1A] mb-6">Revenue Trend (30 Days)</h3>
+                                <div className="h-64 w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={revenueData}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E5E5" />
+                                            <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#6C6863' }} />
+                                            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#6C6863' }} tickFormatter={(val) => `$${val}`} />
+                                            <Tooltip cursor={{ fill: '#F9F8F6' }} contentStyle={{ borderRadius: '0px', border: '1px solid #E5E5E5' }} />
+                                            <Bar dataKey="value" fill="#1A1A1A" radius={[2, 2, 0, 0]} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#1A1A1A] mb-6">Occupancy History</h3>
+                                <div className="h-64 w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <LineChart data={occupancyData}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E5E5" />
+                                            <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#6C6863' }} />
+                                            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#6C6863' }} tickFormatter={(val) => `${val}%`} domain={[0, 100]} />
+                                            <Tooltip contentStyle={{ borderRadius: '0px', border: '1px solid #E5E5E5' }} />
+                                            <Line type="step" dataKey="value" stroke="#D4AF37" strokeWidth={2} dot={{ r: 3, fill: '#D4AF37' }} />
+                                        </LineChart>
+                                    </ResponsiveContainer>
                                 </div>
                             </div>
                         </div>

@@ -45,3 +45,11 @@ export const PaymentService = {
     getPaymentDetails: (id: number) => api.get(`/payments/${id}`),
     processRefund: (id: number) => api.post(`/payments/${id}/refund`, {}),
 };
+
+export const AnalyticsService = {
+    getOverview: () => api.get('/analytics/overview'),
+    getBookings: (period: string = '30d') => api.get(`/analytics/bookings?period=${period}`),
+    getRevenue: (period: string = '30d') => api.get(`/analytics/revenue?period=${period}`),
+    getOccupancy: () => api.get('/analytics/occupancy'),
+    getTodayStats: () => api.get('/analytics/today'),
+};

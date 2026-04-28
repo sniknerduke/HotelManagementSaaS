@@ -24,6 +24,13 @@ public interface InventoryClient {
     @Path("/rooms/{id}/status")
     RoomDTO updateRoomStatus(@PathParam("id") Long id, UpdateStatusRequest req);
 
+    @GET
+    @Path("/rooms")
+    java.util.List<RoomDTO> getAllRooms(
+            @jakarta.ws.rs.QueryParam("status") String status,
+            @jakarta.ws.rs.QueryParam("type") Long typeId,
+            @jakarta.ws.rs.QueryParam("floor") Integer floor);
+
     record RoomDTO(Long id, String roomNumber, String status) {}
     record UpdateStatusRequest(String status) {}
 }

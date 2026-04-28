@@ -225,7 +225,7 @@ public class BookingResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         try {
-            inventoryClient.updateRoomStatus(reservation.roomId, new InventoryClient.UpdateStatusRequest("CLEANING"));
+            inventoryClient.updateRoomStatus(reservation.roomId, new InventoryClient.UpdateStatusRequest("DIRTY"));
         } catch (Exception e) {
             System.err.println("Failed to update room status for check-out: " + e.getMessage());
             e.printStackTrace();

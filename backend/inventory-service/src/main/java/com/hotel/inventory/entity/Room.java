@@ -24,7 +24,7 @@ public class Room extends PanacheEntity {
     public RoomStatus status = RoomStatus.AVAILABLE;
 
     public enum RoomStatus {
-        AVAILABLE, OCCUPIED, CLEANING, MAINTENANCE, OUT_OF_ORDER
+        AVAILABLE, OCCUPIED, CLEANING, MAINTENANCE, OUT_OF_ORDER, DIRTY, CLEAN, INSPECTED
     }
 
     // --- Finders ---

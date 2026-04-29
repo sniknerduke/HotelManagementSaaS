@@ -36,7 +36,7 @@ export const AdminDashboard: React.FC = () => {
     const [editingCategory, setEditingCategory] = useState<any>(null);
 
     const [isAddRoomModalOpen, setAddRoomModalOpen] = useState(false);
-    const [addRoomForm, setAddRoomForm] = useState({ roomNumber: '', roomTypeId: '' });
+    const [addRoomForm, setAddRoomForm] = useState({ roomNumber: '', roomTypeId: '', imageUrl: '' });
     const [editingRoom, setEditingRoom] = useState<any>(null);
 
     const [isAddStaffModalOpen, setAddStaffModalOpen] = useState(false);
@@ -267,7 +267,8 @@ export const AdminDashboard: React.FC = () => {
                 roomNumber: editingRoom.roomNumber,
                 roomTypeId: editingRoom.roomTypeId || editingRoom.roomType?.id,
                 status: editingRoom.status || 'AVAILABLE',
-                floor: editingRoom.floor || 1
+                floor: editingRoom.floor || 1,
+                imageUrl: editingRoom.imageUrl
             });
             toast('Room updated.', 'success');
             setEditingRoom(null);
@@ -612,9 +613,16 @@ export const AdminDashboard: React.FC = () => {
                                         return (
                                         <Card key={idx} className={`p-0 border border-[#1A1A1A]/10 border-l-4 bg-white ${colorClass.split(' ')[0]} shadow-sm`}>
                                             <div className="flex flex-col sm:flex-row justify-between sm:items-center p-6 gap-4">
-                                                <div className="flex items-baseline gap-4">
-                                                    <span className="font-serif text-3xl text-[#1A1A1A]">{room.roomNumber}</span>
-                                                    <span className="text-sm font-serif italic text-[#6C6863]">Type {room.roomType?.id}</span>
+                                                <div className="flex items-center gap-4">
+                                                    {room.imageUrl && (
+                                                        <div className="w-12 h-12 rounded-sm overflow-hidden shrink-0">
+                                                            <img src={room.imageUrl} alt={room.roomNumber} className="w-full h-full object-cover" />
+                                                        </div>
+                                                    )}
+                                                    <div className="flex items-baseline gap-4">
+                                                        <span className="font-serif text-3xl text-[#1A1A1A]">{room.roomNumber}</span>
+                                                        <span className="text-sm font-serif italic text-[#6C6863]">Type {room.roomType?.id}</span>
+                                                    </div>
                                                 </div>
                                                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                                                     <span className={`text-[10px] uppercase tracking-widest font-bold ${colorClass.split(' ')[1]}`}>{room.status}</span>
@@ -1018,6 +1026,7 @@ export const AdminDashboard: React.FC = () => {
             <Modal isOpen={isAddRoomModalOpen} onClose={() => setAddRoomModalOpen(false)} title="Add Room">
                 <form onSubmit={handleAddRoomSubmit} className="space-y-4">
                     <Input type="text" label="Room Number" value={addRoomForm.roomNumber} onChange={(e) => setAddRoomForm({ ...addRoomForm, roomNumber: e.target.value })} required />
+                    <Input type="text" label="Image URL" value={addRoomForm.imageUrl} onChange={(e) => setAddRoomForm({ ...addRoomForm, imageUrl: e.target.value })} placeholder="/images/rooms/your-image.jpg" />
                     <div>
                         <label className="text-[10px] uppercase font-bold text-[#6C6863] block mb-1">Room Category</label>
                         <select className="w-full p-3 border border-[#1A1A1A]/20 bg-[#F9F8F6] text-sm" value={addRoomForm.roomTypeId} onChange={(e) => setAddRoomForm({ ...addRoomForm, roomTypeId: e.target.value })} required>
@@ -1077,6 +1086,7 @@ export const AdminDashboard: React.FC = () => {
                 {editingRoom && (
                     <form onSubmit={handleEditRoomSubmit} className="space-y-4">
                         <Input type="text" label="Room Number" value={editingRoom.roomNumber} onChange={(e) => setEditingRoom({ ...editingRoom, roomNumber: e.target.value })} required />
+                        <Input type="text" label="Image URL" value={editingRoom.imageUrl || ''} onChange={(e) => setEditingRoom({ ...editingRoom, imageUrl: e.target.value })} placeholder="/images/rooms/your-image.jpg" />
                         <div>
                             <label className="text-[10px] uppercase font-bold text-[#6C6863] block mb-1">Room Category</label>
                             <select className="w-full p-3 border border-[#1A1A1A]/20 bg-[#F9F8F6] text-sm" value={editingRoom.roomTypeId || editingRoom.roomType?.id || ''} onChange={(e) => setEditingRoom({ ...editingRoom, roomTypeId: e.target.value })} required>

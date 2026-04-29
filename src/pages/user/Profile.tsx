@@ -5,7 +5,7 @@ import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { useNavigate } from 'react-router-dom';
-import { BookingService, AuthService, PaymentService } from '../../api';
+import { BookingService, AuthService, PaymentService, InventoryService } from '../../api';
 
 type Tab = 'active' | 'bookings' | 'profile' | 'payment' | 'preferences';
 
@@ -45,14 +45,27 @@ export const Profile: React.FC = () => {
 
   const [dbBookings, setDbBookings] = useState<any[]>([]);
   const [isFetchingBookings, setIsFetchingBookings] = useState(false);
+  const [roomImages, setRoomImages] = useState<Record<number, string>>({});
   const hasActiveStay = dbBookings.some((b) => b.status === 'CONFIRMED' || b.status === 'CHECKED_IN');
 
   useEffect(() => {
     if (user?.id && !isFetchingBookings) {
       setIsFetchingBookings(true);
-      BookingService.getUserBookings(user.id)
-        .then((res: any[]) => setDbBookings(res))
-        .catch((err) => console.error('Failed to load bookings', err))
+      Promise.all([
+        BookingService.getUserBookings(user.id),
+        InventoryService.getAllRooms()
+      ])
+        .then(([res, roomsRes]: [any[], any[]]) => {
+            setDbBookings(res);
+            const imageMap: Record<number, string> = {};
+            roomsRes.forEach(r => {
+                if (r.imageUrl) {
+                    imageMap[r.id] = r.imageUrl;
+                }
+            });
+            setRoomImages(imageMap);
+        })
+        .catch((err) => console.error('Failed to load bookings or rooms', err))
         .finally(() => setIsFetchingBookings(false));
     }
   }, [user]);
@@ -268,7 +281,7 @@ export const Profile: React.FC = () => {
                   <Card key={booking.id || index} className="p-0 border-none shadow-[0_8px_32px_rgba(0,0,0,0.04)] bg-white overflow-hidden group">
                     <div className="grid grid-cols-1 md:grid-cols-12">
                       <div className="md:col-span-4 aspect-[4/3] md:aspect-auto overflow-hidden relative">
-                        <img src={getFallbackImage()} alt="Room" className="w-full h-full object-cover grayscale transition-all duration-[2000ms] group-hover:grayscale-0 group-hover:scale-105" />
+                        <img src={roomImages[booking.roomId] || getFallbackImage()} alt="Room" className="w-full h-full object-cover grayscale transition-all duration-[2000ms] group-hover:grayscale-0 group-hover:scale-105" />
                       </div>
                       <div className="md:col-span-8 p-8 flex flex-col justify-between">
                         <div>

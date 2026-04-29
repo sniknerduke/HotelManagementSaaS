@@ -27,16 +27,17 @@ public class InventoryResource {
         }
     }
 
-    public record RoomResponse(Long id, String roomNumber, Integer floor, String status, Long roomTypeId) {
+    public record RoomResponse(Long id, String roomNumber, Integer floor, String status, Long roomTypeId, String imageUrl) {
         public static RoomResponse from(Room room) {
             return new RoomResponse(room.id, room.roomNumber, room.floor, room.status.name(),
-                    room.roomType != null ? room.roomType.id : null);
+                    room.roomType != null ? room.roomType.id : null, room.imageUrl);
         }
     }
 
     public record CreateRoomRequest(
             @NotBlank(message = "Room number is required") String roomNumber, 
-            @NotNull(message = "Room type ID is required") Long roomTypeId) {}
+            @NotNull(message = "Room type ID is required") Long roomTypeId,
+            String imageUrl) {}
 
     public record UpdateRoomTypeRequest(
             @NotBlank(message = "Name is required") String name, 
@@ -49,7 +50,8 @@ public class InventoryResource {
             String roomNumber, 
             Long roomTypeId, 
             Room.RoomStatus status, 
-            Integer floor) {}
+            Integer floor,
+            String imageUrl) {}
 
     public record UpdateRoomStatusRequest(
             @NotBlank(message = "Status is required") String status) {}
@@ -138,6 +140,7 @@ public class InventoryResource {
         if (req.roomNumber() != null) room.roomNumber = req.roomNumber();
         if (req.status() != null) room.status = req.status();
         if (req.floor() != null) room.floor = req.floor();
+        if (req.imageUrl() != null) room.imageUrl = req.imageUrl();
 
         return Response.ok(RoomResponse.from(room)).build();
     }
@@ -213,6 +216,7 @@ public class InventoryResource {
         Room room = new Room();
         room.roomNumber = req.roomNumber();
         room.roomType = rt;
+        room.imageUrl = req.imageUrl();
         room.persist();
 
         return Response.status(Response.Status.CREATED)

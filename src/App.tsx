@@ -53,7 +53,8 @@ function App() {
                   <Route path='login' element={<Login />} />
                   <Route path='register' element={<Register />} />
                   <Route path='oauth/callback' element={<AuthCallback />} />
-                  <Route path='vnpay/callback' element={<VNPayCallback />} />
+                  <Route path='payment/success' element={<VNPayCallback />} />
+                  <Route path='payment/failed' element={<VNPayCallback />} />
                   
                   {/* Authenticated Routes */}
                   <Route element={<ProtectedRoute />}>

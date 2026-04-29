@@ -49,7 +49,13 @@ export const AdminDashboard: React.FC = () => {
     const [settings, setSettings] = useState({
         hotelName: 'Lumière Hotel & Resort',
         taxRate: '8.5',
-        currency: 'USD'
+        currency: 'USD',
+        breakfastPrice: 25.00,
+        minNights: 1,
+        maxNights: 30,
+        maxGuestsPerBooking: 8,
+        checkInTime: '14:00',
+        checkOutTime: '11:00'
     });
 
     const [coupons, setCoupons] = useState([
@@ -72,18 +78,32 @@ export const AdminDashboard: React.FC = () => {
 
     const refreshData = async () => {
         try {
-            const [bookingsRes, usersRes, roomsRes, roomTypesRes, paymentsRes] = await Promise.all([
+            const [bookingsRes, usersRes, roomsRes, roomTypesRes, paymentsRes, settingsRes] = await Promise.all([
                 BookingService.getAllBookings(),
                 AuthService.getAllUsers(),
                 InventoryService.getAllRooms(),
                 InventoryService.getAllRoomTypes(),
-                PaymentService.getAllPayments()
+                PaymentService.getAllPayments(),
+                SettingsService.getSettings()
             ]);
             setBookings(bookingsRes);
             setUsers(usersRes);
             setRooms(roomsRes);
             setRoomTypes(roomTypesRes);
             setPayments(paymentsRes);
+            if (settingsRes) {
+                setSettings({
+                    hotelName: settingsRes.hotelName || 'Lumière Hotel & Resort',
+                    taxRate: settingsRes.taxRate !== undefined ? settingsRes.taxRate.toString() : '8.5',
+                    currency: settingsRes.currency || 'USD',
+                    breakfastPrice: settingsRes.breakfastPrice !== undefined ? Number(settingsRes.breakfastPrice) : 25.00,
+                    minNights: settingsRes.minNights || 1,
+                    maxNights: settingsRes.maxNights || 30,
+                    maxGuestsPerBooking: settingsRes.maxGuestsPerBooking || 8,
+                    checkInTime: settingsRes.checkInTime || '14:00',
+                    checkOutTime: settingsRes.checkOutTime || '11:00'
+                });
+            }
             
             try {
                 const [overview, today, revenueChart, occupancyChart] = await Promise.all([
@@ -339,8 +359,17 @@ export const AdminDashboard: React.FC = () => {
         }
     };
 
-    const handleSaveSettings = () => {
-        toast(`Global changes committed. ${settings.hotelName} config updated.`, 'success');
+    const handleSaveSettings = async () => {
+        try {
+            await SettingsService.updateSettings({
+                ...settings,
+                taxRate: Number(settings.taxRate)
+            });
+            toast(`Global changes committed. ${settings.hotelName} config updated.`, 'success');
+        } catch (error) {
+            toast('Failed to save settings.', 'error');
+            console.error(error);
+        }
     };
 
     const handleExport = (type: string, format: 'CSV' | 'PDF') => {
@@ -855,6 +884,36 @@ export const AdminDashboard: React.FC = () => {
                                                 <option value="EUR">EUR (€)</option>
                                                 <option value="VND">VND (₫)</option>
                                             </select>
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                                        <div>
+                                            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">Breakfast Price</label>
+                                            <input type="number" min="0" step="0.5" value={settings.breakfastPrice} onChange={(e) => setSettings({ ...settings, breakfastPrice: Number(e.target.value) })} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-mono text-lg text-[#1A1A1A]" />
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">Max Guests per Booking</label>
+                                            <input type="number" min="1" value={settings.maxGuestsPerBooking} onChange={(e) => setSettings({ ...settings, maxGuestsPerBooking: Number(e.target.value) })} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-mono text-lg text-[#1A1A1A]" />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                                        <div>
+                                            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">Min Nights</label>
+                                            <input type="number" min="1" value={settings.minNights} onChange={(e) => setSettings({ ...settings, minNights: Number(e.target.value) })} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-mono text-lg text-[#1A1A1A]" />
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">Max Nights</label>
+                                            <input type="number" min="1" value={settings.maxNights} onChange={(e) => setSettings({ ...settings, maxNights: Number(e.target.value) })} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-mono text-lg text-[#1A1A1A]" />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                                        <div>
+                                            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">Check-in Time</label>
+                                            <input type="time" value={settings.checkInTime} onChange={(e) => setSettings({ ...settings, checkInTime: e.target.value })} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-mono text-lg text-[#1A1A1A]" />
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">Check-out Time</label>
+                                            <input type="time" value={settings.checkOutTime} onChange={(e) => setSettings({ ...settings, checkOutTime: e.target.value })} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-mono text-lg text-[#1A1A1A]" />
                                         </div>
                                     </div>
                                 </div>

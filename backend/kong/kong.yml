@@ -17,6 +17,7 @@ services:
       - name: inventory-route
         paths:
           - /api/inventory
+          - /api/settings
         strip_path: false
 
   - name: booking-service

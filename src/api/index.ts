@@ -46,6 +46,11 @@ export const PaymentService = {
     processRefund: (id: number) => api.post(`/payments/${id}/refund`, {}),
 };
 
+export const SettingsService = {
+    getSettings: () => api.get('/settings'),
+    updateSettings: (data: any) => api.put('/settings', data),
+};
+
 export const AnalyticsService = {
     getOverview: () => api.get('/analytics/overview'),
     getBookings: (period: string = '30d') => api.get(`/analytics/bookings?period=${period}`),

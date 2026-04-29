@@ -4,7 +4,7 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Modal } from '../../components/ui/Modal';
-import { BookingService, AuthService, InventoryService, PaymentService, AnalyticsService } from '../../api';
+import { BookingService, AuthService, InventoryService, PaymentService, AnalyticsService, SettingsService } from '../../api';
 import { useToast } from '../../context/ToastContext';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 

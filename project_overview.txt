@@ -266,6 +266,8 @@ graph LR
 
 ---
 
+
+// Ummmm the coupon on room control on admin UI is still not working and change the trans on room and inventory to quản lý phòng  
 ### Step 7 — 📊 Analytics & Dashboard *(Real Data!)*
 
 > **Why seventh?** With real bookings and payments flowing, now build analytics endpoints to power the admin dashboard.
@@ -317,13 +319,13 @@ graph LR
 
 > **Why last?** Only invest in CI/CD and production infra once the app is feature-complete and tested.
 
-- [ ] Create `.github/workflows/ci.yml` — build + test on push/PR
-- [ ] Add health check endpoints — `GET /api/health` per service
-- [ ] Production Docker Compose — SSL termination, real secrets, health probes
-- [ ] Lock down CORS — only allow your production domain
-- [ ] Frontend build optimization — code splitting, lazy route loading
-- [ ] Email notifications — booking confirmation, check-in reminder, receipts (Quarkus Mailer)
-- [ ] Structured JSON logging — centralized log aggregation
+- [x] Create `.github/workflows/ci.yml` — build + test on push/PR
+- [x] Add health check endpoints — `GET /api/health` per service
+- [x] Production Docker Compose — SSL termination, real secrets, health probes
+- [x] Lock down CORS — only allow your production domain
+- [x] Frontend build optimization — code splitting, lazy route loading
+- [x] Email notifications — booking confirmation, check-in reminder, receipts (Quarkus Mailer)
+- [x] Structured JSON logging — centralized log aggregation
 
 ---
 

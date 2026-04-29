@@ -11,12 +11,15 @@ export const Dashboard: React.FC = () => {
     const { toast } = useToast();
     
     const [bookings, setBookings] = useState<any[]>([]);
+    const [isFetching, setIsFetching] = useState(false);
 
     useEffect(() => {
-        if (user?.id) {
+        if (user?.id && !isFetching) {
+            setIsFetching(true);
             BookingService.getUserBookings(user.id)
                 .then((res: any[]) => setBookings(res))
-                .catch((err) => console.error('Failed to fetch bookings', err));
+                .catch((err) => console.error('Failed to fetch bookings', err))
+                .finally(() => setIsFetching(false));
         }
     }, [user]);
 

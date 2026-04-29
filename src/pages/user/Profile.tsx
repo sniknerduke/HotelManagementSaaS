@@ -44,13 +44,16 @@ export const Profile: React.FC = () => {
   };
 
   const [dbBookings, setDbBookings] = useState<any[]>([]);
+  const [isFetchingBookings, setIsFetchingBookings] = useState(false);
   const hasActiveStay = dbBookings.some((b) => b.status === 'CONFIRMED' || b.status === 'CHECKED_IN');
 
   useEffect(() => {
-    if (user?.id) {
+    if (user?.id && !isFetchingBookings) {
+      setIsFetchingBookings(true);
       BookingService.getUserBookings(user.id)
         .then((res: any[]) => setDbBookings(res))
-        .catch((err) => console.error('Failed to load bookings', err));
+        .catch((err) => console.error('Failed to load bookings', err))
+        .finally(() => setIsFetchingBookings(false));
     }
   }, [user]);
 

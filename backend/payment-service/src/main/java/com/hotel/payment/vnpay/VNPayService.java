@@ -23,7 +23,7 @@ public class VNPayService {
     @ConfigProperty(name = "vnpay.returnUrl")
     String vnpReturnUrl;
 
-    public String createOrder(long amount, String orderInfor, String urlReturn, String ipAddr, String txnRef) {
+    public String createOrder(java.math.BigDecimal amount, String orderInfor, String urlReturn, String ipAddr, String txnRef) {
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String vnp_TxnRef = txnRef != null ? txnRef : VNPayUtil.getRandomNumber(8);
@@ -35,10 +35,14 @@ public class VNPayService {
         vnp_Params.put("vnp_Version", vnp_Version);
         vnp_Params.put("vnp_Command", vnp_Command);
         vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
-        vnp_Params.put("vnp_Amount", String.valueOf(amount * 100)); // amount in VND
+        
+        // Amount must be multiplied by 100 and formatted as a string with no decimals
+        String vnp_Amount = amount.multiply(new java.math.BigDecimal(100)).setScale(0, java.math.RoundingMode.HALF_UP).toString();
+        vnp_Params.put("vnp_Amount", vnp_Amount);
+        
         vnp_Params.put("vnp_CurrCode", "VND");
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-        vnp_Params.put("vnp_OrderInfo", orderInfor);
+        vnp_Params.put("vnp_OrderInfo", removeAccents(orderInfor));
         vnp_Params.put("vnp_OrderType", vnp_OrderType);
         vnp_Params.put("vnp_Locale", "vn");
         
@@ -125,5 +129,12 @@ public class VNPayService {
         }
         String signValue = VNPayUtil.hmacSHA512(vnpHashSecret, hashData.toString());
         return signValue.equals(vnp_SecureHash);
+    }
+
+    private String removeAccents(String str) {
+        if (str == null) return "";
+        String nfdNormalizedString = java.text.Normalizer.normalize(str, java.text.Normalizer.Form.NFD);
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return pattern.matcher(nfdNormalizedString).replaceAll("").replace('đ', 'd').replace('Đ', 'D');
     }
 }

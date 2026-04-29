@@ -19,10 +19,15 @@ export const Checkout: React.FC = () => {
 
     const [guestInfo, setGuestInfo] = useState({ firstName: user?.firstName || '', lastName: user?.lastName || '', email: user?.email || '', phone: user?.phoneNumber || '' });
     
-    // Simulate mapping roomType to an actual room (in real scenario, backend finds an available roomId of the roomType)
-    const roomId = searchParams.get('roomType') || '1'; // Using mock roomId based on type
-    const roomPrice = parseInt(searchParams.get('price') || '450');
-    const totalAmount = (roomPrice * 3) + 142; // Taxes and fees
+    // In a real scenario, we would use a proper roomId. 
+    // Here we use the roomType as a mock roomId if it's numeric, otherwise default to 1.
+    const roomTypeParam = searchParams.get('roomType');
+    const roomIdNum = parseInt(roomTypeParam || '1');
+    const roomId = isNaN(roomIdNum) ? 1 : roomIdNum;
+
+    const roomPriceParam = searchParams.get('price');
+    const roomPrice = parseInt(roomPriceParam || '450');
+    const totalAmount = isNaN(roomPrice) ? 0 : (roomPrice * 3) + 142; // Taxes and fees
 
     const handleNext = () => setStep(s => Math.min(s + 1, 3) as 1 | 2 | 3);
     const handlePrev = () => setStep(s => Math.max(s - 1, 1) as 1 | 2 | 3);
@@ -30,11 +35,23 @@ export const Checkout: React.FC = () => {
     const handleConfirmBooking = async () => {
         setLoading(true);
         setError('');
+        if (!user || !user.id) {
+            toast("You must be logged in to book.", "error");
+            setLoading(false);
+            return;
+        }
+
+        if (totalAmount <= 0) {
+            toast("Invalid booking amount.", "error");
+            setLoading(false);
+            return;
+        }
+
         try {
             // 1. Create Booking
             const bookingRes = await BookingService.createBooking({
-                roomId: parseInt(roomId),
-                userId: user?.id,
+                roomId: roomId,
+                userId: user.id,
                 checkInDate: "2026-05-12",
                 checkOutDate: "2026-05-15",
                 totalPrice: totalAmount,

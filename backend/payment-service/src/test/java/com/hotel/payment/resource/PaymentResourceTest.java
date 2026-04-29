@@ -11,6 +11,7 @@ import io.restassured.http.ContentType;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
+import java.math.BigDecimal;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
@@ -45,7 +46,7 @@ public class PaymentResourceTest {
                 .thenReturn(new BookingClient.BookingDTO(1L, "CONFIRMED"));
 
         // Mock: VNPay createOrder returns a payment URL (third param 'urlReturn' can be null)
-        Mockito.when(vnPayService.createOrder(anyLong(), any(), any(), any(), any()))
+        Mockito.when(vnPayService.createOrder(any(BigDecimal.class), any(), any(), any(), any()))
                 .thenReturn("https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?fake=params");
     }
 

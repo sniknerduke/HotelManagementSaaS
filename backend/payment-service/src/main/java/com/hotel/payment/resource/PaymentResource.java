@@ -68,10 +68,13 @@ public class PaymentResource {
             payment.status = PaymentStatus.PENDING;
             payment.persist();
             
+            // Convert USD to VND (approx 1 USD = 25,400 VND)
+            // Ideally this would come from a configuration or an external API
+            java.math.BigDecimal amountInVnd = req.amount().multiply(new java.math.BigDecimal(25400));
+            
             // Generate payment URL
             String ipAddr = "127.0.0.1";
-            // Return to frontend instead of API, normally it's the frontend URL, but using configured returnUrl for now
-            String url = vnPayService.createOrder(req.amount().longValue(), "Payment for reservation " + req.reservationId(), null, ipAddr, payment.transactionId);
+            String url = vnPayService.createOrder(amountInVnd, "Payment for reservation " + req.reservationId(), null, ipAddr, payment.transactionId);
             return Response.ok(PaymentResponse.from(payment, url)).build();
         }
 

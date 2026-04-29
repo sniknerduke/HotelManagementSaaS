@@ -99,9 +99,12 @@ public class BookingResource {
             }
             inventoryClient.updateRoomStatus(req.roomId(), new InventoryClient.UpdateStatusRequest("OCCUPIED"));
         } catch (Exception e) {
-            e.printStackTrace();
+            String errorMessage = e.getMessage();
+            if (errorMessage == null || errorMessage.isEmpty()) {
+                errorMessage = "Connection error with inventory service";
+            }
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"error\": \"Failed to verify or update room with inventory service: " + e.getMessage() + "\"}")
+                    .entity("{\"error\": \"Inventory check failed: " + errorMessage + "\"}")
                     .build();
         }
 

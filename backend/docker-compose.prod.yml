@@ -1,0 +1,201 @@
+version: "3.9"
+
+services:
+  # ========================
+  # PostgreSQL Databases
+  # ========================
+  user-db:
+    image: postgres:16-alpine
+    container_name: hotel-user-db-prod
+    environment:
+      POSTGRES_DB: hotel_user_db
+      POSTGRES_USER: ${DB_USER:-hotel}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-super_secret_prod_password_change_me}
+    volumes:
+      - user-db-data:/var/lib/postgresql/data
+    networks:
+      - hotel-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${DB_USER:-hotel} -d hotel_user_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  inventory-db:
+    image: postgres:16-alpine
+    container_name: hotel-inventory-db-prod
+    environment:
+      POSTGRES_DB: hotel_inventory_db
+      POSTGRES_USER: ${DB_USER:-hotel}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-super_secret_prod_password_change_me}
+    volumes:
+      - inventory-db-data:/var/lib/postgresql/data
+    networks:
+      - hotel-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${DB_USER:-hotel} -d hotel_inventory_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  booking-db:
+    image: postgres:16-alpine
+    container_name: hotel-booking-db-prod
+    environment:
+      POSTGRES_DB: hotel_booking_db
+      POSTGRES_USER: ${DB_USER:-hotel}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-super_secret_prod_password_change_me}
+    volumes:
+      - booking-db-data:/var/lib/postgresql/data
+    networks:
+      - hotel-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${DB_USER:-hotel} -d hotel_booking_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  payment-db:
+    image: postgres:16-alpine
+    container_name: hotel-payment-db-prod
+    environment:
+      POSTGRES_DB: hotel_payment_db
+      POSTGRES_USER: ${DB_USER:-hotel}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-super_secret_prod_password_change_me}
+    volumes:
+      - payment-db-data:/var/lib/postgresql/data
+    networks:
+      - hotel-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${DB_USER:-hotel} -d hotel_payment_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ========================
+  # Quarkus Microservices
+  # ========================
+  user-service:
+    build:
+      context: .
+      dockerfile: user-service/Dockerfile
+    container_name: hotel-user-service-prod
+    environment:
+      QUARKUS_PROFILE: prod
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://user-db:5432/hotel_user_db
+      QUARKUS_DATASOURCE_USERNAME: ${DB_USER:-hotel}
+      QUARKUS_DATASOURCE_PASSWORD: ${DB_PASSWORD:-super_secret_prod_password_change_me}
+      MP_JWT_VERIFY_PUBLICKEY_LOCATION: /deployments/publicKey.pem
+      SMALLRYE_JWT_SIGN_KEY_LOCATION: /deployments/privateKey.pem
+    volumes:
+      - ./keys:/deployments:ro
+    depends_on:
+      user-db:
+        condition: service_healthy
+    networks:
+      - hotel-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8081/api/health/ready || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  inventory-service:
+    build:
+      context: .
+      dockerfile: inventory-service/Dockerfile
+    container_name: hotel-inventory-service-prod
+    environment:
+      QUARKUS_PROFILE: prod
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://inventory-db:5432/hotel_inventory_db
+      QUARKUS_DATASOURCE_USERNAME: ${DB_USER:-hotel}
+      QUARKUS_DATASOURCE_PASSWORD: ${DB_PASSWORD:-super_secret_prod_password_change_me}
+    depends_on:
+      inventory-db:
+        condition: service_healthy
+    networks:
+      - hotel-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8082/api/health/ready || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  booking-service:
+    build:
+      context: .
+      dockerfile: booking-service/Dockerfile
+    container_name: hotel-booking-service-prod
+    environment:
+      QUARKUS_PROFILE: prod
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://booking-db:5432/hotel_booking_db
+      QUARKUS_DATASOURCE_USERNAME: ${DB_USER:-hotel}
+      QUARKUS_DATASOURCE_PASSWORD: ${DB_PASSWORD:-super_secret_prod_password_change_me}
+    depends_on:
+      booking-db:
+        condition: service_healthy
+    networks:
+      - hotel-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8083/api/health/ready || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: payment-service/Dockerfile
+    container_name: hotel-payment-service-prod
+    environment:
+      QUARKUS_PROFILE: prod
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://payment-db:5432/hotel_payment_db
+      QUARKUS_DATASOURCE_USERNAME: ${DB_USER:-hotel}
+      QUARKUS_DATASOURCE_PASSWORD: ${DB_PASSWORD:-super_secret_prod_password_change_me}
+    depends_on:
+      payment-db:
+        condition: service_healthy
+    networks:
+      - hotel-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8084/api/health/ready || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # ========================
+  # Kong API Gateway
+  # ========================
+  kong:
+    image: kong:3.4-ubuntu
+    container_name: hotel-api-gateway-prod
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_PROXY_LISTEN: 0.0.0.0:8000, 0.0.0.0:8443 ssl
+    ports:
+      - "8000:8000"  # Gateway Proxy Port (HTTP)
+      - "8443:8443"  # Gateway Proxy Port (HTTPS)
+    volumes:
+      - ./kong/kong.yml:/usr/local/kong/declarative/kong.yml
+    networks:
+      - hotel-network
+    depends_on:
+      - user-service
+      - inventory-service
+      - booking-service
+      - payment-service
+
+volumes:
+  user-db-data:
+  inventory-db-data:
+  booking-db-data:
+  payment-db-data:
+
+networks:
+  hotel-network:
+    driver: bridge

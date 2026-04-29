@@ -18,6 +18,7 @@ services:
         paths:
           - /api/inventory
           - /api/settings
+          - /api/housekeeping
         strip_path: false
 
   - name: booking-service

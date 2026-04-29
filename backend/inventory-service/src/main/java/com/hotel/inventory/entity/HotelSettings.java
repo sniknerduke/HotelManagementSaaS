@@ -36,11 +36,14 @@ public class HotelSettings extends PanacheEntity {
     @Column(name = "check_out_time")
     public String checkOutTime = "11:00";
     
+    /**
+     * Returns the singleton settings row. If none exists, creates one with defaults.
+     * Uses findAll().firstResult() so we don't rely on a hardcoded ID.
+     */
     public static HotelSettings getSettings() {
-        HotelSettings settings = findById(1L);
+        HotelSettings settings = HotelSettings.<HotelSettings>findAll().firstResult();
         if (settings == null) {
             settings = new HotelSettings();
-            settings.id = 1L;
             settings.persist();
         }
         return settings;

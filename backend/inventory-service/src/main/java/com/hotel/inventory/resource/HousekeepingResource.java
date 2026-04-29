@@ -1,12 +1,17 @@
 package com.hotel.inventory.resource;
 
 import com.hotel.inventory.entity.HousekeepingTask;
+import com.hotel.inventory.entity.HousekeepingTask.TaskStatus;
 import com.hotel.inventory.entity.Room;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,105 +20,157 @@ import java.util.UUID;
 @Consumes(MediaType.APPLICATION_JSON)
 public class HousekeepingResource {
 
-    public record HousekeepingTaskResponse(Long id, Long roomId, String roomNumber, String roomStatus, UUID assignedTo, String taskStatus, String notes) {
-        public static HousekeepingTaskResponse from(HousekeepingTask task) {
-            return new HousekeepingTaskResponse(
+    // --- DTOs ---
+
+    public record TaskResponse(Long id, Long roomId, String roomNumber, UUID assignedTo,
+                               String notes, String status, Instant createdAt, Instant completedAt) {
+        public static TaskResponse from(HousekeepingTask task) {
+            return new TaskResponse(
                     task.id,
                     task.room != null ? task.room.id : null,
                     task.room != null ? task.room.roomNumber : null,
-                    task.room != null ? task.room.status.name() : null,
                     task.assignedTo,
+                    task.notes,
                     task.status.name(),
-                    task.notes
+                    task.createdAt,
+                    task.completedAt
             );
         }
     }
 
-    public record RoomStatusDTO(Long roomId, String roomNumber, String status) {
-        public static RoomStatusDTO from(Room room) {
-            return new RoomStatusDTO(room.id, room.roomNumber, room.status.name());
-        }
-    }
+    public record CreateTaskRequest(
+            @NotNull(message = "Room ID is required") Long roomId,
+            UUID assignedTo,
+            String notes) {}
 
-    public record AssignTaskRequest(UUID staffId, String notes) {}
-    public record UpdateRoomStatusRequest(String status) {}
+    public record UpdateTaskStatusRequest(
+            @NotBlank(message = "Status is required") String status) {}
 
+    public record AssignTaskRequest(
+            @NotNull(message = "Staff user ID is required") UUID assignedTo) {}
+
+    // --- Endpoints ---
+
+    /**
+     * List housekeeping tasks. Defaults to active (non-completed) tasks.
+     * Optional filters: ?status=PENDING&assignedTo=<uuid>
+     */
     @GET
     @Path("/tasks")
     @RolesAllowed({"ADMIN", "STAFF"})
-    public Response getPendingTasks() {
-        // List rooms where status = DIRTY or CLEANING
-        List<Room> rooms = Room.list("status in ?1", List.of(Room.RoomStatus.DIRTY, Room.RoomStatus.CLEANING));
-        List<RoomStatusDTO> result = rooms.stream().map(RoomStatusDTO::from).toList();
+    public Response getTasks(
+            @QueryParam("status") TaskStatus status,
+            @QueryParam("assignedTo") UUID assignedTo) {
+
+        List<HousekeepingTask> tasks;
+
+        if (status != null && assignedTo != null) {
+            tasks = HousekeepingTask.list("status = ?1 and assignedTo = ?2", status, assignedTo);
+        } else if (status != null) {
+            tasks = HousekeepingTask.findByStatus(status);
+        } else if (assignedTo != null) {
+            tasks = HousekeepingTask.findByAssignee(assignedTo);
+        } else {
+            tasks = HousekeepingTask.findActiveTasks();
+        }
+
+        List<TaskResponse> result = tasks.stream()
+                .map(TaskResponse::from)
+                .toList();
+
         return Response.ok(result).build();
     }
 
-    @PATCH
-    @Path("/rooms/{id}/status")
+    /**
+     * Create a housekeeping task manually (e.g., for maintenance or special cleaning).
+     * Auto-created tasks happen in BookingResource.checkOut().
+     */
+    @POST
+    @Path("/tasks")
     @RolesAllowed({"ADMIN", "STAFF"})
     @Transactional
-    public Response updateRoomCleaningStatus(@PathParam("id") Long id, UpdateRoomStatusRequest req) {
-        Room room = Room.findById(id);
+    public Response createTask(@Valid CreateTaskRequest req) {
+        Room room = Room.findById(req.roomId());
         if (room == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"error\": \"Room not found\"}")
+                    .build();
+        }
+
+        // Check if there's already an active task for this room
+        HousekeepingTask existing = HousekeepingTask.findActiveTaskByRoom(req.roomId());
+        if (existing != null) {
+            return Response.status(Response.Status.CONFLICT)
+                    .entity("{\"error\": \"An active housekeeping task already exists for this room\"}")
+                    .build();
+        }
+
+        HousekeepingTask task = new HousekeepingTask();
+        task.room = room;
+        task.assignedTo = req.assignedTo();
+        task.notes = req.notes();
+        task.persist();
+
+        // Set room status to DIRTY if it isn't already in a cleaning state
+        if (room.status == Room.RoomStatus.AVAILABLE || room.status == Room.RoomStatus.OCCUPIED) {
+            room.status = Room.RoomStatus.DIRTY;
+        }
+
+        return Response.status(Response.Status.CREATED)
+                .entity(TaskResponse.from(task))
+                .build();
+    }
+
+    /**
+     * Update task status: PENDING → IN_PROGRESS → COMPLETED.
+     * When marked COMPLETED, automatically sets the room to AVAILABLE.
+     */
+    @PATCH
+    @Path("/tasks/{id}/status")
+    @RolesAllowed({"ADMIN", "STAFF"})
+    @Transactional
+    public Response updateTaskStatus(@PathParam("id") Long id, @Valid UpdateTaskStatusRequest req) {
+        HousekeepingTask task = HousekeepingTask.findById(id);
+        if (task == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
+        TaskStatus newStatus;
         try {
-            Room.RoomStatus newStatus = Room.RoomStatus.valueOf(req.status().toUpperCase());
-            room.status = newStatus;
-            
-            // If marked as CLEAN or INSPECTED, and there's a task, mark it as COMPLETED
-            if (newStatus == Room.RoomStatus.CLEAN || newStatus == Room.RoomStatus.INSPECTED || newStatus == Room.RoomStatus.AVAILABLE) {
-                HousekeepingTask activeTask = HousekeepingTask.findActiveTaskByRoom(id);
-                if (activeTask != null) {
-                    activeTask.status = HousekeepingTask.TaskStatus.COMPLETED;
-                }
-            }
-            
-            return Response.ok(RoomStatusDTO.from(room)).build();
+            newStatus = TaskStatus.valueOf(req.status().toUpperCase());
         } catch (IllegalArgumentException e) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"error\": \"Invalid status\"}").build();
+                    .entity("{\"error\": \"Invalid status: " + req.status() + ". Valid: PENDING, IN_PROGRESS, COMPLETED\"}")
+                    .build();
         }
+
+        task.status = newStatus;
+
+        // Update room status based on task status
+        if (newStatus == TaskStatus.IN_PROGRESS) {
+            task.room.status = Room.RoomStatus.CLEANING;
+        } else if (newStatus == TaskStatus.COMPLETED) {
+            task.completedAt = Instant.now();
+            task.room.status = Room.RoomStatus.AVAILABLE;
+        }
+
+        return Response.ok(TaskResponse.from(task)).build();
     }
 
-    @POST
-    @Path("/rooms/{id}/assign")
-    @RolesAllowed({"ADMIN", "STAFF"})
+    /**
+     * Assign or reassign a staff member to a task.
+     */
+    @PATCH
+    @Path("/tasks/{id}/assign")
+    @RolesAllowed("ADMIN")
     @Transactional
-    public Response assignStaffToRoom(@PathParam("id") Long roomId, AssignTaskRequest req) {
-        Room room = Room.findById(roomId);
-        if (room == null) {
+    public Response assignTask(@PathParam("id") Long id, @Valid AssignTaskRequest req) {
+        HousekeepingTask task = HousekeepingTask.findById(id);
+        if (task == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        HousekeepingTask task = HousekeepingTask.findActiveTaskByRoom(roomId);
-        if (task == null) {
-            task = new HousekeepingTask();
-            task.room = room;
-            task.status = HousekeepingTask.TaskStatus.PENDING;
-        }
-        
-        task.assignedTo = req.staffId();
-        if (req.notes() != null) {
-            task.notes = req.notes();
-        }
-        task.persist();
-        
-        // Also update room status to CLEANING if currently DIRTY and being assigned
-        if (room.status == Room.RoomStatus.DIRTY) {
-            room.status = Room.RoomStatus.CLEANING;
-        }
-
-        return Response.ok(HousekeepingTaskResponse.from(task)).build();
-    }
-
-    @GET
-    @Path("/assignments")
-    @RolesAllowed({"ADMIN", "STAFF"})
-    public Response getAllAssignments() {
-        List<HousekeepingTask> tasks = HousekeepingTask.listAll();
-        List<HousekeepingTaskResponse> result = tasks.stream().map(HousekeepingTaskResponse::from).toList();
-        return Response.ok(result).build();
+        task.assignedTo = req.assignedTo();
+        return Response.ok(TaskResponse.from(task)).build();
     }
 }

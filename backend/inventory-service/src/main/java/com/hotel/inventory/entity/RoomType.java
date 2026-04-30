@@ -21,7 +21,7 @@ public class RoomType extends PanacheEntity {
     @Column(name = "max_guests", nullable = false)
     public int maxGuests;
 
-    @Column(name = "image_url")
+    @Column(name = "image_url", columnDefinition = "TEXT")
     public String imageUrl;
 
     @com.fasterxml.jackson.annotation.JsonIgnore

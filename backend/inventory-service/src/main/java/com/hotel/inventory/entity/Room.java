@@ -23,7 +23,7 @@ public class Room extends PanacheEntity {
     @Column(nullable = false)
     public RoomStatus status = RoomStatus.AVAILABLE;
 
-    @Column(name = "image_url")
+    @Column(name = "image_url", columnDefinition = "TEXT")
     public String imageUrl;
 
     public enum RoomStatus {

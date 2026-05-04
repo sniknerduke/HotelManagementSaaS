@@ -5,10 +5,28 @@ const BASE_URL = '/api'; // Proxied to localhost:8000 via vite.config.ts
 
 const handleResponse = async (response: Response) => {
     if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `API request failed with status ${response.status}`);
+        let errorData = {};
+        try {
+            errorData = await response.json();
+        } catch (e) {
+            // handle empty body on non-ok status
+        }
+        throw new Error((errorData as any).error || `API request failed with status ${response.status}`);
     }
-    return response.json();
+    
+    // Check if the response is empty (like 204 No Content)
+    if (response.status === 204) {
+        return null;
+    }
+
+    // Also check for empty responses that aren't 204 but have no body
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+        return response.json();
+    }
+    
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
 };
 
 const getToken = () => localStorage.getItem('auth_token');

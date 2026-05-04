@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { BookingService, PaymentService } from '../api';
+import { BookingService, PaymentService, InventoryService } from '../api';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useSearchParams } from 'react-router-dom';
@@ -19,11 +19,41 @@ export const Checkout: React.FC = () => {
 
     const [guestInfo, setGuestInfo] = useState({ firstName: user?.firstName || '', lastName: user?.lastName || '', email: user?.email || '', phone: user?.phoneNumber || '' });
     
-    // In a real scenario, we would use a proper roomId. 
-    // Here we use the roomType as a mock roomId if it's numeric, otherwise default to 1.
-    const roomTypeParam = searchParams.get('roomType');
-    const roomIdNum = parseInt(roomTypeParam || '1');
-    const roomId = isNaN(roomIdNum) ? 1 : roomIdNum;
+    // Resolve an actual available room for the requested room type
+    const roomTypeId = parseInt(searchParams.get('roomType') || '1');
+    const [roomId, setRoomId] = useState<number | null>(null);
+    const [roomLoading, setRoomLoading] = useState(true);
+    const [roomTypeName, setRoomTypeName] = useState<string>('');
+    const [roomTypeImage, setRoomTypeImage] = useState<string>('');
+
+    useEffect(() => {
+        const resolveRoom = async () => {
+            try {
+                // Fetch room type info for display
+                try {
+                    const rtInfo = await InventoryService.getRoomType(roomTypeId);
+                    if (rtInfo) {
+                        setRoomTypeName(rtInfo.name || '');
+                        setRoomTypeImage(rtInfo.imageUrl || '');
+                    }
+                } catch (_) { /* non-critical */ }
+
+                // Find first available room of this type
+                const allRooms = await InventoryService.getAllRooms();
+                const available = allRooms.find(
+                    (r: any) => r.roomTypeId === roomTypeId && r.status === 'AVAILABLE'
+                );
+                if (available) {
+                    setRoomId(available.id);
+                }
+            } catch (e) {
+                console.error('Failed to resolve available room', e);
+            } finally {
+                setRoomLoading(false);
+            }
+        };
+        resolveRoom();
+    }, [roomTypeId]);
 
     const roomPriceParam = searchParams.get('price');
     const roomPrice = parseInt(roomPriceParam || '450');
@@ -37,6 +67,12 @@ export const Checkout: React.FC = () => {
         setError('');
         if (!user || !user.id) {
             toast("You must be logged in to book.", "error");
+            setLoading(false);
+            return;
+        }
+
+        if (!roomId) {
+            toast("No rooms available for this room type. Please try a different category.", "error");
             setLoading(false);
             return;
         }
@@ -135,8 +171,8 @@ export const Checkout: React.FC = () => {
 
                             <div className="pt-8 flex justify-between">
                                 <Button variant="ghost" onClick={handlePrev} disabled={loading} className="hidden sm:flex text-[#6C6863] hover:text-[#1A1A1A]">{t('checkout.paymentDetails.back')}</Button>
-                                <Button onClick={handleConfirmBooking} disabled={loading} className="w-full sm:w-auto bg-[#D4AF37] hover:bg-[#1A1A1A] text-white">
-                                    {loading ? 'Processing...' : 'Pay with VNPay'}
+                                <Button onClick={handleConfirmBooking} disabled={loading || roomLoading || !roomId} className="w-full sm:w-auto bg-[#D4AF37] hover:bg-[#1A1A1A] text-white">
+                                    {roomLoading ? 'Checking availability...' : !roomId ? 'No rooms available' : loading ? 'Processing...' : 'Pay with VNPay'}
                                 </Button>
                             </div>
                         </div>
@@ -162,11 +198,11 @@ export const Checkout: React.FC = () => {
                          <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#1A1A1A] mb-8 pb-4 border-b border-[#1A1A1A]/10">{t('checkout.summary.title')}</h3>
                          
                          <div className="aspect-[4/3] w-full overflow-hidden mb-6 relative">
-                            <img src="https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800&auto=format&fit=crop&q=60" alt="The Grand Suite" className="w-full h-full object-cover grayscale opacity-90 transition-all duration-[2000ms] hover:grayscale-0 hover:scale-105" />
+                            <img src={roomTypeImage || "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800&auto=format&fit=crop&q=60"} alt={roomTypeName || 'Room'} className="w-full h-full object-cover grayscale opacity-90 transition-all duration-[2000ms] hover:grayscale-0 hover:scale-105" />
                             <div className="absolute inset-0 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)] pointer-events-none"></div>
                          </div>
                          
-                         <h4 className="text-2xl font-serif text-[#1A1A1A] mb-2">{searchParams.get('roomType') === '2' ? 'Ocean Villa' : 'The Grand Suite'}</h4>
+                         <h4 className="text-2xl font-serif text-[#1A1A1A] mb-2">{roomTypeName || 'Room'}</h4>
                          <p className="text-xs text-[#6C6863] mb-6 pb-6 border-b border-[#1A1A1A]/10">May 12 - May 15, 2026 • 2 Guests</p>
 
                          <div className="space-y-4 text-sm font-medium">

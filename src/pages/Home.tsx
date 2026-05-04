@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../components/ui/Button';
+import { InventoryService } from '../api';
 // import { Card } from '../components/ui/Card';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -34,6 +35,7 @@ export const Home: React.FC = () => {
   const [rooms, setRooms] = useState(1);
 
   const [isScrolled, setIsScrolled] = useState(false);
+  const [roomTypes, setRoomTypes] = useState<any[]>([]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -44,6 +46,19 @@ export const Home: React.FC = () => {
       setActiveGuestPicker(prev => prev ? (scrolled ? 'sticky' : 'normal') : null);
     };
     window.addEventListener('scroll', handleScroll);
+    
+    InventoryService.getAllRoomTypes()
+      .then(roomTypesData => {
+        if (Array.isArray(roomTypesData)) {
+          setRoomTypes(
+            roomTypesData
+              .filter((room: any) => Number(room.availableCount || 0) > 0)
+              .slice(0, 3)
+          );
+        }
+      })
+      .catch(err => console.error("Failed to fetch featured rooms:", err));
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -289,8 +304,7 @@ export const Home: React.FC = () => {
       <section className="bg-[#1A1A1A] py-24 md:py-32 px-8 md:px-16 w-full text-[#F9F8F6] overflow-hidden">
         <motion.div 
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
+          animate="visible"
           variants={staggerContainer}
           className="max-w-[1600px] mx-auto"
         >
@@ -303,50 +317,33 @@ export const Home: React.FC = () => {
           </motion.div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Card 1 */}
-            <motion.div variants={fadeInUp} className="group cursor-pointer">
-              <div className="overflow-hidden aspect-[4/5] relative mb-6">
-                <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=1000&auto=format&fit=crop" alt="Deluxe Ocean View" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90 group-hover:opacity-100" />
+            {roomTypes.length > 0 ? (
+              roomTypes.map((room) => (
+                <motion.div key={room.id} variants={fadeInUp} className="group cursor-pointer" onClick={() => navigate('/search')}>
+                  <div className="overflow-hidden aspect-[4/5] relative mb-6">
+                    <img 
+                      src={room.imageUrl || "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=1000&auto=format&fit=crop"} 
+                      alt={room.name || 'Featured room'} 
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90 group-hover:opacity-100" 
+                    />
+                  </div>
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-2xl font-serif">{room.name}</h3>
+                    <span className="text-[#D4AF37] font-serif whitespace-nowrap ml-4">{t('home.accommodations.from')} ${room.basePrice}</span>
+                  </div>
+                  <div className="flex justify-between items-end">
+                    <p className="text-sm text-[#F9F8F6]/60">{t('home.accommodations.upToGuests', { count: room.maxGuests || 2 })} • {room.availableCount || 0} available</p>
+                    <span className="text-[10px] uppercase tracking-[0.2em] font-bold border-b border-[#D4AF37] text-[#D4AF37] pb-1 group-hover:text-[#F9F8F6] group-hover:border-[#F9F8F6] transition-colors">{t('home.accommodations.viewDetails')}</span>
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              <div className="md:col-span-3 border border-[#F9F8F6]/10 bg-[#F9F8F6]/5 px-6 py-16 text-center">
+                <p className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#D4AF37] mb-4">{t('home.accommodations.subtitle')}</p>
+                <h3 className="font-serif text-2xl text-[#F9F8F6] mb-3">No featured rooms available right now</h3>
+                <p className="text-sm text-[#F9F8F6]/60">Available room cards will appear here once the inventory service returns data.</p>
               </div>
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="text-2xl font-serif">{t('home.accommodations.deluxeOceanView')}</h3>
-                <span className="text-[#D4AF37] font-serif whitespace-nowrap ml-4">{t('home.accommodations.from')} $450</span>
-              </div>
-              <div className="flex justify-between items-end">
-                <p className="text-sm text-[#F9F8F6]/60">{t('home.accommodations.upToGuests', { count: 2 })} • 45 sqm</p>
-                <span className="text-[10px] uppercase tracking-[0.2em] font-bold border-b border-[#D4AF37] text-[#D4AF37] pb-1 group-hover:text-[#F9F8F6] group-hover:border-[#F9F8F6] transition-colors">{t('home.accommodations.viewDetails')}</span>
-              </div>
-            </motion.div>
-            
-            {/* Card 2 */}
-            <motion.div variants={fadeInUp} className="group cursor-pointer">
-              <div className="overflow-hidden aspect-[4/5] relative mb-6">
-                <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1000&auto=format&fit=crop" alt="Signature Suite" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90 group-hover:opacity-100" />
-              </div>
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="text-2xl font-serif">{t('home.accommodations.signatureSuite')}</h3>
-                <span className="text-[#D4AF37] font-serif whitespace-nowrap ml-4">{t('home.accommodations.from')} $850</span>
-              </div>
-              <div className="flex justify-between items-end">
-                <p className="text-sm text-[#F9F8F6]/60">{t('home.accommodations.upToGuests', { count: 3 })} • 65 sqm</p>
-                <span className="text-[10px] uppercase tracking-[0.2em] font-bold border-b border-[#D4AF37] text-[#D4AF37] pb-1 group-hover:text-[#F9F8F6] group-hover:border-[#F9F8F6] transition-colors">{t('home.accommodations.viewDetails')}</span>
-              </div>
-            </motion.div>
-
-            {/* Card 3 */}
-            <motion.div variants={fadeInUp} className="group cursor-pointer">
-              <div className="overflow-hidden aspect-[4/5] relative mb-6">
-                <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1000&auto=format&fit=crop" alt="The Grand Penthouse" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-90 group-hover:opacity-100" />
-              </div>
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="text-2xl font-serif">{t('home.accommodations.grandPenthouse')}</h3>
-                <span className="text-[#D4AF37] font-serif whitespace-nowrap ml-4">{t('home.accommodations.from')} $2,200</span>
-              </div>
-              <div className="flex justify-between items-end">
-                <p className="text-sm text-[#F9F8F6]/60">{t('home.accommodations.upToGuests', { count: 4 })} • 120 sqm</p>
-                <span className="text-[10px] uppercase tracking-[0.2em] font-bold border-b border-[#D4AF37] text-[#D4AF37] pb-1 group-hover:text-[#F9F8F6] group-hover:border-[#F9F8F6] transition-colors">{t('home.accommodations.viewDetails')}</span>
-              </div>
-            </motion.div>
+            )}
           </div>
         </motion.div>
       </section>

@@ -27,6 +27,13 @@ export const InventoryService = {
     updateRoomStatus: (id: number, status: string) => api.patch(`/inventory/rooms/${id}/status`, { status }),
 };
 
+export const AmenityService = {
+    getAllAmenities: () => api.get('/inventory/amenities'),
+    createAmenity: (data: any) => api.post('/inventory/amenities', data),
+    updateAmenity: (id: number, data: any) => api.put(`/inventory/amenities/${id}`, data),
+    deleteAmenity: (id: number) => api.delete(`/inventory/amenities/${id}`),
+};
+
 export const BookingService = {
     createBooking: (data: any) => api.post('/bookings', data),
     getAllBookings: () => api.get('/bookings'),
@@ -36,6 +43,14 @@ export const BookingService = {
     cancelBooking: (id: number) => api.delete(`/bookings/${id}`),
     checkIn: (id: number) => api.post(`/bookings/${id}/check-in`, {}),
     checkOut: (id: number) => api.post(`/bookings/${id}/check-out`, {}),
+};
+
+export const PromotionService = {
+    getAllPromotions: () => api.get('/promotions'),
+    validatePromotion: (code: string) => api.get(`/promotions/validate/${code}`),
+    createPromotion: (data: any) => api.post('/promotions', data),
+    updatePromotion: (id: number, data: any) => api.put(`/promotions/${id}`, data),
+    deletePromotion: (id: number) => api.delete(`/promotions/${id}`),
 };
 
 export const PaymentService = {

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { BookingService, PaymentService, InventoryService } from '../api';
+import { BookingService, PaymentService, InventoryService, PromotionService } from '../api';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useSearchParams } from 'react-router-dom';
@@ -16,6 +16,32 @@ export const Checkout: React.FC = () => {
     const [step, setStep] = useState<1 | 2 | 3>(1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+
+    const [promoCode, setPromoCode] = useState('');
+    const [discountPercentage, setDiscountPercentage] = useState(0);
+    const [promoError, setPromoError] = useState('');
+    const [applyingPromo, setApplyingPromo] = useState(false);
+
+    const handleApplyPromo = async () => {
+        if (!promoCode) return;
+        setApplyingPromo(true);
+        setPromoError('');
+        try {
+            const promo = await PromotionService.validatePromotion(promoCode);
+            if (promo && promo.discountPercentage) {
+                setDiscountPercentage(promo.discountPercentage);
+                toast('Promotion applied successfully!', 'success');
+            } else {
+                setPromoError('Invalid promotion code');
+                setDiscountPercentage(0);
+            }
+        } catch (e: any) {
+            setPromoError(e.response?.data || 'Invalid promotion code');
+            setDiscountPercentage(0);
+        } finally {
+            setApplyingPromo(false);
+        }
+    };
 
     const [guestInfo, setGuestInfo] = useState({ firstName: user?.firstName || '', lastName: user?.lastName || '', email: user?.email || '', phone: user?.phoneNumber || '' });
     
@@ -57,7 +83,9 @@ export const Checkout: React.FC = () => {
 
     const roomPriceParam = searchParams.get('price');
     const roomPrice = parseInt(roomPriceParam || '450');
-    const totalAmount = isNaN(roomPrice) ? 0 : (roomPrice * 3) + 142; // Taxes and fees
+    const baseAmount = isNaN(roomPrice) ? 0 : (roomPrice * 3) + 142; // Taxes and fees
+    const discountAmount = discountPercentage > 0 && !isNaN(roomPrice) ? (roomPrice * 3) * (discountPercentage / 100) : 0;
+    const totalAmount = baseAmount - discountAmount;
 
     const handleNext = () => setStep(s => Math.min(s + 1, 3) as 1 | 2 | 3);
     const handlePrev = () => setStep(s => Math.max(s - 1, 1) as 1 | 2 | 3);
@@ -214,6 +242,33 @@ export const Checkout: React.FC = () => {
                                  <span>{t('checkout.summary.taxes')}</span>
                                  <span className="text-[#1A1A1A] font-serif">$142</span>
                              </div>
+                             {discountAmount > 0 && (
+                                 <div className="flex justify-between items-center text-green-600">
+                                     <span>Discount ({discountPercentage}%)</span>
+                                     <span className="font-serif">-${discountAmount.toFixed(2)}</span>
+                                 </div>
+                             )}
+                         </div>
+
+                         <div className="mt-6 pt-6 border-t border-[#1A1A1A]/10">
+                             <div className="flex gap-2">
+                                 <Input 
+                                     placeholder="Promo Code" 
+                                     value={promoCode} 
+                                     onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                                     className="uppercase font-mono text-xs h-10"
+                                     disabled={discountPercentage > 0}
+                                 />
+                                 <Button 
+                                     onClick={discountPercentage > 0 ? () => { setDiscountPercentage(0); setPromoCode(''); } : handleApplyPromo} 
+                                     disabled={applyingPromo || (!promoCode && discountPercentage === 0)}
+                                     variant="secondary" 
+                                     className="h-10 text-[10px] uppercase px-4 whitespace-nowrap"
+                                 >
+                                     {applyingPromo ? '...' : discountPercentage > 0 ? 'Remove' : 'Apply'}
+                                 </Button>
+                             </div>
+                             {promoError && <p className="text-red-500 text-xs mt-2">{promoError}</p>}
                          </div>
 
                          <div className="mt-8 pt-6 border-t border-[#1A1A1A]/20 flex justify-between items-end">

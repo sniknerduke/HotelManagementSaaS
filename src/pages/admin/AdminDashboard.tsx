@@ -4,7 +4,7 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Modal } from '../../components/ui/Modal';
-import { BookingService, AuthService, InventoryService, PaymentService, AnalyticsService, SettingsService } from '../../api';
+import { BookingService, AuthService, InventoryService, PaymentService, AnalyticsService, SettingsService, AmenityService, PromotionService } from '../../api';
 import { useToast } from '../../context/ToastContext';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -20,6 +20,9 @@ export const AdminDashboard: React.FC = () => {
     const [rooms, setRooms] = useState<any[]>([]);
     const [roomTypes, setRoomTypes] = useState<any[]>([]);
     const [payments, setPayments] = useState<any[]>([]);
+    const [amenities, setAmenities] = useState<any[]>([]);
+    const [isAmenityModalOpen, setAmenityModalOpen] = useState(false);
+    const [addAmenityForm, setAddAmenityForm] = useState({ name: '', description: '', icon: '' });
 
     const [analyticsOverview, setAnalyticsOverview] = useState<any>(null);
     const [todayStats, setTodayStats] = useState<any>(null);
@@ -32,11 +35,11 @@ export const AdminDashboard: React.FC = () => {
     const [editingBooking, setEditingBooking] = useState<any>(null);
 
     const [isAddCategoryModalOpen, setAddCategoryModalOpen] = useState(false);
-    const [addCategoryForm, setAddCategoryForm] = useState({ name: '', description: '', basePrice: 0, maxGuests: 2, imageUrl: '', amenities: '' });
+    const [addCategoryForm, setAddCategoryForm] = useState({ name: '', description: '', basePrice: 0, maxGuests: 2, imageUrl: '', amenityIds: [] as number[] });
     const [editingCategory, setEditingCategory] = useState<any>(null);
 
     const [isAddRoomModalOpen, setAddRoomModalOpen] = useState(false);
-    const [addRoomForm, setAddRoomForm] = useState({ roomNumber: '', roomTypeId: '', imageUrl: '', description: '', amenities: '' });
+    const [addRoomForm, setAddRoomForm] = useState({ roomNumber: '', roomTypeId: '', imageUrl: '', description: '', amenityIds: [] as number[] });
     const [editingRoom, setEditingRoom] = useState<any>(null);
 
     const [isAddStaffModalOpen, setAddStaffModalOpen] = useState(false);
@@ -58,39 +61,54 @@ export const AdminDashboard: React.FC = () => {
         checkOutTime: '11:00'
     });
 
-    const [coupons, setCoupons] = useState([
-        { id: 1, code: 'SUMMER20', discount: '-20% Off' },
-        { id: 2, code: 'VIPUPGRADE', discount: 'Free Category Up' }
-    ]);
-    const [newCoupon, setNewCoupon] = useState({ code: '', discount: '' });
+    const [coupons, setCoupons] = useState<any[]>([]);
+    const [newCoupon, setNewCoupon] = useState({ code: '', discountPercentage: 0 });
 
-    const handleAddCoupon = () => {
-        if (!newCoupon.code || !newCoupon.discount) return;
-        setCoupons([...coupons, { id: Date.now(), code: newCoupon.code, discount: newCoupon.discount }]);
-        setNewCoupon({ code: '', discount: '' });
-        toast('Coupon added', 'success');
+    const handleAddCoupon = async () => {
+        if (!newCoupon.code || newCoupon.discountPercentage <= 0) return;
+        try {
+            await PromotionService.createPromotion({
+                code: newCoupon.code,
+                discountPercentage: newCoupon.discountPercentage,
+                active: true
+            });
+            toast('Promotion added successfully', 'success');
+            setNewCoupon({ code: '', discountPercentage: 0 });
+            refreshData();
+        } catch (e: any) {
+            toast(e.message || 'Failed to add promotion', 'error');
+        }
     };
 
-    const handleDeleteCoupon = (id: number) => {
-        setCoupons(coupons.filter(c => c.id !== id));
-        toast('Coupon removed', 'success');
+    const handleDeleteCoupon = async (id: number) => {
+        try {
+            await PromotionService.deletePromotion(id);
+            toast('Promotion removed', 'success');
+            refreshData();
+        } catch (e: any) {
+            toast(e.message || 'Failed to remove promotion', 'error');
+        }
     };
 
     const refreshData = async () => {
         try {
-            const [bookingsRes, usersRes, roomsRes, roomTypesRes, paymentsRes, settingsRes] = await Promise.all([
+            const [bookingsRes, usersRes, roomsRes, roomTypesRes, paymentsRes, settingsRes, amenitiesRes, promotionsRes] = await Promise.all([
                 BookingService.getAllBookings(),
                 AuthService.getAllUsers(),
                 InventoryService.getAllRooms(),
                 InventoryService.getAllRoomTypes(),
                 PaymentService.getAllPayments(),
-                SettingsService.getSettings()
+                SettingsService.getSettings(),
+                AmenityService.getAllAmenities(),
+                PromotionService.getAllPromotions()
             ]);
             setBookings(bookingsRes);
             setUsers(usersRes);
             setRooms(roomsRes);
             setRoomTypes(roomTypesRes);
             setPayments(paymentsRes);
+            setAmenities(amenitiesRes);
+            setCoupons(promotionsRes);
             if (settingsRes) {
                 setSettings({
                     hotelName: settingsRes.hotelName || 'Lumière Hotel & Resort',
@@ -231,7 +249,7 @@ export const AdminDashboard: React.FC = () => {
             await InventoryService.createRoomType(addCategoryForm);
             toast('Room category created successfully.', 'success');
             setAddCategoryModalOpen(false);
-            setAddCategoryForm({ name: '', description: '', basePrice: 0, maxGuests: 2, imageUrl: '', amenities: '' });
+            setAddCategoryForm({ name: '', description: '', basePrice: 0, maxGuests: 2, imageUrl: '', amenityIds: [] });
             refreshData();
         } catch (err: any) {
             toast(err.message || 'Failed to create room category.', 'error');
@@ -244,7 +262,7 @@ export const AdminDashboard: React.FC = () => {
             await InventoryService.createRoom(addRoomForm);
             toast('Room created successfully.', 'success');
             setAddRoomModalOpen(false);
-            setAddRoomForm({ roomNumber: '', roomTypeId: '', imageUrl: '', description: '', amenities: '' });
+            setAddRoomForm({ roomNumber: '', roomTypeId: '', imageUrl: '', description: '', amenityIds: [] });
             refreshData();
         } catch (err: any) {
             toast(err.message || 'Failed to create room.', 'error');
@@ -270,7 +288,9 @@ export const AdminDashboard: React.FC = () => {
                 roomTypeId: editingRoom.roomTypeId || editingRoom.roomType?.id,
                 status: editingRoom.status || 'AVAILABLE',
                 floor: editingRoom.floor || 1,
-                imageUrl: editingRoom.imageUrl
+                imageUrl: editingRoom.imageUrl,
+                description: editingRoom.description,
+                amenityIds: (editingRoom.amenities || []).map((a: any) => a.id)
             });
             toast('Room updated.', 'success');
             setEditingRoom(null);
@@ -283,7 +303,11 @@ export const AdminDashboard: React.FC = () => {
     const handleEditCategorySubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await InventoryService.updateRoomType(editingCategory.id, editingCategory);
+            const payload = {
+                ...editingCategory,
+                amenityIds: (editingCategory.amenities || []).map((a: any) => a.id)
+            };
+            await InventoryService.updateRoomType(editingCategory.id, payload);
             toast('Room category updated.', 'success');
             setEditingCategory(null);
             refreshData();
@@ -300,6 +324,51 @@ export const AdminDashboard: React.FC = () => {
             refreshData();
         } catch (err: any) {
             toast(err.message || 'Failed to delete category.', 'error');
+        }
+    };
+
+    const handleAmenityToggle = (formState: any, setFormState: any, amenityId: number, isEdit: boolean = false) => {
+        if (isEdit) {
+            const currentAmenities = formState.amenities || [];
+            const hasAmenity = currentAmenities.some((a: any) => a.id === amenityId);
+            let newAmenities;
+            if (hasAmenity) {
+                newAmenities = currentAmenities.filter((a: any) => a.id !== amenityId);
+            } else {
+                const amenityToAdd = amenities.find(a => a.id === amenityId);
+                newAmenities = [...currentAmenities, amenityToAdd];
+            }
+            setFormState({ ...formState, amenities: newAmenities });
+        } else {
+            const currentIds = formState.amenityIds || [];
+            const newIds = currentIds.includes(amenityId) 
+                ? currentIds.filter((id: number) => id !== amenityId)
+                : [...currentIds, amenityId];
+            setFormState({ ...formState, amenityIds: newIds });
+        }
+    };
+
+    const handleAddAmenitySubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            await AmenityService.createAmenity(addAmenityForm);
+            toast('Amenity created.', 'success');
+            setAddAmenityForm({ name: '', description: '', icon: '' });
+            setAmenityModalOpen(false);
+            refreshData();
+        } catch (err: any) {
+            toast(err.message || 'Failed to create amenity.', 'error');
+        }
+    };
+
+    const handleDeleteAmenity = async (id: number) => {
+        if (!window.confirm("Delete this amenity?")) return;
+        try {
+            await AmenityService.deleteAmenity(id);
+            toast('Amenity deleted.', 'success');
+            refreshData();
+        } catch (err: any) {
+            toast(err.message || 'Failed to delete amenity.', 'error');
         }
     };
 
@@ -602,6 +671,7 @@ export const AdminDashboard: React.FC = () => {
                         <div className="flex justify-between items-end border-b border-[#1A1A1A]/20 pb-4 mb-8">
                             <h2 className="text-3xl font-serif text-[#1A1A1A]">{t('admin.inventory.title')} <span className="italic text-[#D4AF37]">{t('admin.inventory.titleItalic')}</span></h2>
                             <div className="flex gap-4">
+                                <Button onClick={() => setAmenityModalOpen(true)} variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase tracking-widest font-bold h-10 px-6">Amenities</Button>
                                 <Button onClick={() => setAddRoomModalOpen(true)} variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase tracking-widest font-bold h-10 px-6">Add Room</Button>
                                 <Button onClick={() => setAddCategoryModalOpen(true)} variant="primary" className="bg-[#1A1A1A] hover:bg-[#D4AF37] transition-colors text-white text-[10px] uppercase tracking-widest font-bold h-10 px-6">{t('admin.inventory.addCategory')}</Button>
                             </div>
@@ -674,15 +744,17 @@ export const AdminDashboard: React.FC = () => {
                                             
                                             <div className="flex gap-2 mb-4">
                                                 <Input 
-                                                    placeholder="CODE" 
+                                                    placeholder="CODE (e.g. SUMMER20)" 
                                                     value={newCoupon.code} 
                                                     onChange={e => setNewCoupon({...newCoupon, code: e.target.value.toUpperCase()})}
                                                     className="w-1/2 uppercase font-mono text-sm"
                                                 />
                                                 <Input 
-                                                    placeholder="-10% Off / $50 Off" 
-                                                    value={newCoupon.discount} 
-                                                    onChange={e => setNewCoupon({...newCoupon, discount: e.target.value})}
+                                                    type="number"
+                                                    min="0" max="100"
+                                                    placeholder="Discount %" 
+                                                    value={newCoupon.discountPercentage} 
+                                                    onChange={e => setNewCoupon({...newCoupon, discountPercentage: Number(e.target.value)})}
                                                     className="w-1/2 text-sm"
                                                 />
                                                 <Button type="button" onClick={handleAddCoupon} variant="primary" className="bg-[#1A1A1A] hover:bg-[#D4AF37] text-white text-[10px] uppercase px-4 h-10">Add</Button>
@@ -693,7 +765,7 @@ export const AdminDashboard: React.FC = () => {
                                                     <div key={c.id} className={`flex items-center justify-between p-3 rounded-sm ${i % 2 === 0 ? 'bg-[#1A1A1A] text-white' : 'bg-[#F9F8F6] border border-[#1A1A1A]/10 text-[#1A1A1A]'}`}>
                                                         <span className="font-mono text-sm tracking-widest font-bold">{c.code}</span>
                                                         <div className="flex items-center gap-4">
-                                                            <span className={`text-[10px] uppercase font-bold ${i % 2 === 0 ? 'text-[#D4AF37]' : 'text-[#6C6863]'}`}>{c.discount}</span>
+                                                            <span className={`text-[10px] uppercase font-bold ${i % 2 === 0 ? 'text-[#D4AF37]' : 'text-[#6C6863]'}`}>{c.discountPercentage}% Off</span>
                                                             <button onClick={() => handleDeleteCoupon(c.id)} className="text-[10px] uppercase text-red-500 hover:text-red-700 font-bold ml-2">Del</button>
                                                         </div>
                                                     </div>
@@ -1025,7 +1097,17 @@ export const AdminDashboard: React.FC = () => {
                 <form onSubmit={handleAddCategorySubmit} className="space-y-4">
                     <Input type="text" label="Category Name" value={addCategoryForm.name} onChange={(e) => setAddCategoryForm({ ...addCategoryForm, name: e.target.value })} required />
                     <Input type="text" label="Description" value={addCategoryForm.description} onChange={(e) => setAddCategoryForm({ ...addCategoryForm, description: e.target.value })} required />
-                    <Input type="text" label="Amenities (comma separated)" value={addCategoryForm.amenities} onChange={(e) => setAddCategoryForm({ ...addCategoryForm, amenities: e.target.value })} placeholder="e.g. Wifi, Pool, Spa" />
+                    <div>
+                        <label className="text-[10px] uppercase font-bold text-[#6C6863] block mb-2">Amenities</label>
+                        <div className="grid grid-cols-2 gap-2">
+                            {amenities.map(a => (
+                                <label key={a.id} className="flex items-center gap-2 text-sm cursor-pointer">
+                                    <input type="checkbox" checked={addCategoryForm.amenityIds.includes(a.id)} onChange={() => handleAmenityToggle(addCategoryForm, setAddCategoryForm, a.id, false)} className="accent-[#1A1A1A]" />
+                                    {a.name}
+                                </label>
+                            ))}
+                        </div>
+                    </div>
                     <div className="grid grid-cols-2 gap-4">
                         <Input type="number" label="Base Price (USD)" value={addCategoryForm.basePrice} onChange={(e) => setAddCategoryForm({ ...addCategoryForm, basePrice: Number(e.target.value) })} required />
                         <Input type="number" label="Capacity (Guests)" value={addCategoryForm.maxGuests} onChange={(e) => setAddCategoryForm({ ...addCategoryForm, maxGuests: Number(e.target.value) })} required />
@@ -1038,7 +1120,17 @@ export const AdminDashboard: React.FC = () => {
                 <form onSubmit={handleAddRoomSubmit} className="space-y-4">
                     <Input type="text" label="Room Number" value={addRoomForm.roomNumber} onChange={(e) => setAddRoomForm({ ...addRoomForm, roomNumber: e.target.value })} required />
                     <Input type="text" label="Description" value={addRoomForm.description} onChange={(e) => setAddRoomForm({ ...addRoomForm, description: e.target.value })} />
-                    <Input type="text" label="Amenities (comma separated)" value={addRoomForm.amenities} onChange={(e) => setAddRoomForm({ ...addRoomForm, amenities: e.target.value })} placeholder="e.g. Ocean View" />
+                    <div>
+                        <label className="text-[10px] uppercase font-bold text-[#6C6863] block mb-2">Amenities</label>
+                        <div className="grid grid-cols-2 gap-2">
+                            {amenities.map(a => (
+                                <label key={a.id} className="flex items-center gap-2 text-sm cursor-pointer">
+                                    <input type="checkbox" checked={addRoomForm.amenityIds.includes(a.id)} onChange={() => handleAmenityToggle(addRoomForm, setAddRoomForm, a.id, false)} className="accent-[#1A1A1A]" />
+                                    {a.name}
+                                </label>
+                            ))}
+                        </div>
+                    </div>
                     <Input type="text" label="Image URL" value={addRoomForm.imageUrl} onChange={(e) => setAddRoomForm({ ...addRoomForm, imageUrl: e.target.value })} placeholder="/images/rooms/your-image.jpg" />
                     <div>
                         <label className="text-[10px] uppercase font-bold text-[#6C6863] block mb-1">Room Category</label>
@@ -1086,7 +1178,17 @@ export const AdminDashboard: React.FC = () => {
                     <form onSubmit={handleEditCategorySubmit} className="space-y-4">
                         <Input type="text" label="Category Name" value={editingCategory.name} onChange={(e) => setEditingCategory({ ...editingCategory, name: e.target.value })} required />
                         <Input type="text" label="Description" value={editingCategory.description} onChange={(e) => setEditingCategory({ ...editingCategory, description: e.target.value })} required />
-                        <Input type="text" label="Amenities (comma separated)" value={editingCategory.amenities || ''} onChange={(e) => setEditingCategory({ ...editingCategory, amenities: e.target.value })} placeholder="e.g. Wifi, Pool, Spa" />
+                        <div>
+                            <label className="text-[10px] uppercase font-bold text-[#6C6863] block mb-2">Amenities</label>
+                            <div className="grid grid-cols-2 gap-2">
+                                {amenities.map(a => (
+                                    <label key={a.id} className="flex items-center gap-2 text-sm cursor-pointer">
+                                        <input type="checkbox" checked={(editingCategory.amenities || []).some((am: any) => am.id === a.id)} onChange={() => handleAmenityToggle(editingCategory, setEditingCategory, a.id, true)} className="accent-[#1A1A1A]" />
+                                        {a.name}
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
                         <div className="grid grid-cols-2 gap-4">
                             <Input type="number" label="Base Price (USD)" value={editingCategory.basePrice} onChange={(e) => setEditingCategory({ ...editingCategory, basePrice: Number(e.target.value) })} required />
                             <Input type="number" label="Capacity (Guests)" value={editingCategory.defaultCapacity || editingCategory.capacity} onChange={(e) => setEditingCategory({ ...editingCategory, defaultCapacity: Number(e.target.value) })} required />
@@ -1101,7 +1203,17 @@ export const AdminDashboard: React.FC = () => {
                     <form onSubmit={handleEditRoomSubmit} className="space-y-4">
                         <Input type="text" label="Room Number" value={editingRoom.roomNumber} onChange={(e) => setEditingRoom({ ...editingRoom, roomNumber: e.target.value })} required />
                         <Input type="text" label="Description" value={editingRoom.description || ''} onChange={(e) => setEditingRoom({ ...editingRoom, description: e.target.value })} />
-                        <Input type="text" label="Amenities (comma separated)" value={editingRoom.amenities || ''} onChange={(e) => setEditingRoom({ ...editingRoom, amenities: e.target.value })} placeholder="e.g. Ocean View" />
+                        <div>
+                            <label className="text-[10px] uppercase font-bold text-[#6C6863] block mb-2">Amenities</label>
+                            <div className="grid grid-cols-2 gap-2">
+                                {amenities.map(a => (
+                                    <label key={a.id} className="flex items-center gap-2 text-sm cursor-pointer">
+                                        <input type="checkbox" checked={(editingRoom.amenities || []).some((am: any) => am.id === a.id)} onChange={() => handleAmenityToggle(editingRoom, setEditingRoom, a.id, true)} className="accent-[#1A1A1A]" />
+                                        {a.name}
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
                         <Input type="text" label="Image URL" value={editingRoom.imageUrl || ''} onChange={(e) => setEditingRoom({ ...editingRoom, imageUrl: e.target.value })} placeholder="/images/rooms/your-image.jpg" />
                         <div>
                             <label className="text-[10px] uppercase font-bold text-[#6C6863] block mb-1">Room Category</label>
@@ -1143,6 +1255,25 @@ export const AdminDashboard: React.FC = () => {
                         )}
                     </div>
                 )}
+            </Modal>
+            <Modal isOpen={isAmenityModalOpen} onClose={() => setAmenityModalOpen(false)} title="Manage Amenities">
+                <div className="space-y-6">
+                    <form onSubmit={handleAddAmenitySubmit} className="flex gap-2 items-end">
+                        <div className="flex-1">
+                            <Input type="text" label="New Amenity Name" value={addAmenityForm.name} onChange={(e) => setAddAmenityForm({ ...addAmenityForm, name: e.target.value })} required />
+                        </div>
+                        <Button type="submit" variant="primary" className="bg-[#1A1A1A] text-white whitespace-nowrap h-12">Add</Button>
+                    </form>
+                    <div className="border-t border-[#1A1A1A]/10 pt-4 max-h-60 overflow-y-auto space-y-2">
+                        {amenities.map(a => (
+                            <div key={a.id} className="flex justify-between items-center bg-[#F9F8F6] p-3 rounded">
+                                <span className="text-sm font-serif">{a.name}</span>
+                                <button onClick={() => handleDeleteAmenity(a.id)} className="text-red-500 hover:text-red-700 text-xs font-bold uppercase">Delete</button>
+                            </div>
+                        ))}
+                        {amenities.length === 0 && <p className="text-sm text-[#6C6863] italic">No amenities found.</p>}
+                    </div>
+                </div>
             </Modal>
         </div>
     );

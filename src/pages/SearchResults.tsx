@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../components/ui/Button';
 
-import { InventoryService } from '../api';
+import { InventoryService, AmenityService } from '../api';
 
 // Removed static mockRooms in favor of live API data
 
@@ -24,34 +24,29 @@ export const SearchResults: React.FC = () => {
     const [roomsData, setRoomsData] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    const [filters, setFilters] = useState({
-        privatePool: false,
-        oceanView: false,
-        butlerService: false,
-        balcony: false,
-        spaAccess: false,
-        fitnessCenter: false,
-        wifi: false,
-        petFriendly: false,
-        breakfast: false
-    });
+    const [amenities, setAmenities] = useState<any[]>([]);
+    const [selectedAmenityIds, setSelectedAmenityIds] = useState<number[]>([]);
 
-    const toggleFilter = (key: keyof typeof filters) => {
-        setFilters(prev => ({ ...prev, [key]: !prev[key] }));
+    useEffect(() => {
+        const fetchAmenities = async () => {
+            try {
+                const data = await AmenityService.getAllAmenities();
+                setAmenities(data);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        fetchAmenities();
+    }, []);
+
+    const toggleFilter = (id: number) => {
+        setSelectedAmenityIds(prev => prev.includes(id) ? prev.filter(aId => aId !== id) : [...prev, id]);
     };
 
     const filteredRooms = roomsData.filter(room => {
-        const roomAmenities = (room.amenities || "").toLowerCase();
-        if (filters.privatePool && !roomAmenities.includes("pool")) return false;
-        if (filters.oceanView && !roomAmenities.includes("ocean")) return false;
-        if (filters.butlerService && !roomAmenities.includes("butler")) return false;
-        if (filters.balcony && !roomAmenities.includes("balcony")) return false;
-        if (filters.spaAccess && !roomAmenities.includes("spa")) return false;
-        if (filters.fitnessCenter && (!roomAmenities.includes("fitness") && !roomAmenities.includes("gym"))) return false;
-        if (filters.wifi && !roomAmenities.includes("wifi")) return false;
-        if (filters.petFriendly && !roomAmenities.includes("pet")) return false;
-        if (filters.breakfast && !roomAmenities.includes("breakfast")) return false;
-        return true;
+        if (selectedAmenityIds.length === 0) return true;
+        const roomAmenityIds = (room.amenities || []).map((a: any) => a.id);
+        return selectedAmenityIds.every(id => roomAmenityIds.includes(id));
     });
 
     useEffect(() => {
@@ -265,42 +260,12 @@ export const SearchResults: React.FC = () => {
                     <div className="pt-8 border-t border-[#1A1A1A]/10 mt-[-2rem]">
                         <label className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-4 block">{t('search.filters.amenities')}</label>
                         <div className="space-y-3 font-serif text-[#1A1A1A] text-sm">
-                            <label className="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" checked={filters.privatePool} onChange={() => toggleFilter('privatePool')} className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
-                                <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.privatePool')}</span>
-                            </label>
-                            <label className="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" checked={filters.oceanView} onChange={() => toggleFilter('oceanView')} className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
-                                <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.oceanView')}</span>
-                            </label>
-                            <label className="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" checked={filters.butlerService} onChange={() => toggleFilter('butlerService')} className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
-                                <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.butlerService')}</span>
-                            </label>
-                            <label className="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" checked={filters.balcony} onChange={() => toggleFilter('balcony')} className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
-                                <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.balcony')}</span>
-                            </label>
-                            <label className="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" checked={filters.spaAccess} onChange={() => toggleFilter('spaAccess')} className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
-                                <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.spaAccess')}</span>
-                            </label>
-                            <label className="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" checked={filters.fitnessCenter} onChange={() => toggleFilter('fitnessCenter')} className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
-                                <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.fitnessCenter')}</span>
-                            </label>
-                            <label className="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" checked={filters.wifi} onChange={() => toggleFilter('wifi')} className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
-                                <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.wifi')}</span>
-                            </label>
-                            <label className="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" checked={filters.petFriendly} onChange={() => toggleFilter('petFriendly')} className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
-                                <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.petFriendly')}</span>
-                            </label>
-                            <label className="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" checked={filters.breakfast} onChange={() => toggleFilter('breakfast')} className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
-                                <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.breakfast')}</span>
-                            </label>
+                            {amenities.map(a => (
+                                <label key={a.id} className="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" checked={selectedAmenityIds.includes(a.id)} onChange={() => toggleFilter(a.id)} className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
+                                    <span className="group-hover:text-[#D4AF37] transition-colors">{a.name}</span>
+                                </label>
+                            ))}
                         </div>
                     </div>
                 </div>

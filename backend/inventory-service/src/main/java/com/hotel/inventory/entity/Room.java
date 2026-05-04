@@ -3,6 +3,8 @@ package com.hotel.inventory.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.*;
+import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "rooms")
@@ -29,8 +31,13 @@ public class Room extends PanacheEntity {
     @Column(name = "description", columnDefinition = "TEXT")
     public String description;
 
-    @Column(name = "amenities", columnDefinition = "TEXT")
-    public String amenities;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "room_amenities",
+        joinColumns = @JoinColumn(name = "room_id"),
+        inverseJoinColumns = @JoinColumn(name = "amenity_id")
+    )
+    public List<Amenity> amenities = new ArrayList<>();
 
     public enum RoomStatus {
         AVAILABLE, OCCUPIED, DIRTY, CLEANING, INSPECTED, MAINTENANCE, OUT_OF_ORDER

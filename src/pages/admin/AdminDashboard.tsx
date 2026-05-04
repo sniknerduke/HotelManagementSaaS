@@ -32,11 +32,11 @@ export const AdminDashboard: React.FC = () => {
     const [editingBooking, setEditingBooking] = useState<any>(null);
 
     const [isAddCategoryModalOpen, setAddCategoryModalOpen] = useState(false);
-    const [addCategoryForm, setAddCategoryForm] = useState({ name: '', description: '', basePrice: 0, maxGuests: 2, imageUrl: '' });
+    const [addCategoryForm, setAddCategoryForm] = useState({ name: '', description: '', basePrice: 0, maxGuests: 2, imageUrl: '', amenities: '' });
     const [editingCategory, setEditingCategory] = useState<any>(null);
 
     const [isAddRoomModalOpen, setAddRoomModalOpen] = useState(false);
-    const [addRoomForm, setAddRoomForm] = useState({ roomNumber: '', roomTypeId: '', imageUrl: '', description: '' });
+    const [addRoomForm, setAddRoomForm] = useState({ roomNumber: '', roomTypeId: '', imageUrl: '', description: '', amenities: '' });
     const [editingRoom, setEditingRoom] = useState<any>(null);
 
     const [isAddStaffModalOpen, setAddStaffModalOpen] = useState(false);
@@ -231,6 +231,7 @@ export const AdminDashboard: React.FC = () => {
             await InventoryService.createRoomType(addCategoryForm);
             toast('Room category created successfully.', 'success');
             setAddCategoryModalOpen(false);
+            setAddCategoryForm({ name: '', description: '', basePrice: 0, maxGuests: 2, imageUrl: '', amenities: '' });
             refreshData();
         } catch (err: any) {
             toast(err.message || 'Failed to create room category.', 'error');
@@ -243,7 +244,7 @@ export const AdminDashboard: React.FC = () => {
             await InventoryService.createRoom(addRoomForm);
             toast('Room created successfully.', 'success');
             setAddRoomModalOpen(false);
-            setAddRoomForm({ roomNumber: '', roomTypeId: '', imageUrl: '', description: '' });
+            setAddRoomForm({ roomNumber: '', roomTypeId: '', imageUrl: '', description: '', amenities: '' });
             refreshData();
         } catch (err: any) {
             toast(err.message || 'Failed to create room.', 'error');
@@ -1024,6 +1025,7 @@ export const AdminDashboard: React.FC = () => {
                 <form onSubmit={handleAddCategorySubmit} className="space-y-4">
                     <Input type="text" label="Category Name" value={addCategoryForm.name} onChange={(e) => setAddCategoryForm({ ...addCategoryForm, name: e.target.value })} required />
                     <Input type="text" label="Description" value={addCategoryForm.description} onChange={(e) => setAddCategoryForm({ ...addCategoryForm, description: e.target.value })} required />
+                    <Input type="text" label="Amenities (comma separated)" value={addCategoryForm.amenities} onChange={(e) => setAddCategoryForm({ ...addCategoryForm, amenities: e.target.value })} placeholder="e.g. Wifi, Pool, Spa" />
                     <div className="grid grid-cols-2 gap-4">
                         <Input type="number" label="Base Price (USD)" value={addCategoryForm.basePrice} onChange={(e) => setAddCategoryForm({ ...addCategoryForm, basePrice: Number(e.target.value) })} required />
                         <Input type="number" label="Capacity (Guests)" value={addCategoryForm.maxGuests} onChange={(e) => setAddCategoryForm({ ...addCategoryForm, maxGuests: Number(e.target.value) })} required />
@@ -1036,6 +1038,7 @@ export const AdminDashboard: React.FC = () => {
                 <form onSubmit={handleAddRoomSubmit} className="space-y-4">
                     <Input type="text" label="Room Number" value={addRoomForm.roomNumber} onChange={(e) => setAddRoomForm({ ...addRoomForm, roomNumber: e.target.value })} required />
                     <Input type="text" label="Description" value={addRoomForm.description} onChange={(e) => setAddRoomForm({ ...addRoomForm, description: e.target.value })} />
+                    <Input type="text" label="Amenities (comma separated)" value={addRoomForm.amenities} onChange={(e) => setAddRoomForm({ ...addRoomForm, amenities: e.target.value })} placeholder="e.g. Ocean View" />
                     <Input type="text" label="Image URL" value={addRoomForm.imageUrl} onChange={(e) => setAddRoomForm({ ...addRoomForm, imageUrl: e.target.value })} placeholder="/images/rooms/your-image.jpg" />
                     <div>
                         <label className="text-[10px] uppercase font-bold text-[#6C6863] block mb-1">Room Category</label>
@@ -1083,6 +1086,7 @@ export const AdminDashboard: React.FC = () => {
                     <form onSubmit={handleEditCategorySubmit} className="space-y-4">
                         <Input type="text" label="Category Name" value={editingCategory.name} onChange={(e) => setEditingCategory({ ...editingCategory, name: e.target.value })} required />
                         <Input type="text" label="Description" value={editingCategory.description} onChange={(e) => setEditingCategory({ ...editingCategory, description: e.target.value })} required />
+                        <Input type="text" label="Amenities (comma separated)" value={editingCategory.amenities || ''} onChange={(e) => setEditingCategory({ ...editingCategory, amenities: e.target.value })} placeholder="e.g. Wifi, Pool, Spa" />
                         <div className="grid grid-cols-2 gap-4">
                             <Input type="number" label="Base Price (USD)" value={editingCategory.basePrice} onChange={(e) => setEditingCategory({ ...editingCategory, basePrice: Number(e.target.value) })} required />
                             <Input type="number" label="Capacity (Guests)" value={editingCategory.defaultCapacity || editingCategory.capacity} onChange={(e) => setEditingCategory({ ...editingCategory, defaultCapacity: Number(e.target.value) })} required />
@@ -1097,6 +1101,7 @@ export const AdminDashboard: React.FC = () => {
                     <form onSubmit={handleEditRoomSubmit} className="space-y-4">
                         <Input type="text" label="Room Number" value={editingRoom.roomNumber} onChange={(e) => setEditingRoom({ ...editingRoom, roomNumber: e.target.value })} required />
                         <Input type="text" label="Description" value={editingRoom.description || ''} onChange={(e) => setEditingRoom({ ...editingRoom, description: e.target.value })} />
+                        <Input type="text" label="Amenities (comma separated)" value={editingRoom.amenities || ''} onChange={(e) => setEditingRoom({ ...editingRoom, amenities: e.target.value })} placeholder="e.g. Ocean View" />
                         <Input type="text" label="Image URL" value={editingRoom.imageUrl || ''} onChange={(e) => setEditingRoom({ ...editingRoom, imageUrl: e.target.value })} placeholder="/images/rooms/your-image.jpg" />
                         <div>
                             <label className="text-[10px] uppercase font-bold text-[#6C6863] block mb-1">Room Category</label>

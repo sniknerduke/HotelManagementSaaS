@@ -20,17 +20,17 @@ public class InventoryResource {
     // --- DTOs ---
 
     public record RoomTypeResponse(Long id, String name, String description,
-                                   java.math.BigDecimal basePrice, int maxGuests, String imageUrl, long availableCount) {
+                                   java.math.BigDecimal basePrice, int maxGuests, String imageUrl, String amenities, long availableCount) {
         public static RoomTypeResponse from(RoomType rt) {
             long available = Room.countAvailableByType(rt.id);
-            return new RoomTypeResponse(rt.id, rt.name, rt.description, rt.basePrice, rt.maxGuests, rt.imageUrl, available);
+            return new RoomTypeResponse(rt.id, rt.name, rt.description, rt.basePrice, rt.maxGuests, rt.imageUrl, rt.amenities, available);
         }
     }
 
-    public record RoomResponse(Long id, String roomNumber, Integer floor, String status, Long roomTypeId, String imageUrl, String description) {
+    public record RoomResponse(Long id, String roomNumber, Integer floor, String status, Long roomTypeId, String imageUrl, String description, String amenities) {
         public static RoomResponse from(Room room) {
             return new RoomResponse(room.id, room.roomNumber, room.floor, room.status.name(),
-                    room.roomType != null ? room.roomType.id : null, room.imageUrl, room.description);
+                    room.roomType != null ? room.roomType.id : null, room.imageUrl, room.description, room.amenities);
         }
     }
 
@@ -38,14 +38,16 @@ public class InventoryResource {
             @NotBlank(message = "Room number is required") String roomNumber, 
             @NotNull(message = "Room type ID is required") Long roomTypeId,
             String imageUrl,
-            String description) {}
+            String description,
+            String amenities) {}
 
     public record UpdateRoomTypeRequest(
             @NotBlank(message = "Name is required") String name, 
             String description, 
             @NotNull(message = "Base price is required") @Positive(message = "Base price must be positive") java.math.BigDecimal basePrice, 
             @NotNull(message = "Max guests is required") @Min(value = 1, message = "Max guests must be at least 1") Integer maxGuests, 
-            String imageUrl) {}
+            String imageUrl,
+            String amenities) {}
 
     public record UpdateRoomRequest(
             String roomNumber, 
@@ -53,7 +55,8 @@ public class InventoryResource {
             Room.RoomStatus status, 
             Integer floor,
             String imageUrl,
-            String description) {}
+            String description,
+            String amenities) {}
 
     public record UpdateRoomStatusRequest(
             @NotBlank(message = "Status is required") String status) {}
@@ -144,6 +147,7 @@ public class InventoryResource {
         if (req.floor() != null) room.floor = req.floor();
         if (req.imageUrl() != null) room.imageUrl = req.imageUrl();
         if (req.description() != null) room.description = req.description();
+        if (req.amenities() != null) room.amenities = req.amenities();
 
         return Response.ok(RoomResponse.from(room)).build();
     }
@@ -221,6 +225,7 @@ public class InventoryResource {
         room.roomType = rt;
         room.imageUrl = req.imageUrl();
         if (req.description() != null) room.description = req.description();
+        if (req.amenities() != null) room.amenities = req.amenities();
         room.persist();
 
         return Response.status(Response.Status.CREATED)
@@ -254,6 +259,7 @@ public class InventoryResource {
         if (req.basePrice() != null) rt.basePrice = req.basePrice();
         if (req.maxGuests() != null) rt.maxGuests = req.maxGuests();
         if (req.imageUrl() != null) rt.imageUrl = req.imageUrl();
+        if (req.amenities() != null) rt.amenities = req.amenities();
 
         return Response.ok(RoomTypeResponse.from(rt)).build();
     }

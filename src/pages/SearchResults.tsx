@@ -24,6 +24,36 @@ export const SearchResults: React.FC = () => {
     const [roomsData, setRoomsData] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
+    const [filters, setFilters] = useState({
+        privatePool: false,
+        oceanView: false,
+        butlerService: false,
+        balcony: false,
+        spaAccess: false,
+        fitnessCenter: false,
+        wifi: false,
+        petFriendly: false,
+        breakfast: false
+    });
+
+    const toggleFilter = (key: keyof typeof filters) => {
+        setFilters(prev => ({ ...prev, [key]: !prev[key] }));
+    };
+
+    const filteredRooms = roomsData.filter(room => {
+        const roomAmenities = (room.amenities || "").toLowerCase();
+        if (filters.privatePool && !roomAmenities.includes("pool")) return false;
+        if (filters.oceanView && !roomAmenities.includes("ocean")) return false;
+        if (filters.butlerService && !roomAmenities.includes("butler")) return false;
+        if (filters.balcony && !roomAmenities.includes("balcony")) return false;
+        if (filters.spaAccess && !roomAmenities.includes("spa")) return false;
+        if (filters.fitnessCenter && (!roomAmenities.includes("fitness") && !roomAmenities.includes("gym"))) return false;
+        if (filters.wifi && !roomAmenities.includes("wifi")) return false;
+        if (filters.petFriendly && !roomAmenities.includes("pet")) return false;
+        if (filters.breakfast && !roomAmenities.includes("breakfast")) return false;
+        return true;
+    });
+
     useEffect(() => {
       const handleScroll = () => {
         const scrolled = window.scrollY > window.innerHeight * 0.2; // Lower threshold for search page
@@ -236,39 +266,39 @@ export const SearchResults: React.FC = () => {
                         <label className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-4 block">{t('search.filters.amenities')}</label>
                         <div className="space-y-3 font-serif text-[#1A1A1A] text-sm">
                             <label className="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
+                                <input type="checkbox" checked={filters.privatePool} onChange={() => toggleFilter('privatePool')} className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
                                 <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.privatePool')}</span>
                             </label>
                             <label className="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
+                                <input type="checkbox" checked={filters.oceanView} onChange={() => toggleFilter('oceanView')} className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
                                 <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.oceanView')}</span>
                             </label>
                             <label className="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
+                                <input type="checkbox" checked={filters.butlerService} onChange={() => toggleFilter('butlerService')} className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
                                 <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.butlerService')}</span>
                             </label>
                             <label className="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
+                                <input type="checkbox" checked={filters.balcony} onChange={() => toggleFilter('balcony')} className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
                                 <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.balcony')}</span>
                             </label>
                             <label className="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
+                                <input type="checkbox" checked={filters.spaAccess} onChange={() => toggleFilter('spaAccess')} className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
                                 <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.spaAccess')}</span>
                             </label>
                             <label className="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
+                                <input type="checkbox" checked={filters.fitnessCenter} onChange={() => toggleFilter('fitnessCenter')} className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
                                 <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.fitnessCenter')}</span>
                             </label>
                             <label className="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
+                                <input type="checkbox" checked={filters.wifi} onChange={() => toggleFilter('wifi')} className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
                                 <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.wifi')}</span>
                             </label>
                             <label className="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
+                                <input type="checkbox" checked={filters.petFriendly} onChange={() => toggleFilter('petFriendly')} className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
                                 <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.petFriendly')}</span>
                             </label>
                             <label className="flex items-center gap-3 cursor-pointer group">
-                                <input type="checkbox" className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
+                                <input type="checkbox" checked={filters.breakfast} onChange={() => toggleFilter('breakfast')} className="accent-[#1A1A1A] w-4 h-4 cursor-pointer align-middle border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" />
                                 <span className="group-hover:text-[#D4AF37] transition-colors">{t('search.filters.breakfast')}</span>
                             </label>
                         </div>
@@ -277,13 +307,13 @@ export const SearchResults: React.FC = () => {
 
                 {/* Right Main Column: Rooms */}
                 <div className="md:col-span-8 lg:col-span-8 lg:col-start-5 space-y-16">
-                    <p className="text-[#6C6863] font-serif italic text-sm">{t('search.residencesAvailable', { count: roomsData.length })}</p>
+                    <p className="text-[#6C6863] font-serif italic text-sm">{t('search.residencesAvailable', { count: filteredRooms.length })}</p>
 
                     {isLoading ? (
                         <div className="py-20 flex justify-center items-center">
                             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D4AF37]"></div>
                         </div>
-                    ) : roomsData.map((room) => (
+                    ) : filteredRooms.map((room) => (
                         <div key={room.id} className="group grid grid-cols-1 lg:grid-cols-2 gap-8 border-t border-[#1A1A1A]/10 pt-16 mt-16 first:mt-4 first:pt-4">
                             <div className="overflow-hidden aspect-[4/5] relative">
                                 <img 

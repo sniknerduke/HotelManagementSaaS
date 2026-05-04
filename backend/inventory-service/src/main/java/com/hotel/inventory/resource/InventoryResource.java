@@ -27,17 +27,18 @@ public class InventoryResource {
         }
     }
 
-    public record RoomResponse(Long id, String roomNumber, Integer floor, String status, Long roomTypeId, String imageUrl) {
+    public record RoomResponse(Long id, String roomNumber, Integer floor, String status, Long roomTypeId, String imageUrl, String description) {
         public static RoomResponse from(Room room) {
             return new RoomResponse(room.id, room.roomNumber, room.floor, room.status.name(),
-                    room.roomType != null ? room.roomType.id : null, room.imageUrl);
+                    room.roomType != null ? room.roomType.id : null, room.imageUrl, room.description);
         }
     }
 
     public record CreateRoomRequest(
             @NotBlank(message = "Room number is required") String roomNumber, 
             @NotNull(message = "Room type ID is required") Long roomTypeId,
-            String imageUrl) {}
+            String imageUrl,
+            String description) {}
 
     public record UpdateRoomTypeRequest(
             @NotBlank(message = "Name is required") String name, 
@@ -51,7 +52,8 @@ public class InventoryResource {
             Long roomTypeId, 
             Room.RoomStatus status, 
             Integer floor,
-            String imageUrl) {}
+            String imageUrl,
+            String description) {}
 
     public record UpdateRoomStatusRequest(
             @NotBlank(message = "Status is required") String status) {}
@@ -141,6 +143,7 @@ public class InventoryResource {
         if (req.status() != null) room.status = req.status();
         if (req.floor() != null) room.floor = req.floor();
         if (req.imageUrl() != null) room.imageUrl = req.imageUrl();
+        if (req.description() != null) room.description = req.description();
 
         return Response.ok(RoomResponse.from(room)).build();
     }
@@ -217,6 +220,7 @@ public class InventoryResource {
         room.roomNumber = req.roomNumber();
         room.roomType = rt;
         room.imageUrl = req.imageUrl();
+        if (req.description() != null) room.description = req.description();
         room.persist();
 
         return Response.status(Response.Status.CREATED)

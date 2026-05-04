@@ -26,6 +26,9 @@ public class Room extends PanacheEntity {
     @Column(name = "image_url", columnDefinition = "TEXT")
     public String imageUrl;
 
+    @Column(name = "description", columnDefinition = "TEXT")
+    public String description;
+
     public enum RoomStatus {
         AVAILABLE, OCCUPIED, DIRTY, CLEANING, INSPECTED, MAINTENANCE, OUT_OF_ORDER
     }

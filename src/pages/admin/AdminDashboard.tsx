@@ -36,7 +36,7 @@ export const AdminDashboard: React.FC = () => {
     const [editingCategory, setEditingCategory] = useState<any>(null);
 
     const [isAddRoomModalOpen, setAddRoomModalOpen] = useState(false);
-    const [addRoomForm, setAddRoomForm] = useState({ roomNumber: '', roomTypeId: '', imageUrl: '' });
+    const [addRoomForm, setAddRoomForm] = useState({ roomNumber: '', roomTypeId: '', imageUrl: '', description: '' });
     const [editingRoom, setEditingRoom] = useState<any>(null);
 
     const [isAddStaffModalOpen, setAddStaffModalOpen] = useState(false);
@@ -243,6 +243,7 @@ export const AdminDashboard: React.FC = () => {
             await InventoryService.createRoom(addRoomForm);
             toast('Room created successfully.', 'success');
             setAddRoomModalOpen(false);
+            setAddRoomForm({ roomNumber: '', roomTypeId: '', imageUrl: '', description: '' });
             refreshData();
         } catch (err: any) {
             toast(err.message || 'Failed to create room.', 'error');
@@ -1034,6 +1035,7 @@ export const AdminDashboard: React.FC = () => {
             <Modal isOpen={isAddRoomModalOpen} onClose={() => setAddRoomModalOpen(false)} title="Add Room">
                 <form onSubmit={handleAddRoomSubmit} className="space-y-4">
                     <Input type="text" label="Room Number" value={addRoomForm.roomNumber} onChange={(e) => setAddRoomForm({ ...addRoomForm, roomNumber: e.target.value })} required />
+                    <Input type="text" label="Description" value={addRoomForm.description} onChange={(e) => setAddRoomForm({ ...addRoomForm, description: e.target.value })} />
                     <Input type="text" label="Image URL" value={addRoomForm.imageUrl} onChange={(e) => setAddRoomForm({ ...addRoomForm, imageUrl: e.target.value })} placeholder="/images/rooms/your-image.jpg" />
                     <div>
                         <label className="text-[10px] uppercase font-bold text-[#6C6863] block mb-1">Room Category</label>
@@ -1094,6 +1096,7 @@ export const AdminDashboard: React.FC = () => {
                 {editingRoom && (
                     <form onSubmit={handleEditRoomSubmit} className="space-y-4">
                         <Input type="text" label="Room Number" value={editingRoom.roomNumber} onChange={(e) => setEditingRoom({ ...editingRoom, roomNumber: e.target.value })} required />
+                        <Input type="text" label="Description" value={editingRoom.description || ''} onChange={(e) => setEditingRoom({ ...editingRoom, description: e.target.value })} />
                         <Input type="text" label="Image URL" value={editingRoom.imageUrl || ''} onChange={(e) => setEditingRoom({ ...editingRoom, imageUrl: e.target.value })} placeholder="/images/rooms/your-image.jpg" />
                         <div>
                             <label className="text-[10px] uppercase font-bold text-[#6C6863] block mb-1">Room Category</label>

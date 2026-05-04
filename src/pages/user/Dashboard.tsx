@@ -43,7 +43,7 @@ export const Dashboard: React.FC = () => {
         }
     };
 
-    const totalStays = bookings.filter(b => b.status === 'COMPLETED').length;
+    const totalStays = bookings.filter(b => b.status === 'CHECKED_OUT').length;
     const upcoming = bookings.filter(b => b.status === 'PENDING' || b.status === 'CONFIRMED').length;
     const totalSpent = bookings.filter(b => b.status !== 'CANCELLED').reduce((sum, b) => sum + (b.totalPrice || 0), 0);
 
@@ -109,7 +109,18 @@ export const Dashboard: React.FC = () => {
                                     <td className="py-6 font-serif italic group-hover:text-[#D4AF37] transition-colors duration-500">BKG-{b.id}</td>
                                     <td className="py-6 text-[#6C6863]">{b.checkInDate} to {b.checkOutDate}</td>
                                     <td className="py-6 text-[#6C6863]">Room {b.roomId}</td>
-                                    <td className="py-6"><span className={`px-3 py-1 text-[10px] uppercase tracking-[0.1em] ${b.status === 'PENDING' ? 'bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/20' : 'bg-[#1A1A1A] text-white'}`}>{b.status}</span></td>
+                                    <td className="py-6">
+                                        <span className={`px-3 py-1 text-[10px] uppercase tracking-[0.1em] border ${
+                                            b.status === 'PENDING' ? 'bg-[#D4AF37]/10 text-[#D4AF37] border-[#D4AF37]/20' : 
+                                            b.status === 'CONFIRMED' ? 'bg-blue-100/50 text-blue-700 border-blue-200' :
+                                            b.status === 'CHECKED_IN' ? 'bg-green-100/50 text-green-700 border-green-200' :
+                                            b.status === 'CHECKED_OUT' ? 'bg-gray-100/50 text-gray-700 border-gray-200' :
+                                            b.status === 'CANCELLED' ? 'bg-red-100/50 text-red-700 border-red-200' :
+                                            'bg-orange-100/50 text-orange-700 border-orange-200'
+                                        }`}>
+                                            {b.status}
+                                        </span>
+                                    </td>
                                     <td className="py-6 text-right space-x-3">
                                         {['PENDING', 'CONFIRMED'].includes(b.status) && (
                                             <button onClick={() => handleCancelReservation(b.id)} className="text-[10px] uppercase tracking-[0.2em] text-red-600 hover:text-red-800 underline underline-offset-4">Cancel</button>

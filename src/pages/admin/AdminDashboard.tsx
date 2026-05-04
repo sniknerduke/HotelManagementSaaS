@@ -522,6 +522,7 @@ export const AdminDashboard: React.FC = () => {
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end border-b border-[#1A1A1A]/20 pb-4 mb-8 gap-4">
                             <h2 className="text-3xl font-serif text-[#1A1A1A]">{t('admin.reservations.title')} <span className="italic text-[#D4AF37]">{t('admin.reservations.titleItalic')}</span></h2>
                             <div className="flex gap-4">
+                                <Button onClick={() => refreshData()} variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase font-bold tracking-[0.1em] h-10 px-4 whitespace-nowrap">Refresh</Button>
                                 <Button onClick={() => setWalkInModalOpen(true)} variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase font-bold tracking-[0.1em] h-10 px-4 whitespace-nowrap">{t('admin.reservations.walkIn')}</Button>
                                 <Button onClick={() => toast('Calendar View loading... connecting module.', 'info')} variant="primary" className="bg-[#1A1A1A] text-white hover:bg-[#D4AF37] transition-colors text-[10px] uppercase font-bold tracking-[0.1em] h-10 px-4 whitespace-nowrap">{t('admin.reservations.calendar')}</Button>
                             </div>
@@ -558,7 +559,14 @@ export const AdminDashboard: React.FC = () => {
                                             <td className="py-4 px-6 text-sm text-[#1A1A1A] font-serif italic text-[#D4AF37]">Room {booking.roomId}</td>
                                             <td className="py-4 px-6 text-xs text-[#6C6863]">{booking.checkInDate} to {booking.checkOutDate}</td>
                                             <td className="py-4 px-6">
-                                                <span className={`text-[9px] uppercase font-bold tracking-widest px-2 py-1 ${booking.status === 'CHECKED_IN' ? 'bg-green-100/50 border border-green-200 text-green-700' : 'bg-blue-100/50 border border-blue-200 text-blue-700'}`}>
+                                                <span className={`text-[9px] uppercase font-bold tracking-widest px-2 py-1 border ${
+                                                    booking.status === 'PENDING' ? 'bg-[#D4AF37]/10 text-[#D4AF37] border-[#D4AF37]/20' : 
+                                                    booking.status === 'CONFIRMED' ? 'bg-blue-100/50 text-blue-700 border-blue-200' :
+                                                    booking.status === 'CHECKED_IN' ? 'bg-green-100/50 text-green-700 border-green-200' :
+                                                    booking.status === 'CHECKED_OUT' ? 'bg-gray-100/50 text-gray-700 border-gray-200' :
+                                                    booking.status === 'CANCELLED' ? 'bg-red-100/50 text-red-700 border-red-200' :
+                                                    'bg-orange-100/50 text-orange-700 border-orange-200'
+                                                }`}>
                                                     {booking.status}
                                                 </span>
                                             </td>

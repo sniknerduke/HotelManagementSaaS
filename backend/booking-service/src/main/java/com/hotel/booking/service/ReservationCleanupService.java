@@ -2,7 +2,7 @@ package com.hotel.booking.service;
 
 import com.hotel.booking.entity.Reservation;
 import com.hotel.booking.entity.Reservation.ReservationStatus;
-import com.hotel.booking.resource.InventoryClient;
+import com.hotel.booking.client.InventoryClient;
 
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;

@@ -44,6 +44,12 @@ public class User extends PanacheEntityBase {
     @Column(name = "is_active")
     public Boolean isActive = true;
 
+    @Column(name = "reset_password_otp")
+    public String resetPasswordOtp;
+
+    @Column(name = "reset_password_expires")
+    public Instant resetPasswordExpires;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     public UserRole role = UserRole.GUEST;

@@ -10,6 +10,7 @@ prompt
 node_modules
 dist
 dist-ssr
+implementation_plan.md
 *.local
 project_overview.txt
 # Editor directories and files

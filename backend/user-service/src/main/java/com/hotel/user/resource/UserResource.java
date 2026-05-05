@@ -22,6 +22,9 @@ public class UserResource {
     @Inject
     JwtService jwtService;
 
+    @Inject
+    com.hotel.user.service.MailService mailService;
+
     // --- DTOs ---
 
     public record RegisterRequest(
@@ -34,6 +37,17 @@ public class UserResource {
     public record LoginRequest(
             @NotBlank(message = "Email is required") @Email(message = "Invalid email format") String email, 
             @NotBlank(message = "Password is required") String password) {}
+
+    public record ForgotPasswordRequest(
+            @NotBlank(message = "Email is required") @Email(message = "Invalid email format") String email) {}
+
+    public record ResetPasswordRequest(
+            @NotBlank(message = "Email is required") @Email(message = "Invalid email format") String email,
+            @NotBlank(message = "OTP is required") String otp,
+            @NotBlank(message = "New password is required") @Size(min = 6, message = "New password must be at least 6 characters") String newPassword) {}
+
+    public record NewsletterRequest(
+            @NotBlank(message = "Email is required") @Email(message = "Invalid email format") String email) {}
 
     public record UpdateProfileRequest(
             String firstName, 
@@ -108,6 +122,49 @@ public class UserResource {
         return Response.ok()
                 .entity("{\"message\": \"Login successful\", \"token\": \"" + token + "\", \"userId\": \"" + user.id + "\"}")
                 .build();
+    }
+
+    @POST
+    @Path("/forgot-password")
+    @PermitAll
+    @Transactional
+    public Response forgotPassword(@Valid ForgotPasswordRequest req) {
+        User user = User.findByEmail(req.email());
+        if (user != null && user.isActive) {
+            String otp = String.format("%06d", new java.util.Random().nextInt(999999));
+            user.resetPasswordOtp = otp;
+            user.resetPasswordExpires = java.time.Instant.now().plus(java.time.Duration.ofMinutes(15));
+            mailService.sendForgotPasswordEmail(user.email, otp);
+        }
+        // Always return 200 OK to prevent email enumeration attacks
+        return Response.ok("{\"message\": \"If an active account with that email exists, an OTP has been sent.\"}").build();
+    }
+
+    @POST
+    @Path("/reset-password")
+    @PermitAll
+    @Transactional
+    public Response resetPassword(@Valid ResetPasswordRequest req) {
+        User user = User.findByEmail(req.email());
+        if (user == null || !user.isActive) {
+             return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"Invalid request.\"}").build();
+        }
+        if (user.resetPasswordOtp == null || !user.resetPasswordOtp.equals(req.otp()) || user.resetPasswordExpires.isBefore(java.time.Instant.now())) {
+             return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\": \"Invalid or expired OTP.\"}").build();
+        }
+        
+        user.passwordHash = io.quarkus.elytron.security.common.BcryptUtil.bcryptHash(req.newPassword());
+        user.resetPasswordOtp = null;
+        user.resetPasswordExpires = null;
+        return Response.ok("{\"message\": \"Password reset successfully.\"}").build();
+    }
+
+    @POST
+    @Path("/newsletter")
+    @PermitAll
+    public Response subscribeNewsletter(@Valid NewsletterRequest req) {
+        mailService.sendNewsletterWelcome(req.email());
+        return Response.ok("{\"message\": \"Successfully subscribed to the newsletter\"}").build();
     }
 
     @GET

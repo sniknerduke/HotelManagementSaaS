@@ -3,9 +3,27 @@ import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
+import { useToast } from '../../context/ToastContext';
+import { AuthService } from '../../api';
 
 export const Footer: React.FC = () => {
   const { t } = useTranslation();
+  const { toast } = useToast();
+  const [email, setEmail] = React.useState('');
+
+  const handleSubscribe = async () => {
+    if (!email) {
+      toast('Please enter your email', 'error');
+      return;
+    }
+    try {
+      await AuthService.subscribeNewsletter({ email });
+      toast('Successfully subscribed to the newsletter!', 'success');
+      setEmail('');
+    } catch (e: any) {
+      toast(e.message || 'Failed to subscribe', 'error');
+    }
+  };
 
   return (
     <footer className="bg-[#1A1A1A] text-[#F9F8F6] pt-24 md:pt-32 pb-12 mt-24">
@@ -21,8 +39,10 @@ export const Footer: React.FC = () => {
               <Input 
                 placeholder={t('footer.emailPlaceholder') as string} 
                 className="text-[#F9F8F6] border-[#F9F8F6]/20 placeholder:text-[#6C6863] focus:border-[#D4AF37]" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
-              <Button variant="secondary" className="border-[#F9F8F6]/20 text-[#F9F8F6] hover:bg-[#D4AF37] hover:border-[#D4AF37] hover:text-[#1A1A1A] mt-2">
+              <Button onClick={handleSubscribe} variant="secondary" className="border-[#F9F8F6]/20 text-[#F9F8F6] hover:bg-[#D4AF37] hover:border-[#D4AF37] hover:text-[#1A1A1A] mt-2">
                 {t('footer.subscribe')}
               </Button>
             </div>

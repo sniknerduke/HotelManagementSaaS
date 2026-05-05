@@ -22,6 +22,7 @@ public class AmenityResource {
             String icon) {}
 
     @GET
+    @Transactional
     public Response getAllAmenities() {
         return Response.ok(Amenity.listAll()).build();
     }

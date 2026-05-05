@@ -27,6 +27,8 @@ services:
       - name: booking-route
         paths:
           - /api/bookings
+          - /api/promotions
+          - /api/analytics
         strip_path: false
 
   - name: payment-service

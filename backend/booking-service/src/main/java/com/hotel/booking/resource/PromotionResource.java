@@ -4,6 +4,8 @@ import com.hotel.booking.entity.Promotion;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -15,7 +17,12 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 public class PromotionResource {
 
-    public record PromotionRequest(String code, BigDecimal discountPercentage, boolean active) {}
+    public record PromotionRequest(
+            @NotBlank(message = "Promotion code is required") String code,
+            @NotNull(message = "Discount percentage is required")
+            @Positive(message = "Discount must be positive")
+            @DecimalMax(value = "100", message = "Discount cannot exceed 100%") BigDecimal discountPercentage,
+            boolean active) {}
 
     @GET
     @PermitAll
@@ -37,7 +44,7 @@ public class PromotionResource {
     @POST
     @RolesAllowed({"ADMIN", "MANAGER"})
     @Transactional
-    public Response createPromotion(PromotionRequest request) {
+    public Response createPromotion(@Valid PromotionRequest request) {
         if (Promotion.findByCode(request.code()) != null) {
             return Response.status(Response.Status.CONFLICT).entity("Promotion code already exists").build();
         }
@@ -53,10 +60,15 @@ public class PromotionResource {
     @Path("/{id}")
     @RolesAllowed({"ADMIN", "MANAGER"})
     @Transactional
-    public Response updatePromotion(@PathParam("id") Long id, PromotionRequest request) {
+    public Response updatePromotion(@PathParam("id") Long id, @Valid PromotionRequest request) {
         Promotion promo = Promotion.findById(id);
         if (promo == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        // Check if another promotion already uses this code
+        Promotion existing = Promotion.findByCode(request.code());
+        if (existing != null && !existing.id.equals(promo.id)) {
+            return Response.status(Response.Status.CONFLICT).entity("Promotion code already exists").build();
         }
         promo.code = request.code();
         promo.discountPercentage = request.discountPercentage();

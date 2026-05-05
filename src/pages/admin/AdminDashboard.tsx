@@ -189,14 +189,14 @@ export const AdminDashboard: React.FC = () => {
         e.preventDefault();
         try {
             if (!walkInForm.userId || !walkInForm.roomId) throw new Error("User and Room must be selected.");
-            await BookingService.createBooking({
+            const newBooking = await BookingService.createBooking({
                 userId: walkInForm.userId,
                 roomId: Number(walkInForm.roomId),
                 checkInDate: walkInForm.checkInDate,
                 checkOutDate: walkInForm.checkOutDate,
                 totalPrice: Number(walkInForm.totalPrice)
             });
-            await BookingService.checkIn(1 /* placeholder */);
+            await BookingService.checkIn(newBooking.id);
             toast('Walk-In booking created successfully!', 'success');
             setWalkInModalOpen(false);
             refreshData();

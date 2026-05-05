@@ -117,13 +117,13 @@ export const Contact: React.FC = () => {
                         
                         <div className="mb-8">
                             <h4 className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-3">{t('contact.info.addressTitle')}</h4>
-                            <p className="font-serif text-xl text-[#1A1A1A] leading-relaxed">124 Luxury Avenue<br/>Historic District, Metropolis 10001</p>
+                            <p className="font-serif text-xl text-[#1A1A1A] leading-relaxed">1 Le Duan Boulevard<br/>District 1, Ho Chi Minh City, Vietnam</p>
                         </div>
                         
                         {/* Embedded Interactive Map (Google Maps iframe) */}
                         <div className="w-full h-[300px] bg-[#1A1A1A]/5 mb-8 relative grayscale hover:grayscale-0 transition-all duration-700 border border-[#1A1A1A]/10">
                             <iframe 
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d193595.15830869428!2d-74.119763973046!3d40.69766374874431!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sNew%20York%2C%20NY%2C%20USA!5e0!3m2!1sen!2s!4v1698263152917!5m2!1sen!2s" 
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.2618999335193!2d106.69994641474921!3d10.783688192316531!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f4a0c8b9d3b%3A0x6b45d2f623ec2844!2sDistrict%201%2C%20Ho%20Chi%20Minh%20City!5e0!3m2!1sen!2s!4v1698263152917!5m2!1sen!2s" 
                                 width="100%" 
                                 height="100%" 
                                 style={{ border: 0 }} 

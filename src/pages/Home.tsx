@@ -442,7 +442,7 @@ export const Home: React.FC = () => {
              
              <div className="mb-10">
                <h4 className="text-xs uppercase tracking-[0.1em] font-bold mb-4 border-b border-[#F9F8F6]/20 pb-2 text-[#D4AF37]">{t('contact.info.addressTitle')}</h4>
-               <p className="font-serif text-lg text-[#F9F8F6]/80 leading-relaxed">124 Luxury Avenue<br/>Historic District, Metropolis 10001</p>
+               <p className="font-serif text-lg text-[#F9F8F6]/80 leading-relaxed">1 Le Duan Boulevard<br/>District 1, Ho Chi Minh City, Vietnam</p>
              </div>
              
              <div className="mb-10">

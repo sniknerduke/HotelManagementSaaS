@@ -39,9 +39,9 @@ graph LR
 
 ---
 
-## P5 — Vietnam Maps & Location Info
+## P5 — Vietnam Maps & Location Info (Completed)
 
-> Currently, maps and location info are generic placeholders.
+> Replaced generic placeholders with District 1, Ho Chi Minh City, Vietnam.
 
 1. **[MODIFY] `Home.tsx` & `Contact.tsx`**: Update the Map coordinates and iframe to point to District 1, Ho Chi Minh City, Vietnam.
 2. **[MODIFY] `SearchResults.tsx`**: Update the map coordinates shown next to the search results.

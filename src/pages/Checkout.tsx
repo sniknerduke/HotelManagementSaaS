@@ -36,7 +36,7 @@ export const Checkout: React.FC = () => {
                 setDiscountPercentage(0);
             }
         } catch (e: any) {
-            setPromoError(e.response?.data || 'Invalid promotion code');
+            setPromoError(e.message || 'Invalid promotion code');
             setDiscountPercentage(0);
         } finally {
             setApplyingPromo(false);
@@ -45,8 +45,11 @@ export const Checkout: React.FC = () => {
 
     const [guestInfo, setGuestInfo] = useState({ firstName: user?.firstName || '', lastName: user?.lastName || '', email: user?.email || '', phone: user?.phoneNumber || '' });
     
-    // Resolve an actual available room for the requested room type
+    // Read booking parameters from URL search params
     const roomTypeId = parseInt(searchParams.get('roomType') || '1');
+    const checkInDate = searchParams.get('checkIn') || '2026-05-12';
+    const checkOutDate = searchParams.get('checkOut') || '2026-05-15';
+    const nights = Math.max(1, Math.round((new Date(checkOutDate).getTime() - new Date(checkInDate).getTime()) / (1000 * 60 * 60 * 24)));
     const [roomId, setRoomId] = useState<number | null>(null);
     const [roomLoading, setRoomLoading] = useState(true);
     const [roomTypeName, setRoomTypeName] = useState<string>('');
@@ -83,8 +86,8 @@ export const Checkout: React.FC = () => {
 
     const roomPriceParam = searchParams.get('price');
     const roomPrice = parseInt(roomPriceParam || '450');
-    const baseAmount = isNaN(roomPrice) ? 0 : (roomPrice * 3) + 142; // Taxes and fees
-    const discountAmount = discountPercentage > 0 && !isNaN(roomPrice) ? (roomPrice * 3) * (discountPercentage / 100) : 0;
+    const baseAmount = isNaN(roomPrice) ? 0 : (roomPrice * nights) + 142; // Taxes and fees
+    const discountAmount = discountPercentage > 0 && !isNaN(roomPrice) ? (roomPrice * nights) * (discountPercentage / 100) : 0;
     const totalAmount = baseAmount - discountAmount;
 
     const handleNext = () => setStep(s => Math.min(s + 1, 3) as 1 | 2 | 3);
@@ -116,8 +119,8 @@ export const Checkout: React.FC = () => {
             const bookingRes = await BookingService.createBooking({
                 roomId: roomId,
                 userId: user.id,
-                checkInDate: "2026-05-12",
-                checkOutDate: "2026-05-15",
+                checkInDate: checkInDate,
+                checkOutDate: checkOutDate,
                 totalPrice: totalAmount,
                 adultCount: 2,
                 childCount: 0
@@ -231,12 +234,12 @@ export const Checkout: React.FC = () => {
                          </div>
                          
                          <h4 className="text-2xl font-serif text-[#1A1A1A] mb-2">{roomTypeName || 'Room'}</h4>
-                         <p className="text-xs text-[#6C6863] mb-6 pb-6 border-b border-[#1A1A1A]/10">May 12 - May 15, 2026 • 2 Guests</p>
+                         <p className="text-xs text-[#6C6863] mb-6 pb-6 border-b border-[#1A1A1A]/10">{checkInDate} - {checkOutDate} • 2 Guests</p>
 
                          <div className="space-y-4 text-sm font-medium">
                              <div className="flex justify-between items-center text-[#6C6863]">
-                                 <span>{t('checkout.summary.nights', { count: 3, price: roomPrice })}</span>
-                                 <span className="text-[#1A1A1A] font-serif">${roomPrice * 3}</span>
+                                 <span>{t('checkout.summary.nights', { count: nights, price: roomPrice })}</span>
+                                 <span className="text-[#1A1A1A] font-serif">${roomPrice * nights}</span>
                              </div>
                              <div className="flex justify-between items-center text-[#6C6863]">
                                  <span>{t('checkout.summary.taxes')}</span>

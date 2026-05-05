@@ -119,8 +119,8 @@ export const SearchResults: React.FC = () => {
                 <button onClick={(e) => e.stopPropagation()} className="text-[#1A1A1A]/40 hover:text-[#1A1A1A] transition-colors h-8 w-8 flex items-center justify-center border border-transparent hover:border-[#1A1A1A]/20">→</button>
               </div>
               <div className="grid grid-cols-7 gap-2 text-center mb-4">
-                {['S','M','T','W','T','F','S'].map(d => (
-                   <span key={d} className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863]/60">{d}</span>
+                {['S','M','T','W','T','F','S'].map((d, i) => (
+                   <span key={i} className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863]/60">{d}</span>
                 ))}
               </div>
               <div className="grid grid-cols-7 gap-y-4 gap-x-0 overflow-hidden text-center font-serif text-lg">

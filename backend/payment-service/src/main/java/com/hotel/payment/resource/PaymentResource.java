@@ -58,6 +58,12 @@ public class PaymentResource {
     @RolesAllowed({"GUEST", "STAFF", "ADMIN"})
     @Transactional
     public Response createPayment(@Valid CreatePaymentRequest req, @jakarta.ws.rs.core.Context jakarta.ws.rs.core.UriInfo uriInfo) {
+        long completedPayments = Payment.count("reservationId = ?1 and status = ?2", req.reservationId(), PaymentStatus.COMPLETED);
+        if (completedPayments > 0) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"Payment already completed for this reservation.\"}")
+                    .build();
+        }
         Payment payment = new Payment();
         payment.reservationId = req.reservationId();
         payment.paymentMethod = req.paymentMethod();

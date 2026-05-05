@@ -97,6 +97,17 @@ public class BookingResource {
                         .entity("{\"error\": \"Room is not available\"}")
                         .build();
             }
+
+            long overlapping = Reservation.count(
+                    "roomId = ?1 and status != ?2 and checkInDate < ?4 and checkOutDate > ?3", 
+                    req.roomId(), ReservationStatus.CANCELLED, req.checkInDate(), req.checkOutDate()
+            );
+            if (overlapping > 0) {
+                return Response.status(Response.Status.CONFLICT)
+                        .entity("{\"error\": \"Room is already booked for these dates.\"}")
+                        .build();
+            }
+
             inventoryClient.updateRoomStatus(req.roomId(), new InventoryClient.UpdateStatusRequest("OCCUPIED"));
         } catch (Exception e) {
             String errorMessage = e.getMessage();

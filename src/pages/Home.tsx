@@ -66,18 +66,8 @@ export const Home: React.FC = () => {
 
   const SearchBarContent = ({ isSticky = false }: { isSticky?: boolean }) => (
     <>
-      {/* Location */}
-      <div className={`flex-[1.5] w-full border-b md:border-b-0 md:border-r border-[#1A1A1A]/10 ${isSticky ? 'pb-2 md:pb-0 md:pr-6 xl:pr-8' : 'pb-4 md:pb-0 md:pr-8 xl:pr-12'} group cursor-text`}>
-        <label className={`block uppercase font-bold tracking-[0.2em] text-[#6C6863] group-hover:text-[#1A1A1A] transition-colors ${isSticky ? 'text-[8px] mb-1' : 'text-[10px] mb-3'}`}>{t('home.destination')}</label>
-        <input 
-          type="text" 
-          placeholder={t('home.whereTo')} 
-          className={`w-full bg-transparent border-none outline-none text-[#1A1A1A] font-serif placeholder:text-[#1A1A1A]/30 focus:ring-0 p-0 ${isSticky ? 'text-lg xl:text-xl' : 'text-xl xl:text-3xl'}`} 
-        />
-      </div>
-
       {/* Dates / Custom Luxury Date Picker Trigger */}
-      <div className="flex-[2] w-full border-b md:border-b-0 md:border-r border-[#1A1A1A]/10 group cursor-pointer relative">
+      <div className={`flex-1 w-full border-b md:border-b-0 md:border-r border-[#1A1A1A]/10 group cursor-pointer relative`}>
         <div className={isSticky ? 'pb-2 md:pb-0 md:px-6 xl:px-8' : 'pb-4 md:pb-0 md:px-8 xl:px-12'}>
           <label className={`block uppercase font-bold tracking-[0.2em] text-[#6C6863] group-hover:text-[#1A1A1A] transition-colors ${isSticky ? 'text-[8px] mb-1' : 'text-[10px] mb-3'}`}>{t('home.checkInCheckOut')}</label>
           <div 

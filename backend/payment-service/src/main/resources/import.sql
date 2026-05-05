@@ -8,3 +8,5 @@ INSERT INTO payments (id, reservation_id, amount, payment_method, transaction_id
 VALUES (3, 3, 200.00, 'CREDIT_CARD', 'TXN-5555555555', 'COMPLETED', CURRENT_TIMESTAMP - INTERVAL '10' DAY);
 
 ALTER SEQUENCE payments_SEQ RESTART WITH 100;
+
+CREATE UNIQUE INDEX idx_unique_completed_payment ON payments(reservation_id) WHERE status = 'COMPLETED';

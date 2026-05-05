@@ -109,7 +109,9 @@ public class PaymentResource {
             String vnp_ResponseCode = params.get("vnp_ResponseCode");
             String vnp_TxnRef = params.get("vnp_TxnRef");
             
-            Payment payment = Payment.find("transactionId", vnp_TxnRef).firstResult();
+            Payment payment = Payment.find("transactionId", vnp_TxnRef)
+                    .withLock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+                    .firstResult();
             if (payment != null && payment.status == PaymentStatus.PENDING) {
                 if ("00".equals(vnp_ResponseCode)) {
                     payment.status = PaymentStatus.COMPLETED;
@@ -144,7 +146,9 @@ public class PaymentResource {
             String vnp_ResponseCode = params.get("vnp_ResponseCode");
             String vnp_TxnRef = params.get("vnp_TxnRef");
             
-            Payment payment = Payment.find("transactionId", vnp_TxnRef).firstResult();
+            Payment payment = Payment.find("transactionId", vnp_TxnRef)
+                    .withLock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+                    .firstResult();
             if (payment != null) {
                 if (payment.status == PaymentStatus.PENDING) {
                     if ("00".equals(vnp_ResponseCode)) {

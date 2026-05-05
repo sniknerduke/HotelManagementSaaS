@@ -98,11 +98,11 @@ public class BookingResource {
                         .build();
             }
 
-            long overlapping = Reservation.count(
+            List<Reservation> overlapping = Reservation.<Reservation>find(
                     "roomId = ?1 and status != ?2 and checkInDate < ?4 and checkOutDate > ?3", 
                     req.roomId(), ReservationStatus.CANCELLED, req.checkInDate(), req.checkOutDate()
-            );
-            if (overlapping > 0) {
+            ).withLock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE).list();
+            if (!overlapping.isEmpty()) {
                 return Response.status(Response.Status.CONFLICT)
                         .entity("{\"error\": \"Room is already booked for these dates.\"}")
                         .build();

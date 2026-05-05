@@ -19,6 +19,8 @@ import java.util.UUID;
 @Consumes(MediaType.APPLICATION_JSON)
 public class UserResource {
 
+    private static final java.security.SecureRandom SECURE_RANDOM = new java.security.SecureRandom();
+
     @Inject
     JwtService jwtService;
 
@@ -131,7 +133,7 @@ public class UserResource {
     public Response forgotPassword(@Valid ForgotPasswordRequest req) {
         User user = User.findByEmail(req.email());
         if (user != null && user.isActive) {
-            String otp = String.format("%06d", new java.util.Random().nextInt(999999));
+            String otp = String.format("%06d", SECURE_RANDOM.nextInt(1000000));
             user.resetPasswordOtp = otp;
             user.resetPasswordExpires = java.time.Instant.now().plus(java.time.Duration.ofMinutes(15));
             mailService.sendForgotPasswordEmail(user.email, otp);

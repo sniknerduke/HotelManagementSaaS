@@ -32,6 +32,7 @@ public interface InventoryClient {
             @jakarta.ws.rs.QueryParam("type") Long typeId,
             @jakarta.ws.rs.QueryParam("floor") Integer floor);
 
-    record RoomDTO(Long id, String roomNumber, String status) {}
+    record RoomTypeDTO(Long id, String name, java.math.BigDecimal basePrice) {}
+    record RoomDTO(Long id, String roomNumber, String status, RoomTypeDTO roomType) {}
     record UpdateStatusRequest(String status) {}
 }

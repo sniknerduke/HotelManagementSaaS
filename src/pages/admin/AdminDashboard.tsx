@@ -47,6 +47,26 @@ export const AdminDashboard: React.FC = () => {
     const [editingStaffRole, setEditingStaffRole] = useState<any>(null);
     const [editingUser, setEditingUser] = useState<any>(null);
     
+    // Auto-calculate walk-in booking total price based on per-day/per-night rate
+    useEffect(() => {
+        if (walkInForm.checkInDate && walkInForm.checkOutDate && walkInForm.roomId) {
+            const checkIn = new Date(walkInForm.checkInDate).getTime();
+            const checkOut = new Date(walkInForm.checkOutDate).getTime();
+            if (!isNaN(checkIn) && !isNaN(checkOut) && checkOut > checkIn) {
+                const nights = Math.max(1, Math.round((checkOut - checkIn) / (1000 * 60 * 60 * 24)));
+                const selectedRoom = rooms.find(r => r.id === Number(walkInForm.roomId));
+                const pricePerNight = selectedRoom?.roomType?.basePrice || 0;
+                setWalkInForm(prev => {
+                    const computedTotal = nights * pricePerNight;
+                    if (prev.totalPrice !== computedTotal) {
+                        return { ...prev, totalPrice: computedTotal };
+                    }
+                    return prev;
+                });
+            }
+        }
+    }, [walkInForm.checkInDate, walkInForm.checkOutDate, walkInForm.roomId, rooms]);
+
     const [viewingPayment, setViewingPayment] = useState<any>(null);
 
     const [settings, setSettings] = useState({
@@ -1072,7 +1092,7 @@ export const AdminDashboard: React.FC = () => {
                         <Input type="date" label="Check In" value={walkInForm.checkInDate} onChange={(e) => setWalkInForm({ ...walkInForm, checkInDate: e.target.value })} required />
                         <Input type="date" label="Check Out" value={walkInForm.checkOutDate} onChange={(e) => setWalkInForm({ ...walkInForm, checkOutDate: e.target.value })} required />
                     </div>
-                    <Input type="number" label="Total Price (USD)" value={walkInForm.totalPrice} onChange={(e) => setWalkInForm({ ...walkInForm, totalPrice: Number(e.target.value) })} required />
+                    <Input type="number" label="Calculated Total Price (USD - per night)" value={walkInForm.totalPrice} disabled className="bg-gray-100" required />
                     <Button type="submit" variant="primary" className="w-full mt-4 bg-[#1A1A1A] text-white">Create Walk-In Booking</Button>
                 </form>
             </Modal>

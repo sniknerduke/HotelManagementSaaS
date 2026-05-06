@@ -319,7 +319,10 @@ export const Home: React.FC = () => {
                   </div>
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="text-2xl font-serif">{room.name}</h3>
-                    <span className="text-[#D4AF37] font-serif whitespace-nowrap ml-4">{t('home.accommodations.from')} ${room.basePrice}</span>
+                    <span className="text-[#D4AF37] font-serif whitespace-nowrap ml-4">
+                      {t('home.accommodations.from')} ${room.basePrice} 
+                      <span className="text-sm italic opacity-80"> / {t('search.night')}</span>
+                    </span>
                   </div>
                   <div className="flex justify-between items-end">
                     <p className="text-sm text-[#F9F8F6]/60">{t('home.accommodations.upToGuests', { count: room.maxGuests || 2 })} • {room.availableCount || 0} available</p>

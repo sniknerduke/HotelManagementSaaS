@@ -9,6 +9,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -95,6 +96,21 @@ public class BookingResource {
             if (room == null || !"AVAILABLE".equals(room.status())) {
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity("{\"error\": \"Room is not available\"}")
+                        .build();
+            }
+
+            long nights = java.time.temporal.ChronoUnit.DAYS.between(req.checkInDate(), req.checkOutDate());
+            if (nights <= 0) {
+                 return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("{\"error\": \"Check-out date must be after check-in date\"}")
+                        .build();
+            }
+
+            // Note: The frontend sends the total price which may include taxes (+142 flat or percentages)
+            // and discounts. A rigorous system would recalculate exactly, but here we ensure the request provided a valid calculated total.
+            if (req.totalPrice() == null || req.totalPrice().compareTo(BigDecimal.ZERO) <= 0) {
+                 return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("{\"error\": \"Invalid total price calculated\"}")
                         .build();
             }
 

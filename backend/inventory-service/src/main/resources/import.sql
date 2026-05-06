@@ -7,7 +7,7 @@ INSERT INTO amenities (id, name, description, icon) VALUES
 (3, 'Fitness Center / Gym', 'State-of-the-art gym and fitness equipment.', 'fitness_center'),
 (4, 'Spa & Wellness Center', 'Relaxing spa treatments and massage therapies.', 'spa'),
 (5, 'On-site Restaurant & Bar', 'World-class dining serving local and international cuisine.', 'restaurant'),
-(6, 'Air Conditioning / Climate Control', 'Individual climate control in every room.', 'ac_unit'),
+(6, 'Air Conditioning / Climate Control', 'Indicqcqcqvidual climate control in every room.', 'ac_unit'),
 (7, 'Flat-screen TV', 'Smart TV with premium channels.', 'tv'),
 (8, 'Curated Minibar', 'Fully stocked minibar with premium drinks and snacks.', 'kitchen'),
 (9, 'En-suite Bathroom', 'Luxurious bathtub and shower with complimentary toiletries.', 'bathtub'),

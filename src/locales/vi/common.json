@@ -259,12 +259,12 @@
   "admin": {
     "sidebar": {
       "title": "Quản trị",
-      "overview": "1. Tổng quan Toàn cầu",
-      "reservations": "2. Đặt phòng",
-      "inventory": "3. Quản lý phòng",
-      "users": "4. Người dùng & Nhân lực",
-      "reports": "5. Báo cáo & Phân tích",
-      "settings": "6. Cài đặt Hệ thống"
+      "overview": "Tổng quan Toàn cầu",
+      "reservations": "Đặt phòng",
+      "inventory": "Quản lý phòng",
+      "users": "Người dùng & Nhân lực",
+      "reports": "Báo cáo & Phân tích",
+      "settings": "Cài đặt Hệ thống"
     },
     "overview": {
       "title": "Bảng",

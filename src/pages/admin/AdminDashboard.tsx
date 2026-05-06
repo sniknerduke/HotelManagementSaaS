@@ -423,6 +423,7 @@ export const AdminDashboard: React.FC = () => {
         e.preventDefault();
         try {
             await AuthService.register(addStaffForm);
+            setAddStaffForm({ firstName: '', lastName: '', email: '', password: '', phoneNumber: '' });
             toast('Account created. Please assign a specific role if needed.', 'success');
             setAddStaffModalOpen(false);
             refreshData();
@@ -808,7 +809,7 @@ export const AdminDashboard: React.FC = () => {
                     <div className="animate-in fade-in duration-500">
                         <div className="flex justify-between items-end border-b border-[#1A1A1A]/20 pb-4 mb-8">
                             <h2 className="text-3xl font-serif text-[#1A1A1A]">{t('admin.users.title')} <span className="italic text-[#D4AF37]">{t('admin.users.titleItalic')}</span></h2>
-                            <Button onClick={() => alert('Available in v2.0')} variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase tracking-widest font-bold h-10 px-6">{t('admin.users.addNew')}</Button>
+                            <Button onClick={() => setAddStaffModalOpen(true)} variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase tracking-widest font-bold h-10 px-6">{t('admin.users.addNew')}</Button>
                         </div>
                         
                         <div className="overflow-x-auto border border-[#1A1A1A]/10 bg-white">
@@ -1151,7 +1152,7 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                     <Input type="email" label="Email Address" value={addStaffForm.email} onChange={(e) => setAddStaffForm({ ...addStaffForm, email: e.target.value })} required />
                     <Input type="password" label="Temporary Password" value={addStaffForm.password} onChange={(e) => setAddStaffForm({ ...addStaffForm, password: e.target.value })} required />
-                    <Input type="text" label="Phone Number" value={addStaffForm.phoneNumber} onChange={(e) => setAddStaffForm({ ...addStaffForm, phoneNumber: e.target.value })} />
+                    <Input type="tel" label="Phone Number" value={addStaffForm.phoneNumber} onChange={(e) => setAddStaffForm({ ...addStaffForm, phoneNumber: e.target.value })} required />
                     <Button type="submit" variant="primary" className="w-full mt-4 bg-[#1A1A1A] text-white">Register Account</Button>
                 </form>
             </Modal>

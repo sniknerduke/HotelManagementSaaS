@@ -11,7 +11,10 @@ const handleResponse = async (response: Response) => {
         } catch (e) {
             // handle empty body on non-ok status
         }
-        throw new Error((errorData as any).error || `API request failed with status ${response.status}`);
+        const errorMessage = (errorData as any).error 
+            || ((errorData as any).errors && (errorData as any).errors[0]?.message) 
+            || `API request failed with status ${response.status}`;
+        throw new Error(errorMessage);
     }
     
     // Check if the response is empty (like 204 No Content)

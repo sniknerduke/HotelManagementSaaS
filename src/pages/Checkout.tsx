@@ -8,6 +8,8 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useSearchParams } from 'react-router-dom';
 
+const VAT_RATE = 0.10; // 10%
+
 export const Checkout: React.FC = () => {
     const { t } = useTranslation();
     const { user } = useAuth();
@@ -46,24 +48,32 @@ export const Checkout: React.FC = () => {
     const [guestInfo, setGuestInfo] = useState({ firstName: user?.firstName || '', lastName: user?.lastName || '', email: user?.email || '', phone: user?.phoneNumber || '' });
     
     // Read booking parameters from URL search params
-    const roomTypeId = parseInt(searchParams.get('roomType') || '1');
-    const checkInDate = searchParams.get('checkIn') || '2026-05-12';
-    const checkOutDate = searchParams.get('checkOut') || '2026-05-15';
-    const nights = Math.max(1, Math.round((new Date(checkOutDate).getTime() - new Date(checkInDate).getTime()) / (1000 * 60 * 60 * 24)));
+    const roomTypeId = parseInt(searchParams.get('roomType') || '1') || 1;
+    const checkInDate = searchParams.get('checkIn') || '';
+    const checkOutDate = searchParams.get('checkOut') || '';
+    const adultsParam = parseInt(searchParams.get('adults') || '2');
+    const childrenParam = parseInt(searchParams.get('children') || '0');
+
+    const nights = (checkInDate && checkOutDate && checkInDate !== 'undefined' && checkOutDate !== 'undefined')
+        ? Math.max(1, Math.round((new Date(checkOutDate).getTime() - new Date(checkInDate).getTime()) / (1000 * 60 * 60 * 24)))
+        : 0;
+
     const [roomId, setRoomId] = useState<number | null>(null);
     const [roomLoading, setRoomLoading] = useState(true);
     const [roomTypeName, setRoomTypeName] = useState<string>('');
     const [roomTypeImage, setRoomTypeImage] = useState<string>('');
+    const [roomPrice, setRoomPrice] = useState<number>(0);
 
     useEffect(() => {
         const resolveRoom = async () => {
             try {
-                // Fetch room type info for display
+                // Fetch room type info for display and pricing
                 try {
                     const rtInfo = await InventoryService.getRoomType(roomTypeId);
                     if (rtInfo) {
                         setRoomTypeName(rtInfo.name || '');
                         setRoomTypeImage(rtInfo.imageUrl || '');
+                        setRoomPrice(Number(rtInfo.basePrice) || 0);
                     }
                 } catch (_) { /* non-critical */ }
 
@@ -84,11 +94,17 @@ export const Checkout: React.FC = () => {
         resolveRoom();
     }, [roomTypeId]);
 
-    const roomPriceParam = searchParams.get('price');
-    const roomPrice = parseInt(roomPriceParam || '450');
-    const baseAmount = isNaN(roomPrice) ? 0 : (roomPrice * nights) + 142; // Taxes and fees
-    const discountAmount = discountPercentage > 0 && !isNaN(roomPrice) ? (roomPrice * nights) * (discountPercentage / 100) : 0;
-    const totalAmount = baseAmount - discountAmount;
+    // Per-night pricing with 10% VAT
+    const subtotal = roomPrice * nights;
+    const vatAmount = subtotal * VAT_RATE;
+    const discountAmount = discountPercentage > 0 ? subtotal * (discountPercentage / 100) : 0;
+    const totalAmount = subtotal + vatAmount - discountAmount;
+
+    const fmtDate = (s: string) => {
+        if (!s) return '—';
+        const d = new Date(s + 'T00:00:00');
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
 
     const handleNext = () => setStep(s => Math.min(s + 1, 3) as 1 | 2 | 3);
     const handlePrev = () => setStep(s => Math.max(s - 1, 1) as 1 | 2 | 3);
@@ -108,6 +124,12 @@ export const Checkout: React.FC = () => {
             return;
         }
 
+        if (!checkInDate || !checkOutDate) {
+            toast("Please select valid dates.", "error");
+            setLoading(false);
+            return;
+        }
+
         if (totalAmount <= 0) {
             toast("Invalid booking amount.", "error");
             setLoading(false);
@@ -115,25 +137,23 @@ export const Checkout: React.FC = () => {
         }
 
         try {
-            // 1. Create Booking
+            // 1. Create Booking — price is calculated server-side
             const bookingRes = await BookingService.createBooking({
                 roomId: roomId,
                 userId: user.id,
                 checkInDate: checkInDate,
                 checkOutDate: checkOutDate,
-                totalPrice: totalAmount,
-                adultCount: 2,
-                childCount: 0
+                adultCount: adultsParam,
+                childCount: childrenParam
             });
 
             // 2. Process Payment via VNPay
             const paymentRes = await PaymentService.createPayment({
                 reservationId: bookingRes.id,
                 paymentMethod: "VNPAY",
-                amount: totalAmount
+                amount: bookingRes.totalPrice // use server-calculated price
             });
 
-            // Assuming paymentRes contains a paymentUrl to redirect to VNPay
             if (paymentRes.paymentUrl) {
                 window.location.href = paymentRes.paymentUrl;
             } else {
@@ -234,16 +254,18 @@ export const Checkout: React.FC = () => {
                          </div>
                          
                          <h4 className="text-2xl font-serif text-[#1A1A1A] mb-2">{roomTypeName || 'Room'}</h4>
-                         <p className="text-xs text-[#6C6863] mb-6 pb-6 border-b border-[#1A1A1A]/10">{checkInDate} - {checkOutDate} • 2 Guests</p>
+                         <p className="text-xs text-[#6C6863] mb-6 pb-6 border-b border-[#1A1A1A]/10">
+                            {fmtDate(checkInDate)} — {fmtDate(checkOutDate)} • {adultsParam} Adult{adultsParam > 1 ? 's' : ''}{childrenParam > 0 ? `, ${childrenParam} Child${childrenParam > 1 ? 'ren' : ''}` : ''}
+                         </p>
 
                          <div className="space-y-4 text-sm font-medium">
                              <div className="flex justify-between items-center text-[#6C6863]">
-                                 <span>{t('checkout.summary.nights', { count: nights, price: roomPrice })}</span>
-                                 <span className="text-[#1A1A1A] font-serif">${roomPrice * nights}</span>
+                                 <span>${roomPrice} × {nights} night{nights > 1 ? 's' : ''}</span>
+                                 <span className="text-[#1A1A1A] font-serif">${subtotal.toLocaleString()}</span>
                              </div>
                              <div className="flex justify-between items-center text-[#6C6863]">
-                                 <span>{t('checkout.summary.taxes')}</span>
-                                 <span className="text-[#1A1A1A] font-serif">$142</span>
+                                 <span>VAT (10%)</span>
+                                 <span className="text-[#1A1A1A] font-serif">${vatAmount.toFixed(2)}</span>
                              </div>
                              {discountAmount > 0 && (
                                  <div className="flex justify-between items-center text-green-600">
@@ -276,7 +298,7 @@ export const Checkout: React.FC = () => {
 
                          <div className="mt-8 pt-6 border-t border-[#1A1A1A]/20 flex justify-between items-end">
                              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#1A1A1A]">{t('checkout.summary.total')}</span>
-                             <span className="text-3xl font-serif text-[#D4AF37]">${totalAmount.toLocaleString()}</span>
+                             <span className="text-3xl font-serif text-[#D4AF37]">${totalAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                          </div>
                     </Card>
                 </div>

@@ -26,8 +26,44 @@ export const Home: React.FC = () => {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
   const [activeDatePicker, setActiveDatePicker] = useState<'sticky' | 'normal' | null>(null);
-  const [checkIn, setCheckIn] = useState<number | null>(null);
-  const [checkOut, setCheckOut] = useState<number | null>(null);
+  const [checkIn, setCheckIn] = useState<Date | null>(null);
+  const [checkOut, setCheckOut] = useState<Date | null>(null);
+  const [calendarMonth, setCalendarMonth] = useState(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const maxDate = new Date(today); maxDate.setMonth(maxDate.getMonth() + 3);
+
+  const fmtDate = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const toISO = (d: Date) => {
+      const offset = d.getTimezoneOffset() * 60000;
+      return new Date(d.getTime() - offset).toISOString().split('T')[0];
+  };
+  const isSameDay = (a: Date, b: Date) => a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+
+  const prevMonth = () => {
+    const p = new Date(calendarMonth); p.setMonth(p.getMonth()-1);
+    if (p >= new Date(today.getFullYear(), today.getMonth(), 1)) setCalendarMonth(p);
+  };
+  const nextMonth = () => {
+    const n = new Date(calendarMonth); n.setMonth(n.getMonth()+1);
+    if (n <= new Date(maxDate.getFullYear(), maxDate.getMonth(), 1)) setCalendarMonth(n);
+  };
+
+  const calendarDays = () => {
+    const year = calendarMonth.getFullYear(), month = calendarMonth.getMonth();
+    const firstDow = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month+1, 0).getDate();
+    const blanks = Array.from({length: firstDow}, () => null);
+    const days = Array.from({length: daysInMonth}, (_, i) => new Date(year, month, i+1));
+    return [...blanks, ...days];
+  };
+
+  const handleDayClick = (day: Date) => {
+    if (day < today || day > maxDate) return;
+    if (!checkIn || (checkIn && checkOut)) { setCheckIn(day); setCheckOut(null); }
+    else if (day > checkIn) { setCheckOut(day); setActiveDatePicker(null); }
+    else { setCheckIn(day); setCheckOut(null); }
+  };
   
   const [activeGuestPicker, setActiveGuestPicker] = useState<'sticky' | 'normal' | null>(null);
   const [adults, setAdults] = useState(2);
@@ -78,7 +114,7 @@ export const Home: React.FC = () => {
             }}
           >
             <span className={`font-serif transition-colors ${isSticky ? 'text-lg xl:text-xl' : 'text-xl xl:text-3xl'} ${!checkIn ? 'text-[#1A1A1A]/30' : 'text-[#1A1A1A]'}`}>
-              {!checkIn ? t('home.addDates') : !checkOut ? `May ${checkIn} - ${t('home.checkout')}` : `May ${checkIn} - May ${checkOut}`}
+              {!checkIn ? t('home.addDates') : !checkOut ? `${fmtDate(checkIn)} - ${t('home.checkout')}` : `${fmtDate(checkIn)} - ${fmtDate(checkOut)}`}
             </span>
             <svg className={`w-4 h-4 text-[#1A1A1A]/40 transition-transform duration-500 transform ${activeDatePicker === (isSticky ? 'sticky' : 'normal') ? 'rotate-180 text-[#1A1A1A]' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M19 9l-7 7-7-7"></path>
@@ -90,44 +126,29 @@ export const Home: React.FC = () => {
         {activeDatePicker === (isSticky ? 'sticky' : 'normal') && (
           <div className="absolute top-[120%] left-0 w-[400px] bg-[#F9F8F6] border border-[#1A1A1A]/10 shadow-[0_32px_64px_rgba(0,0,0,0.2)] z-50 p-8 animate-in fade-in slide-in-from-top-4 duration-500">
             <div className="flex justify-between items-center mb-8">
-              <button onClick={(e) => e.stopPropagation()} className="text-[#1A1A1A]/40 hover:text-[#1A1A1A] transition-colors h-8 w-8 flex items-center justify-center border border-transparent hover:border-[#1A1A1A]/20">←</button>
-              <span className="font-serif italic text-xl text-[#1A1A1A]">May 2026</span>
-              <button onClick={(e) => e.stopPropagation()} className="text-[#1A1A1A]/40 hover:text-[#1A1A1A] transition-colors h-8 w-8 flex items-center justify-center border border-transparent hover:border-[#1A1A1A]/20">→</button>
+              <button onClick={(e) => { e.stopPropagation(); prevMonth(); }} className="text-[#1A1A1A]/40 hover:text-[#1A1A1A] transition-colors h-8 w-8 flex items-center justify-center border border-transparent hover:border-[#1A1A1A]/20">←</button>
+              <span className="font-serif italic text-xl text-[#1A1A1A]">{calendarMonth.toLocaleDateString('en-US',{month:'long',year:'numeric'})}</span>
+              <button onClick={(e) => { e.stopPropagation(); nextMonth(); }} className="text-[#1A1A1A]/40 hover:text-[#1A1A1A] transition-colors h-8 w-8 flex items-center justify-center border border-transparent hover:border-[#1A1A1A]/20">→</button>
             </div>
             <div className="grid grid-cols-7 gap-2 text-center mb-4">
-              {['S','M','T','W','T','F','S'].map(d => (
-                 <span key={d} className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863]/60">{d}</span>
+              {['S','M','T','W','T','F','S'].map((d,i) => (
+                 <span key={i} className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863]/60">{d}</span>
               ))}
             </div>
             <div className="grid grid-cols-7 gap-y-4 gap-x-0 overflow-hidden text-center font-serif text-lg">
-               <span className="opacity-0 bg-transparent"></span><span className="opacity-0 bg-transparent"></span><span className="opacity-0 bg-transparent"></span><span className="opacity-0 bg-transparent"></span><span className="opacity-0 bg-transparent"></span>
-               {[...Array(31)].map((_, i) => {
-                 const day = i + 1;
-                 const isSelected = day === checkIn || day === checkOut;
+               {calendarDays().map((day, i) => {
+                 if (!day) return <span key={`b${i}`} className="opacity-0"></span>;
+                 const disabled = day < today || day > maxDate;
+                 const isSelected = (checkIn && isSameDay(day, checkIn)) || (checkOut && isSameDay(day, checkOut));
                  const isInRange = checkIn && checkOut && day > checkIn && day < checkOut;
-                 
                  return (
-                   <div key={i} className={`relative flex items-center justify-center h-10 ${isInRange ? 'bg-[#D4AF37]/15' : ''} ${day === checkIn && checkOut ? 'bg-gradient-to-r from-transparent to-[#D4AF37]/15' : ''} ${day === checkOut ? 'bg-gradient-to-l from-transparent to-[#D4AF37]/15' : ''}`}>
-                     <button 
-                       onClick={(e) => { 
-                         e.stopPropagation();
-                         if (!checkIn || (checkIn && checkOut)) {
-                           setCheckIn(day);
-                           setCheckOut(null);
-                         } else if (day >= checkIn) {
-                           if (day === checkIn) {
-                            setCheckOut(null);
-                           } else {
-                            setCheckOut(day);
-                            setActiveDatePicker(null);
-                           }
-                         } else {
-                           setCheckIn(day);
-                         }
-                       }}
-                       className={`w-10 h-10 rounded-none flex flex-shrink-0 items-center justify-center transition-colors relative z-10 ${isSelected ? 'bg-[#1A1A1A] text-[#F9F8F6]' : 'text-[#1A1A1A] hover:bg-[#1A1A1A]/5'}`}
+                   <div key={i} className={`relative flex items-center justify-center h-10 ${isInRange ? 'bg-[#D4AF37]/15' : ''} ${checkIn && checkOut && isSameDay(day, checkIn) ? 'bg-gradient-to-r from-transparent to-[#D4AF37]/15' : ''} ${checkOut && isSameDay(day, checkOut) ? 'bg-gradient-to-l from-transparent to-[#D4AF37]/15' : ''}`}>
+                     <button
+                       disabled={disabled}
+                       onClick={(e) => { e.stopPropagation(); handleDayClick(day); }}
+                       className={`w-10 h-10 rounded-none flex flex-shrink-0 items-center justify-center transition-colors relative z-10 ${disabled ? 'text-[#1A1A1A]/20 cursor-not-allowed' : isSelected ? 'bg-[#1A1A1A] text-[#F9F8F6]' : 'text-[#1A1A1A] hover:bg-[#1A1A1A]/5'}`}
                      >
-                       {day}
+                       {day.getDate()}
                      </button>
                    </div>
                  );
@@ -211,7 +232,14 @@ export const Home: React.FC = () => {
       {/* Action */}
       <div className={`w-full md:w-auto mt-4 md:mt-0 shrink-0 relative z-10 ${isSticky ? 'xl:pl-6' : 'xl:pl-8'}`}>
         <Button 
-          onClick={() => navigate('/search')} 
+          onClick={() => {
+            const params = new URLSearchParams();
+            if (checkIn) params.set('checkIn', toISO(checkIn));
+            if (checkOut) params.set('checkOut', toISO(checkOut));
+            params.set('adults', String(adults));
+            params.set('children', String(children));
+            navigate(`/search?${params.toString()}`);
+          }} 
           className={`w-full md:w-auto bg-[#1A1A1A] hover:bg-[#D4AF37] text-[#F9F8F6] hover:text-[#1A1A1A] transition-colors duration-500 shadow-none border-none tracking-[0.3em] ${isSticky ? 'px-8 py-4 text-xs' : 'px-16 py-6 xl:py-8 text-sm'}`}
         >
           {t('home.search')}

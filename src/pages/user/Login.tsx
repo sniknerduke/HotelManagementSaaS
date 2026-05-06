@@ -66,7 +66,7 @@ export const Login: React.FC = () => {
       toast(t('login.success') || "Login successful!", 'success');
 
       // 4. Redirect after welcome animation
-      setTimeout(() => navigate(userData?.role === 'ADMIN' ? '/admin' : '/profile'), 2800);
+      setTimeout(() => navigate(userData?.role === 'ADMIN' ? '/admin' : '/'), 2800);
     } catch (err: any) {
       toast(err.message || "Invalid credentials or server error.", "error");
       setError(err.message || 'Invalid email or password');

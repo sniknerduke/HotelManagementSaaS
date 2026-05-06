@@ -185,6 +185,16 @@ export const AdminDashboard: React.FC = () => {
         return u ? `${u.firstName} ${u.lastName}` : userId.substring(0, 8);
     };
 
+    const getPaymentForBooking = (bookingId: number) => {
+        return payments.find((p: any) => p.reservationId === bookingId);
+    };
+
+    const formatPaymentDate = (bookingId: number) => {
+        const payment = getPaymentForBooking(bookingId);
+        if (!payment || !payment.createdAt) return '—';
+        return new Date(payment.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
+
     const handleCheckIn = async (bookingId: number) => {
         try {
             await BookingService.checkIn(bookingId);
@@ -651,6 +661,7 @@ export const AdminDashboard: React.FC = () => {
                                         <th className="py-4 px-6 font-medium">{t('admin.reservations.table.conf')}</th>
                                         <th className="py-4 px-6 font-medium">{t('admin.reservations.table.room')}</th>
                                         <th className="py-4 px-6 font-medium">{t('admin.reservations.table.dates')}</th>
+                                        <th className="py-4 px-6 font-medium">Payment Date</th>
                                         <th className="py-4 px-6 font-medium">{t('admin.reservations.table.status')}</th>
                                         <th className="py-4 px-6 font-medium text-right">{t('admin.reservations.table.actions')}</th>
                                     </tr>
@@ -662,6 +673,7 @@ export const AdminDashboard: React.FC = () => {
                                             <td className="py-4 px-6 text-xs text-[#6C6863]">BKG-{booking.id}</td>
                                             <td className="py-4 px-6 text-sm text-[#1A1A1A] font-serif italic text-[#D4AF37]">Room {booking.roomId}</td>
                                             <td className="py-4 px-6 text-xs text-[#6C6863]">{booking.checkInDate} to {booking.checkOutDate}</td>
+                                            <td className="py-4 px-6 text-xs text-[#6C6863]">{formatPaymentDate(booking.id)}</td>
                                             <td className="py-4 px-6">
                                                 <span className={`text-[9px] uppercase font-bold tracking-widest px-2 py-1 border ${
                                                     booking.status === 'PENDING' ? 'bg-[#D4AF37]/10 text-[#D4AF37] border-[#D4AF37]/20' : 
@@ -687,7 +699,7 @@ export const AdminDashboard: React.FC = () => {
                                     ))}
                                     {bookings.length === 0 && (
                                         <tr>
-                                            <td colSpan={6} className="py-8 text-center text-[#6C6863] font-serif italic">
+                                            <td colSpan={7} className="py-8 text-center text-[#6C6863] font-serif italic">
                                                 {t('admin.reservations.noData', 'No reservations found.')}
                                             </td>
                                         </tr>
@@ -762,17 +774,6 @@ export const AdminDashboard: React.FC = () => {
                                 <Card className="p-8 border border-[#1A1A1A]/10 bg-white">
                                     <div className="space-y-6">
                                         <div>
-                                            <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#6C6863] mb-2 block">{t('admin.inventory.seasonalMultipliers')}</label>
-                                            <div className="flex items-center justify-between border-b border-[#1A1A1A]/10 pb-3">
-                                                <div>
-                                                    <span className="text-sm font-serif text-[#1A1A1A] block">{t('admin.inventory.highSeason')}</span>
-                                                    <span className="text-[10px] uppercase tracking-widest text-[#D4AF37]">Dec - Mar</span>
-                                                </div>
-                                                <span className="font-mono bg-[#F9F8F6] px-2 py-1 border border-[#1A1A1A]/10">1.25x</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="pt-4">
                                             <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#6C6863] mb-2 block">{t('admin.inventory.activePromotions')}</label>
                                             
                                             <div className="flex gap-2 mb-4">
@@ -1164,7 +1165,32 @@ export const AdminDashboard: React.FC = () => {
                             ))}
                         </div>
                     </div>
-                    <Input type="text" label="Image URL" value={addRoomForm.imageUrl} onChange={(e) => setAddRoomForm({ ...addRoomForm, imageUrl: e.target.value })} placeholder="/images/rooms/your-image.jpg" />
+                    <div className="flex items-end gap-2">
+                        <div className="flex-1">
+                            <Input type="text" label="Image URL" value={addRoomForm.imageUrl} onChange={(e) => setAddRoomForm({ ...addRoomForm, imageUrl: e.target.value })} placeholder="Enter URL or upload local image" />
+                        </div>
+                        <div className="relative mb-[2px]">
+                            <input 
+                                type="file" 
+                                accept="image/*"
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        const reader = new FileReader();
+                                        reader.onloadend = () => {
+                                            setAddRoomForm({ ...addRoomForm, imageUrl: reader.result as string });
+                                        };
+                                        reader.readAsDataURL(file);
+                                    }
+                                }}
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                title="Upload Local Image"
+                            />
+                            <Button type="button" variant="primary" className="bg-[#1A1A1A] hover:bg-[#D4AF37] text-white text-[10px] uppercase px-4 h-10 tracking-widest whitespace-nowrap pointer-events-none">
+                                Upload
+                            </Button>
+                        </div>
+                    </div>
                     <div>
                         <label className="text-[10px] uppercase font-bold text-[#6C6863] block mb-1">Room Category</label>
                         <select className="w-full p-3 border border-[#1A1A1A]/20 bg-[#F9F8F6] text-sm" value={addRoomForm.roomTypeId} onChange={(e) => setAddRoomForm({ ...addRoomForm, roomTypeId: e.target.value })} required>

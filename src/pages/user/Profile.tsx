@@ -43,9 +43,12 @@ export const Profile: React.FC = () => {
   };
 
   const [dbBookings, setDbBookings] = useState<any[]>([]);
+  const [allRooms, setAllRooms] = useState<any[]>([]);
   const [isFetchingBookings, setIsFetchingBookings] = useState(false);
   const [roomImages, setRoomImages] = useState<Record<number, string>>({});
   const hasActiveStay = dbBookings.some((b) => b.status === 'CONFIRMED' || b.status === 'CHECKED_IN');
+
+  const getRoomInfo = (roomId: number) => allRooms.find((r: any) => r.id === roomId);
 
   useEffect(() => {
     if (user?.id && !isFetchingBookings) {
@@ -213,20 +216,36 @@ export const Profile: React.FC = () => {
         <div className="lg:col-span-8 lg:col-start-5 pt-4">
           
           {/* 3. Active Stay Context */}
-          {activeTab === 'active' && hasActiveStay && (
+           {activeTab === 'active' && hasActiveStay && currentStay && (() => {
+              const roomInfo = getRoomInfo(currentStay.roomId);
+              const roomNumber = roomInfo?.roomNumber || `#${currentStay.roomId}`;
+              const roomTypeName = roomInfo?.roomType?.name || roomInfo?.description || 'Suite';
+              const nights = currentStay.checkInDate && currentStay.checkOutDate 
+                ? Math.max(1, Math.round((new Date(currentStay.checkOutDate).getTime() - new Date(currentStay.checkInDate).getTime()) / (1000*60*60*24)))
+                : 1;
+              const fmtD = (s: string) => s ? new Date(s + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+              return (
             <div className="space-y-12 animate-in fade-in duration-700">
               <div className="flex justify-between items-end border-b border-[#1A1A1A]/20 pb-4 mb-8">
                 <h2 className="text-3xl font-serif text-[#1A1A1A]">{t('profile.currentStay.title')} <span className="italic text-[#D4AF37]">{t('profile.currentStay.titleItalic')}</span></h2>
-                <span className="text-[10px] uppercase tracking-[0.3em] bg-[#1A1A1A] text-white px-3 py-1 animate-pulse">{t('profile.currentStay.checkedIn')}</span>
+                <span className={`text-[10px] uppercase tracking-[0.3em] px-3 py-1 ${currentStay.status === 'CHECKED_IN' ? 'bg-[#1A1A1A] text-white animate-pulse' : 'bg-[#D4AF37]/20 text-[#D4AF37]'}`}>
+                  {currentStay.status === 'CHECKED_IN' ? t('profile.currentStay.checkedIn') : 'CONFIRMED'}
+                </span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="bg-[#1A1A1A] text-[#F9F8F6] p-8 border-none relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37]/20 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2"></div>
+                <div className="group bg-[#1A1A1A]/95 hover:bg-[#1A1A1A]/80 backdrop-blur-sm text-[#F9F8F6] p-8 relative overflow-hidden transition-all duration-500">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37]/20 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-500 transform translate-x-1/2 -translate-y-1/2"></div>
                   <p className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#F9F8F6]/60 mb-2">{t('profile.currentStay.roomDetails')}</p>
-                  <h3 className="text-5xl font-serif text-[#D4AF37] mb-2">{currentStay?.roomId || "02"}</h3>
-                  <p className="text-sm font-serif">Lumière Master Room</p>
-                </Card>
+                  <h3 className="text-5xl font-serif text-[#D4AF37] mb-2">{roomNumber}</h3>
+                  <p className="text-sm font-serif">{roomTypeName}</p>
+                  <div className="mt-4 pt-4 border-t border-white/10 space-y-1">
+                    <p className="text-xs text-white/60"><span className="text-white/40 uppercase tracking-widest text-[9px]">Check-in:</span> {fmtD(currentStay.checkInDate)}</p>
+                    <p className="text-xs text-white/60"><span className="text-white/40 uppercase tracking-widest text-[9px]">Check-out:</span> {fmtD(currentStay.checkOutDate)}</p>
+                    <p className="text-xs text-white/60"><span className="text-white/40 uppercase tracking-widest text-[9px]">Duration:</span> {nights} night{nights > 1 ? 's' : ''}</p>
+                    {currentStay.adultCount && <p className="text-xs text-white/60"><span className="text-white/40 uppercase tracking-widest text-[9px]">Guests:</span> {currentStay.adultCount} Adult{currentStay.adultCount > 1 ? 's' : ''}{currentStay.childCount > 0 ? `, ${currentStay.childCount} Child${currentStay.childCount > 1 ? 'ren' : ''}` : ''}</p>}
+                  </div>
+                </div>
 
                 <Card className="p-8 border border-[#1A1A1A]/10 hover:border-[#D4AF37]/50 transition-colors group">
                   <div className="flex justify-between items-start">
@@ -234,7 +253,7 @@ export const Profile: React.FC = () => {
                       <p className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#6C6863] mb-2">{t('profile.currentStay.digitalAccess')}</p>
                       <h4 className="text-xl font-serif text-[#1A1A1A] mb-1">{t('profile.currentStay.wifiCreds')}</h4>
                       <p className="text-sm text-[#1A1A1A]">{t('profile.currentStay.network')}: <span className="font-bold">Lumiere_Guest</span></p>
-                      <p className="text-sm text-[#1A1A1A] mb-6">{t('profile.currentStay.password')}: <span className="font-mono text-[#D4AF37]">LUM#402!X</span></p>
+                      <p className="text-sm text-[#1A1A1A] mb-6">{t('profile.currentStay.password')}: <span className="font-mono text-[#D4AF37]">LUM#{roomNumber}!X</span></p>
                     </div>
                     <svg className="w-8 h-8 text-[#D4AF37] opacity-50 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                   </div>
@@ -246,7 +265,7 @@ export const Profile: React.FC = () => {
                 <p className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#6C6863] mb-6 border-b border-[#1A1A1A]/10 pb-2">{t('profile.currentStay.liveFolio')}</p>
                 <div className="space-y-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#6C6863]">{t('profile.currentStay.roomRate')}</span>
+                    <span className="text-[#6C6863]">{t('profile.currentStay.roomRate')} ({nights} night{nights > 1 ? 's' : ''})</span>
                     <span className="text-[#1A1A1A] font-serif">${currentStay?.totalPrice || "0.00"}</span>
                   </div>
                   <div className="flex justify-between text-sm opacity-50">
@@ -264,7 +283,8 @@ export const Profile: React.FC = () => {
                 </div>
               </Card>
             </div>
-          )}
+              );
+            })()}
 
           {/* 2. Reservation Management */}
           {activeTab === 'bookings' && (

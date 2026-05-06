@@ -38,6 +38,8 @@ export const AmenityService = {
 };
 
 export const BookingService = {
+    getAvailability: (checkIn: string, checkOut: string, guests: number) =>
+        api.get(`/bookings/availability?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`),
     createBooking: (data: any) => api.post('/bookings', data),
     getAllBookings: () => api.get('/bookings'),
     getUserBookings: (userId: string) => api.get(`/bookings/user/${userId}`),

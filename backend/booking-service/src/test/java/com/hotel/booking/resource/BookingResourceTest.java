@@ -35,17 +35,23 @@ public class BookingResourceTest {
 
     @BeforeEach
     void setupMocks() {
+        // Mock RoomType for pricing
+        InventoryClient.RoomTypeDTO roomTypeMock = new InventoryClient.RoomTypeDTO(
+                1L, "Deluxe", "Desc", new java.math.BigDecimal("100.00"), 2, 
+                "img", java.util.Collections.emptyList(), 5L);
+        Mockito.when(inventoryClient.getRoomType(1L)).thenReturn(roomTypeMock);
+
         // Mock: room 1 is AVAILABLE
         Mockito.when(inventoryClient.getRoom(1L))
-                .thenReturn(new InventoryClient.RoomDTO(1L, "101", "AVAILABLE"));
+                .thenReturn(new InventoryClient.RoomDTO(1L, "101", "AVAILABLE", 1L, roomTypeMock));
 
         // Mock: room 2 is OCCUPIED
         Mockito.when(inventoryClient.getRoom(2L))
-                .thenReturn(new InventoryClient.RoomDTO(2L, "102", "OCCUPIED"));
+                .thenReturn(new InventoryClient.RoomDTO(2L, "102", "OCCUPIED", 1L, roomTypeMock));
 
         // Mock: updateRoomStatus always succeeds
         Mockito.when(inventoryClient.updateRoomStatus(any(), any()))
-                .thenReturn(new InventoryClient.RoomDTO(1L, "101", "OCCUPIED"));
+                .thenReturn(new InventoryClient.RoomDTO(1L, "101", "OCCUPIED", 1L, roomTypeMock));
     }
 
     // ==================== CREATE BOOKING ====================
@@ -241,7 +247,7 @@ public class BookingResourceTest {
     void testCheckOut() {
         // Re-setup mock for check-out (room goes to DIRTY)
         Mockito.when(inventoryClient.updateRoomStatus(any(), any()))
-                .thenReturn(new InventoryClient.RoomDTO(1L, "101", "DIRTY"));
+                .thenReturn(new InventoryClient.RoomDTO(1L, "101", "DIRTY", 1L, null));
 
         given()
                 .contentType(ContentType.JSON)

@@ -23,7 +23,10 @@ public class GlobalExceptionMapper implements ExceptionMapper<ConstraintViolatio
                 .collect(Collectors.toList());
 
         return Response.status(Response.Status.BAD_REQUEST)
-                .entity(Map.of("errors", errors))
+                .entity(Map.of(
+                    "errors", errors, 
+                    "error", errors.isEmpty() ? "Validation failed" : errors.get(0).get("message")
+                ))
                 .build();
     }
 

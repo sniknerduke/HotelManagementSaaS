@@ -2,16 +2,18 @@ package com.hotel.booking.resource;
 
 import com.hotel.booking.entity.Reservation;
 import com.hotel.booking.entity.Reservation.ReservationStatus;
+import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -22,6 +24,9 @@ import com.hotel.booking.client.InventoryClient;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class BookingResource {
+
+    /** VAT rate applied on top of the room cost */
+    private static final BigDecimal VAT_RATE = new BigDecimal("0.10"); // 10%
 
     @Inject
     @RestClient
@@ -35,8 +40,6 @@ public class BookingResource {
             @NotNull(message = "Check-in date is required") 
             @FutureOrPresent(message = "Check-in date cannot be in the past") LocalDate checkInDate, 
             @NotNull(message = "Check-out date is required") LocalDate checkOutDate,
-            @NotNull(message = "Total price is required") 
-            @Positive(message = "Total price must be positive") BigDecimal totalPrice,
             @Min(value = 1, message = "At least 1 adult is required") Integer adultCount,
             @Min(value = 0, message = "Child count cannot be negative") Integer childCount) {
 
@@ -44,6 +47,12 @@ public class BookingResource {
         public boolean isValidDates() {
             if (checkInDate == null || checkOutDate == null) return true;
             return checkOutDate.isAfter(checkInDate);
+        }
+
+        @AssertTrue(message = "Check-out date must be within 3 months from today")
+        public boolean isWithin3Months() {
+            if (checkOutDate == null) return true;
+            return !checkOutDate.isAfter(LocalDate.now().plusMonths(3));
         }
     }
 
@@ -75,7 +84,122 @@ public class BookingResource {
         }
     }
 
+    /** DTO returned by the availability endpoint */
+    public record AvailabilityResponse(
+            Long roomTypeId, String name, String description,
+            BigDecimal basePrice, int maxGuests, String imageUrl,
+            List<InventoryClient.AmenityDTO> amenities,
+            long availableCount, long nights,
+            BigDecimal subtotal, BigDecimal vat, BigDecimal total) {}
+
     // --- Endpoints ---
+
+    /**
+     * Date-aware availability search.
+     * Cross-references inventory rooms against existing reservations to find
+     * room types that have at least one room free for the requested date range.
+     */
+    @GET
+    @Path("/availability")
+    @PermitAll
+    public Response checkAvailability(
+            @QueryParam("checkIn") String checkInStr,
+            @QueryParam("checkOut") String checkOutStr,
+            @QueryParam("guests") @DefaultValue("1") int guests) {
+
+        // 1. Parse & validate dates
+        LocalDate today = LocalDate.now();
+        LocalDate maxDate = today.plusMonths(3);
+        LocalDate checkIn;
+        LocalDate checkOut;
+        try {
+            checkIn = LocalDate.parse(checkInStr);
+            checkOut = LocalDate.parse(checkOutStr);
+        } catch (Exception e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"Invalid date format. Use yyyy-MM-dd\"}")
+                    .build();
+        }
+
+        if (checkIn.isBefore(today)) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"Check-in date cannot be in the past\"}")
+                    .build();
+        }
+        if (!checkOut.isAfter(checkIn)) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"Check-out must be after check-in\"}")
+                    .build();
+        }
+        if (checkOut.isAfter(maxDate)) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"Dates must be within 3 months from today\"}")
+                    .build();
+        }
+
+        long nights = ChronoUnit.DAYS.between(checkIn, checkOut);
+
+        // 2. Get all rooms from inventory
+        List<InventoryClient.RoomDTO> allRooms;
+        List<InventoryClient.RoomTypeDTO> allRoomTypes;
+        try {
+            allRooms = inventoryClient.getAllRooms(null, null, null);
+            allRoomTypes = inventoryClient.getAllRoomTypes();
+        } catch (Exception e) {
+            return Response.status(Response.Status.SERVICE_UNAVAILABLE)
+                    .entity("{\"error\": \"Inventory service unavailable\"}")
+                    .build();
+        }
+
+        // 3. Find room IDs that have overlapping ACTIVE reservations
+        //    Only PENDING, CONFIRMED, CHECKED_IN block a room. CHECKED_OUT/CANCELLED/NO_SHOW do not.
+        List<ReservationStatus> activeStatuses = List.of(
+                ReservationStatus.PENDING, ReservationStatus.CONFIRMED, ReservationStatus.CHECKED_IN);
+        List<Reservation> overlapping = Reservation.<Reservation>find(
+                "status in ?1 and checkInDate < ?3 and checkOutDate > ?2",
+                activeStatuses, checkIn, checkOut
+        ).list();
+
+        System.out.println("[AVAILABILITY] checkIn=" + checkIn + " checkOut=" + checkOut
+                + " guests=" + guests + " overlappingReservations=" + overlapping.size());
+
+        Set<Long> bookedRoomIds = overlapping.stream()
+                .map(r -> r.roomId)
+                .collect(Collectors.toSet());
+
+        System.out.println("[AVAILABILITY] bookedRoomIds=" + bookedRoomIds);
+
+        // 4. Filter to rooms that are not booked and not out-of-order/maintenance
+        Set<String> unavailableStatuses = Set.of("OUT_OF_ORDER", "MAINTENANCE");
+        List<InventoryClient.RoomDTO> availableRooms = allRooms.stream()
+                .filter(r -> !bookedRoomIds.contains(r.id()))
+                .filter(r -> !unavailableStatuses.contains(r.status()))
+                .toList();
+
+        // 5. Build a map of roomTypeId -> available room count
+        Map<Long, Long> availableByType = availableRooms.stream()
+                .filter(r -> r.roomTypeId() != null)
+                .collect(Collectors.groupingBy(InventoryClient.RoomDTO::roomTypeId, Collectors.counting()));
+
+        // 6. Build response: room types with enough capacity, at least 1 available room
+        List<AvailabilityResponse> result = allRoomTypes.stream()
+                .filter(rt -> rt.maxGuests() >= guests)
+                .filter(rt -> availableByType.getOrDefault(rt.id(), 0L) > 0)
+                .map(rt -> {
+                    BigDecimal subtotal = rt.basePrice().multiply(BigDecimal.valueOf(nights));
+                    BigDecimal vat = subtotal.multiply(VAT_RATE).setScale(2, RoundingMode.HALF_UP);
+                    BigDecimal total = subtotal.add(vat);
+                    return new AvailabilityResponse(
+                            rt.id(), rt.name(), rt.description(),
+                            rt.basePrice(), rt.maxGuests(), rt.imageUrl(),
+                            rt.amenities(),
+                            availableByType.getOrDefault(rt.id(), 0L),
+                            nights, subtotal, vat, total);
+                })
+                .toList();
+
+        return Response.ok(result).build();
+    }
 
     @GET
     @RolesAllowed("ADMIN")
@@ -91,40 +215,22 @@ public class BookingResource {
     @RolesAllowed({"GUEST", "STAFF", "ADMIN"})
     @Transactional
     public Response createBooking(@Valid CreateBookingRequest req) {
+        // Validate room exists and is not permanently unavailable
+        InventoryClient.RoomDTO room;
         try {
-            InventoryClient.RoomDTO room = inventoryClient.getRoom(req.roomId());
-            if (room == null || !"AVAILABLE".equals(room.status())) {
+            room = inventoryClient.getRoom(req.roomId());
+            if (room == null) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("{\"error\": \"Room is not available\"}")
+                        .entity("{\"error\": \"Room not found\"}")
                         .build();
             }
-
-            long nights = java.time.temporal.ChronoUnit.DAYS.between(req.checkInDate(), req.checkOutDate());
-            if (nights <= 0) {
-                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("{\"error\": \"Check-out date must be after check-in date\"}")
+            // Block only if room is in permanent unavailable states
+            String status = room.status();
+            if ("OUT_OF_ORDER".equals(status) || "MAINTENANCE".equals(status)) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("{\"error\": \"Room is not available (\" + status + \")\"}")
                         .build();
             }
-
-            // Note: The frontend sends the total price which may include taxes (+142 flat or percentages)
-            // and discounts. A rigorous system would recalculate exactly, but here we ensure the request provided a valid calculated total.
-            if (req.totalPrice() == null || req.totalPrice().compareTo(BigDecimal.ZERO) <= 0) {
-                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("{\"error\": \"Invalid total price calculated\"}")
-                        .build();
-            }
-
-            List<Reservation> overlapping = Reservation.<Reservation>find(
-                    "roomId = ?1 and status != ?2 and checkInDate < ?4 and checkOutDate > ?3", 
-                    req.roomId(), ReservationStatus.CANCELLED, req.checkInDate(), req.checkOutDate()
-            ).withLock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE).list();
-            if (!overlapping.isEmpty()) {
-                return Response.status(Response.Status.CONFLICT)
-                        .entity("{\"error\": \"Room is already booked for these dates.\"}")
-                        .build();
-            }
-
-            inventoryClient.updateRoomStatus(req.roomId(), new InventoryClient.UpdateStatusRequest("OCCUPIED"));
         } catch (Exception e) {
             String errorMessage = e.getMessage();
             if (errorMessage == null || errorMessage.isEmpty()) {
@@ -135,14 +241,61 @@ public class BookingResource {
                     .build();
         }
 
+        long nights = ChronoUnit.DAYS.between(req.checkInDate(), req.checkOutDate());
+        if (nights <= 0) {
+             return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"Check-out date must be after check-in date\"}")
+                    .build();
+        }
+
+        // Check for overlapping ACTIVE reservations (pessimistic lock)
+        List<ReservationStatus> activeStatuses = List.of(
+                ReservationStatus.PENDING, ReservationStatus.CONFIRMED, ReservationStatus.CHECKED_IN);
+        List<Reservation> overlapping = Reservation.<Reservation>find(
+                "roomId = ?1 and status in ?2 and checkInDate < ?4 and checkOutDate > ?3", 
+                req.roomId(), activeStatuses, req.checkInDate(), req.checkOutDate()
+        ).withLock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE).list();
+        if (!overlapping.isEmpty()) {
+            return Response.status(Response.Status.CONFLICT)
+                    .entity("{\"error\": \"Room is already booked for these dates.\"}")
+                    .build();
+        }
+
+        // Server-side price calculation
+        BigDecimal basePrice;
+        try {
+            InventoryClient.RoomTypeDTO roomType = null;
+            if (room.roomTypeId() != null) {
+                roomType = inventoryClient.getRoomType(room.roomTypeId());
+            }
+            if (roomType == null) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("{\"error\": \"Could not determine room price\"}")
+                        .build();
+            }
+            basePrice = roomType.basePrice();
+        } catch (Exception e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"Failed to fetch room pricing: " + e.getMessage() + "\"}")
+                    .build();
+        }
+
+        BigDecimal subtotal = basePrice.multiply(BigDecimal.valueOf(nights));
+        BigDecimal vat = subtotal.multiply(VAT_RATE).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal totalPrice = subtotal.add(vat);
+
+        // NOTE: We no longer mark the room as OCCUPIED here.
+        // Room status only changes on actual check-in. Availability is
+        // determined by reservation overlap queries.
+
         Reservation reservation = new Reservation();
         reservation.userId = req.userId();
         reservation.roomId = req.roomId();
         reservation.checkInDate = req.checkInDate();
+        reservation.checkOutDate = req.checkOutDate();
         if (req.adultCount() != null) reservation.adultCount = req.adultCount();
         if (req.childCount() != null) reservation.childCount = req.childCount();
-        reservation.checkOutDate = req.checkOutDate();
-        reservation.totalPrice = req.totalPrice();
+        reservation.totalPrice = totalPrice;
         reservation.persist();
 
         return Response.status(Response.Status.CREATED)

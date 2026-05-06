@@ -282,6 +282,8 @@
       "expectedCheckouts": "Trả phòng Dự kiến",
       "completed": "Đã xong",
       "stayOvers": "Khách lưu trú",
+      "bookedRooms": "Số phòng đang đặt",
+      "availableRooms": "Số phòng trống",
       "actionNeeded": "Cần Xử lý (Cảnh báo)",
       "overbooked": "Loại phòng vượt mức",
       "overbookedDesc": "Standard King đang bị đặt vượt 2 phòng cho ngày 15/10.",

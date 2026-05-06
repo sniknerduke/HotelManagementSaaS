@@ -282,6 +282,8 @@
       "expectedCheckouts": "Expected Check-outs",
       "completed": "Completed",
       "stayOvers": "Stay-overs",
+      "bookedRooms": "Booked Rooms",
+      "availableRooms": "Available Rooms",
       "actionNeeded": "Action Needed (Alerts)",
       "overbooked": "Overbooked Room Type",
       "overbookedDesc": "Standard King is overbooked by 2 rooms for Oct 15.",

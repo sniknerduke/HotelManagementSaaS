@@ -533,6 +533,18 @@ export const AdminDashboard: React.FC = () => {
                                         </div>
                                         <span className="text-2xl font-serif text-[#1A1A1A]">{inHouseGuests}</span>
                                     </div>
+                                    <div className="flex justify-between items-center border-b border-[#1A1A1A]/10 pb-4">
+                                        <div>
+                                            <span className="text-sm font-serif text-[#6C6863] block">{t('admin.overview.bookedRooms')}</span>
+                                        </div>
+                                        <span className="text-2xl font-serif text-[#1A1A1A]">{bookedRooms}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center pb-4">
+                                        <div>
+                                            <span className="text-sm font-serif text-[#6C6863] block">{t('admin.overview.availableRooms')}</span>
+                                        </div>
+                                        <span className="text-2xl font-serif text-[#1A1A1A]">{totalRooms - bookedRooms}</span>
+                                    </div>
                                 </div>
                             </div>
                             

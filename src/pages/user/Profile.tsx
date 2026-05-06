@@ -32,9 +32,8 @@ export const Profile: React.FC = () => {
   // Deactivate account state
   const [isDeactivating, setIsDeactivating] = useState(false);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
+  const handleLogout = async () => {
+    await logout();
   };
 
   const language = i18n.language.toUpperCase() === 'VI' ? 'VN' : i18n.language.toUpperCase();

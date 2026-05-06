@@ -19,9 +19,8 @@ export const Header: React.FC = () => {
     }, 500);
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
+  const handleLogout = async () => {
+    await logout();
   };
 
   return (

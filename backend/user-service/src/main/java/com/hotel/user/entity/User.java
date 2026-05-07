@@ -41,6 +41,12 @@ public class User extends PanacheEntityBase {
     @Column(name = "guest_preferences", columnDefinition = "TEXT")
     public String guestPreferences;
 
+    @Column(name = "internal_notes", columnDefinition = "TEXT")
+    public String internalNotes;
+
+    @Column(name = "is_vip")
+    public Boolean isVip = false;
+
     @Column(name = "avatar_url")
     public String avatarUrl;
 

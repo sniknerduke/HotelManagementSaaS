@@ -12,6 +12,8 @@ export const AuthService = {
     changePassword: (userId: string, data: any) => api.put(`/users/${userId}/password`, data),
     getAllUsers: () => api.get('/users'),
     updateRole: (userId: string, role: string) => api.patch(`/users/${userId}/role`, { role }),
+    updateUserCRM: (userId: string, data: { internalNotes?: string, isVip?: boolean }) => 
+        api.patch(`/users/${userId}/crm`, data),
     deleteUser: (userId: string) => api.delete(`/users/${userId}`),
 };
 

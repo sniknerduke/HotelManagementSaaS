@@ -7,8 +7,9 @@ import { Modal } from '../../components/ui/Modal';
 import { BookingService, AuthService, InventoryService, PaymentService, AnalyticsService, SettingsService, AmenityService, PromotionService } from '../../api';
 import { useToast } from '../../context/ToastContext';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { CRMModule } from './CRMModule';
 
-type AdminTab = 'overview' | 'reservations' | 'inventory' | 'users' | 'reports' | 'settings' | 'payments';
+type AdminTab = 'overview' | 'reservations' | 'inventory' | 'users' | 'crm' | 'reports' | 'settings' | 'payments';
 
 export const AdminDashboard: React.FC = () => {
     const { t } = useTranslation();
@@ -47,6 +48,10 @@ export const AdminDashboard: React.FC = () => {
     const [editingStaffRole, setEditingStaffRole] = useState<any>(null);
     const [editingUser, setEditingUser] = useState<any>(null);
     
+    // Pagination state for Inventory
+    const [currentRoomPage, setCurrentRoomPage] = useState(1);
+    const ROOMS_PER_PAGE = 3;
+
     // Auto-calculate walk-in booking total price based on per-day/per-night rate
     useEffect(() => {
         if (walkInForm.checkInDate && walkInForm.checkOutDate && walkInForm.roomId) {
@@ -515,6 +520,7 @@ export const AdminDashboard: React.FC = () => {
                     <button onClick={() => setActiveTab('reservations')} className={`text-left py-4 border-t border-[#1A1A1A]/5 transition-colors relative ${activeTab === 'reservations' ? 'text-[#1A1A1A] after:-left-4 after:top-1/2 after:-translate-y-1/2 after:absolute after:h-px after:w-2 after:bg-[#D4AF37]' : 'hover:text-[#D4AF37]'}`}>{t('admin.sidebar.reservations')}</button>
                     <button onClick={() => setActiveTab('inventory')} className={`text-left py-4 border-t border-[#1A1A1A]/5 transition-colors relative ${activeTab === 'inventory' ? 'text-[#1A1A1A] after:-left-4 after:top-1/2 after:-translate-y-1/2 after:absolute after:h-px after:w-2 after:bg-[#D4AF37]' : 'hover:text-[#D4AF37]'}`}>{t('admin.sidebar.inventory')}</button>
                     <button onClick={() => setActiveTab('users')} className={`text-left py-4 border-t border-[#1A1A1A]/5 transition-colors relative ${activeTab === 'users' ? 'text-[#1A1A1A] after:-left-4 after:top-1/2 after:-translate-y-1/2 after:absolute after:h-px after:w-2 after:bg-[#D4AF37]' : 'hover:text-[#D4AF37]'}`}>{t('admin.sidebar.users')}</button>
+                    <button onClick={() => setActiveTab('crm')} className={`text-left py-4 border-t border-[#1A1A1A]/5 transition-colors relative ${activeTab === 'crm' ? 'text-[#1A1A1A] after:-left-4 after:top-1/2 after:-translate-y-1/2 after:absolute after:h-px after:w-2 after:bg-[#D4AF37]' : 'hover:text-[#D4AF37]'}`}>Guest CRM</button>
                     <button onClick={() => setActiveTab('payments')} className={`text-left py-4 border-t border-[#1A1A1A]/5 transition-colors relative ${activeTab === 'payments' ? 'text-[#1A1A1A] after:-left-4 after:top-1/2 after:-translate-y-1/2 after:absolute after:h-px after:w-2 after:bg-[#D4AF37]' : 'hover:text-[#D4AF37]'}`}>Payments</button>
                     <button onClick={() => setActiveTab('reports')} className={`text-left py-4 border-t border-[#1A1A1A]/5 transition-colors relative ${activeTab === 'reports' ? 'text-[#1A1A1A] after:-left-4 after:top-1/2 after:-translate-y-1/2 after:absolute after:h-px after:w-2 after:bg-[#D4AF37]' : 'hover:text-[#D4AF37]'}`}>{t('admin.sidebar.reports')}</button>
                     <button onClick={() => setActiveTab('settings')} className={`text-left py-4 border-t border-[#1A1A1A]/5 transition-colors relative ${activeTab === 'settings' ? 'text-[#1A1A1A] after:-left-4 after:top-1/2 after:-translate-y-1/2 after:absolute after:h-px after:w-2 after:bg-[#D4AF37]' : 'hover:text-[#D4AF37]'}`}>{t('admin.sidebar.settings')}</button>
@@ -757,7 +763,7 @@ export const AdminDashboard: React.FC = () => {
                             <div className="lg:col-span-8">
                                 <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#1A1A1A] mb-6">{t('admin.inventory.roomStatus')}</h3>
                                 <div className="space-y-4">
-                                    {rooms.slice(0, 10).map((room, idx) => {
+                                    {rooms.slice((currentRoomPage - 1) * ROOMS_PER_PAGE, currentRoomPage * ROOMS_PER_PAGE).map((room, idx) => {
                                         const statusColors: any = {
                                             'AVAILABLE': 'border-l-green-500 text-green-700',
                                             'OCCUPIED': 'border-l-blue-500 text-blue-700',
@@ -798,6 +804,44 @@ export const AdminDashboard: React.FC = () => {
                                     )})}
                                     {rooms.length === 0 && <p className="text-sm italic text-[#6C6863]">No rooms managed yet.</p>}
                                 </div>
+
+                                {/* Pagination Controls */}
+                                {rooms.length > ROOMS_PER_PAGE && (
+                                    <div className="flex items-center justify-between mt-8 pt-6 border-t border-[#1A1A1A]/10">
+                                        <p className="text-[10px] uppercase tracking-widest font-bold text-[#6C6863]">
+                                            Showing {(currentRoomPage - 1) * ROOMS_PER_PAGE + 1} to {Math.min(currentRoomPage * ROOMS_PER_PAGE, rooms.length)} of {rooms.length}
+                                        </p>
+                                        <div className="flex gap-2">
+                                            <Button 
+                                                variant="ghost" 
+                                                disabled={currentRoomPage === 1}
+                                                onClick={() => setCurrentRoomPage(prev => prev - 1)}
+                                                className="border border-[#1A1A1A]/10 h-8 w-8 p-0 flex items-center justify-center disabled:opacity-30"
+                                            >
+                                                ←
+                                            </Button>
+                                            <div className="flex gap-1">
+                                                {Array.from({ length: Math.ceil(rooms.length / ROOMS_PER_PAGE) }, (_, i) => i + 1).map(p => (
+                                                    <button
+                                                        key={p}
+                                                        onClick={() => setCurrentRoomPage(p)}
+                                                        className={`w-8 h-8 text-[10px] font-bold border ${currentRoomPage === p ? 'bg-[#1A1A1A] text-white border-[#1A1A1A]' : 'border-[#1A1A1A]/10 hover:border-[#1A1A1A]/30'}`}
+                                                    >
+                                                        {p}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <Button 
+                                                variant="ghost" 
+                                                disabled={currentRoomPage >= Math.ceil(rooms.length / ROOMS_PER_PAGE)}
+                                                onClick={() => setCurrentRoomPage(prev => prev + 1)}
+                                                className="border border-[#1A1A1A]/10 h-8 w-8 p-0 flex items-center justify-center disabled:opacity-30"
+                                            >
+                                                →
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="lg:col-span-4">
@@ -919,7 +963,10 @@ export const AdminDashboard: React.FC = () => {
                         <div className="mt-16 pt-16 border-t border-[#1A1A1A]/10">
                             <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#1A1A1A] mb-2">{t('admin.users.crm.title')}</h3>
                             <p className="text-sm text-[#6C6863] font-serif italic mb-8">{t('admin.users.crm.description')}</p>
-                            <Card className="p-8 border-dashed border-2 border-[#1A1A1A]/10 bg-transparent flex flex-col items-center justify-center gap-4 hover:border-[#D4AF37]/50 hover:bg-white transition-all cursor-pointer group">
+                            <Card 
+                                onClick={() => setActiveTab('crm')}
+                                className="p-8 border-dashed border-2 border-[#1A1A1A]/10 bg-transparent flex flex-col items-center justify-center gap-4 hover:border-[#D4AF37]/50 hover:bg-white transition-all cursor-pointer group"
+                            >
                                 <svg className="w-8 h-8 text-[#1A1A1A]/30 group-hover:text-[#D4AF37] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeWidth="1.5" d="M12 4v16m8-8H4"></path></svg>
                                 <span className="text-[10px] uppercase tracking-widest font-bold text-[#1A1A1A]">{t('admin.users.crm.open')}</span>
                             </Card>
@@ -927,7 +974,12 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                 )}
 
-                {/* 5. Reports & Analytics */}
+                {/* 5. CRM Module */}
+                {activeTab === 'crm' && (
+                    <CRMModule />
+                )}
+
+                {/* 6. Reports & Analytics */}
                 {/* Payments */}
                 {activeTab === 'payments' && (
                     <div className="animate-in fade-in duration-500">

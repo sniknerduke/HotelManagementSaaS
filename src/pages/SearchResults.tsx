@@ -56,6 +56,10 @@ export const SearchResults: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [amenities, setAmenities] = useState<any[]>([]);
     const [selectedAmenityIds, setSelectedAmenityIds] = useState<number[]>([]);
+    
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 3;
 
     useEffect(() => { AmenityService.getAllAmenities().then(setAmenities).catch(console.error); }, []);
     const toggleFilter = (id: number) => setSelectedAmenityIds(prev => prev.includes(id) ? prev.filter(aId => aId !== id) : [...prev, id]);
@@ -65,6 +69,14 @@ export const SearchResults: React.FC = () => {
         const roomAmenityIds = (room.amenities || []).map((a: any) => a.id);
         return selectedAmenityIds.every(id => roomAmenityIds.includes(id));
     });
+
+    // Reset page when filters or data change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [selectedAmenityIds, roomsData]);
+
+    const totalPages = Math.ceil(filteredRooms.length / ITEMS_PER_PAGE);
+    const paginatedRooms = filteredRooms.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -269,45 +281,101 @@ export const SearchResults: React.FC = () => {
                         <div className="py-20 flex justify-center items-center">
                             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D4AF37]"></div>
                         </div>
-                    ) : filteredRooms.map((room) => (
-                        <div key={room.roomTypeId || room.id} className="group grid grid-cols-1 lg:grid-cols-2 gap-8 border-t border-[#1A1A1A]/10 pt-16 mt-16 first:mt-4 first:pt-4">
-                            <div className="overflow-hidden aspect-[4/5] relative">
-                                <img 
-                                    src={room.imageUrl || "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800&auto=format&fit=crop&q=60"} 
-                                    alt={room.name} 
-                                    className="w-full h-full object-cover grayscale opacity-90 transition-all duration-[2000ms] group-hover:grayscale-0 group-hover:scale-105"
-                                />
-                                <div className="absolute inset-0 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)] pointer-events-none"></div>
-                            </div>
-                            <div className="flex flex-col justify-between py-4 lg:py-8 lg:pl-4">
-                                <div>
-                                    <h2 className="text-3xl lg:text-4xl font-serif text-[#1A1A1A] group-hover:text-[#D4AF37] transition-colors duration-700">{room.name}</h2>
-                                    <div className="mt-6 space-y-2 text-[#6C6863] text-sm leading-relaxed">
-                                        <p>{t('search.accommodates', { count: room.maxGuests })}</p>
-                                        <p>{room.description || t('search.roomDescription')}</p>
-                                        <p className="text-xs text-[#6C6863]/60">{room.availableCount} room{room.availableCount > 1 ? 's' : ''} available</p>
+                    ) : (
+                        <>
+                            {paginatedRooms.map((room) => (
+                                <div key={room.roomTypeId || room.id} className="group grid grid-cols-1 lg:grid-cols-2 gap-8 border-t border-[#1A1A1A]/10 pt-16 mt-16 first:mt-4 first:pt-4">
+                                    <div className="overflow-hidden aspect-[4/5] relative">
+                                        <img 
+                                            src={room.imageUrl || "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800&auto=format&fit=crop&q=60"} 
+                                            alt={room.name} 
+                                            className="w-full h-full object-cover grayscale opacity-90 transition-all duration-[2000ms] group-hover:grayscale-0 group-hover:scale-105"
+                                        />
+                                        <div className="absolute inset-0 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)] pointer-events-none"></div>
                                     </div>
-                                </div>
-                                <div className="mt-12 space-y-4">
-                                    <div className="flex justify-between items-end">
+                                    <div className="flex flex-col justify-between py-4 lg:py-8 lg:pl-4">
                                         <div>
-                                            <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-1">{t('search.startingFrom')}</p>
-                                            <p className="text-2xl font-serif">${room.basePrice} <span className="text-sm italic text-[#6C6863]">/ {t('search.night')}</span></p>
-                                            {nights > 0 && room.total && <p className="text-sm text-[#6C6863] mt-1">${room.total} <span className="text-xs italic">total ({nights}n, incl. 10% VAT)</span></p>}
+                                            <h2 className="text-3xl lg:text-4xl font-serif text-[#1A1A1A] group-hover:text-[#D4AF37] transition-colors duration-700">{room.name}</h2>
+                                            <div className="mt-6 space-y-2 text-[#6C6863] text-sm leading-relaxed">
+                                                <p>{t('search.accommodates', { count: room.maxGuests })}</p>
+                                                <p>{room.description || t('search.roomDescription')}</p>
+                                                <p className="text-xs text-[#6C6863]/60">{room.availableCount} room{room.availableCount > 1 ? 's' : ''} available</p>
+                                            </div>
                                         </div>
-                                        <Button 
-                                            variant="secondary" 
-                                            className="group-hover:bg-[#1A1A1A] group-hover:text-white transition-all duration-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                                            disabled={!checkIn || !checkOut}
-                                            onClick={() => window.location.href = `/checkout?roomType=${room.roomTypeId || room.id}&checkIn=${checkIn ? toISO(checkIn) : ''}&checkOut=${checkOut ? toISO(checkOut) : ''}&adults=${adults}&children=${children}`}
-                                        >
-                                            {!checkIn || !checkOut ? 'Select Dates' : t('search.reserve')}
-                                        </Button>
+                                        <div className="mt-12 space-y-4">
+                                            <div className="flex justify-between items-end">
+                                                <div>
+                                                    <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-1">{t('search.startingFrom')}</p>
+                                                    <p className="text-2xl font-serif">${room.basePrice} <span className="text-sm italic text-[#6C6863]">/ {t('search.night')}</span></p>
+                                                    {nights > 0 && room.total && <p className="text-sm text-[#6C6863] mt-1">${room.total} <span className="text-xs italic">total ({nights}n, incl. 10% VAT)</span></p>}
+                                                </div>
+                                                <Button 
+                                                    variant="secondary" 
+                                                    className="group-hover:bg-[#1A1A1A] group-hover:text-white transition-all duration-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    disabled={!checkIn || !checkOut}
+                                                    onClick={() => window.location.href = `/checkout?roomType=${room.roomTypeId || room.id}&checkIn=${checkIn ? toISO(checkIn) : ''}&checkOut=${checkOut ? toISO(checkOut) : ''}&adults=${adults}&children=${children}`}
+                                                >
+                                                    {!checkIn || !checkOut ? 'Select Dates' : t('search.reserve')}
+                                                </Button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    ))}
+                            ))}
+
+                            {/* Pagination Controls */}
+                            {totalPages > 1 && (
+                                <div className="flex justify-center items-center gap-8 mt-24 pt-12 border-t border-[#1A1A1A]/10">
+                                    <button 
+                                        onClick={() => {
+                                            setCurrentPage(prev => Math.max(1, prev - 1));
+                                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        }}
+                                        disabled={currentPage === 1}
+                                        className="group flex items-center gap-3 text-[10px] uppercase tracking-[0.3em] font-bold text-[#1A1A1A] disabled:opacity-20 transition-all"
+                                    >
+                                        <svg className="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="square" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                                        </svg>
+                                        Previous
+                                    </button>
+                                    
+                                    <div className="flex items-center gap-4">
+                                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                                            <button
+                                                key={p}
+                                                onClick={() => {
+                                                    setCurrentPage(p);
+                                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                                }}
+                                                className={`w-10 h-10 flex items-center justify-center text-[10px] font-bold transition-all border ${
+                                                    currentPage === p 
+                                                    ? 'bg-[#1A1A1A] text-[#F9F8F6] border-[#1A1A1A]' 
+                                                    : 'text-[#1A1A1A]/40 border-transparent hover:border-[#1A1A1A]/10 hover:text-[#1A1A1A]'
+                                                }`}
+                                            >
+                                                {String(p).padStart(2, '0')}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    <button 
+                                        onClick={() => {
+                                            setCurrentPage(prev => Math.min(totalPages, prev + 1));
+                                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        }}
+                                        disabled={currentPage === totalPages}
+                                        className="group flex items-center gap-3 text-[10px] uppercase tracking-[0.3em] font-bold text-[#1A1A1A] disabled:opacity-20 transition-all"
+                                    >
+                                        Next
+                                        <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="square" strokeWidth="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            )}
+                        </>
+                    )}
                 </div>
             </div>
         </div>

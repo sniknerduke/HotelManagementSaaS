@@ -65,15 +65,22 @@ public class UserResource {
     public record UpdateRoleRequest(
             @NotBlank(message = "Role is required") String role) {}
 
+    public record UpdateCrmRequest(
+            String internalNotes,
+            Boolean isVip) {}
+
     public record ChangePasswordRequest(
             @NotBlank(message = "Current password is required") String currentPassword, 
             @NotBlank(message = "New password is required") @Size(min = 6, message = "New password must be at least 6 characters") String newPassword) {}
 
     public record UserResponse(UUID id, String email, String firstName, String lastName, String role, String phoneNumber,
-                               String nationality, String nationalId, java.time.LocalDate dateOfBirth, String address, String guestPreferences, String avatarUrl, boolean isActive) {
+                               String nationality, String nationalId, java.time.LocalDate dateOfBirth, String address, 
+                               String guestPreferences, String internalNotes, Boolean isVip, String avatarUrl, 
+                               java.time.Instant createdAt, boolean isActive) {
         public static UserResponse from(User u) {
             return new UserResponse(u.id, u.email, u.firstName, u.lastName, u.role.name(), u.phoneNumber,
-                    u.nationality, u.nationalId, u.dateOfBirth, u.address, u.guestPreferences, u.avatarUrl, u.isActive);
+                    u.nationality, u.nationalId, u.dateOfBirth, u.address, u.guestPreferences, 
+                    u.internalNotes, u.isVip, u.avatarUrl, u.createdAt, u.isActive);
         }
     }
 
@@ -264,5 +271,21 @@ public class UserResource {
     @RolesAllowed({"GUEST", "STAFF", "ADMIN"})
     public Response logout() {
         return Response.ok("{\"message\": \"Logged out successfully\"}").build();
+    }
+
+    @PATCH
+    @Path("/{id}/crm")
+    @RolesAllowed({"STAFF", "ADMIN"})
+    @Transactional
+    public Response updateCrm(@PathParam("id") UUID id, @Valid UpdateCrmRequest req) {
+        User user = User.findById(id);
+        if (user == null || !user.isActive) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        if (req.internalNotes() != null) user.internalNotes = req.internalNotes();
+        if (req.isVip() != null) user.isVip = req.isVip();
+
+        return Response.ok(UserResponse.from(user)).build();
     }
 }

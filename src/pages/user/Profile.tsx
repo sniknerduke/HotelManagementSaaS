@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { Star } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
+import { Modal } from '../../components/ui/Modal';
+import { Input } from '../../components/ui/Input';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { useNavigate } from 'react-router-dom';
@@ -48,6 +53,13 @@ export const Profile: React.FC = () => {
   const [roomImages, setRoomImages] = useState<Record<number, string>>({});
   const hasActiveStay = dbBookings.some((b) => b.status === 'CONFIRMED' || b.status === 'CHECKED_IN');
 
+  const [preferences, setPreferences] = useState({
+    roomReqs: [] as string[],
+    dietary: '',
+    notifications: { email: true, sms: true }
+  });
+  const [isSavingPrefs, setIsSavingPrefs] = useState(false);
+
   const getRoomInfo = (roomId: number) => allRooms.find((r: any) => r.id === roomId);
 
   useEffect(() => {
@@ -55,9 +67,10 @@ export const Profile: React.FC = () => {
       setIsFetchingBookings(true);
       Promise.all([
         BookingService.getUserBookings(user.id),
-        InventoryService.getAllRooms()
+        InventoryService.getAllRooms(),
+        AuthService.getProfile(user.id)
       ])
-        .then(([res, roomsRes]: [any[], any[]]) => {
+        .then(([res, roomsRes, profileRes]: [any[], any[], any]) => {
             setDbBookings(res);
             const imageMap: Record<number, string> = {};
             roomsRes.forEach(r => {
@@ -66,8 +79,19 @@ export const Profile: React.FC = () => {
                 }
             });
             setRoomImages(imageMap);
+
+            if (profileRes?.guestPreferences) {
+              try {
+                const prefs = JSON.parse(profileRes.guestPreferences);
+                setPreferences({
+                  roomReqs: prefs.roomReqs || [],
+                  dietary: prefs.dietary || '',
+                  notifications: prefs.notifications || { email: true, sms: true }
+                });
+              } catch (e) {}
+            }
         })
-        .catch((err) => console.error('Failed to load bookings or rooms', err))
+        .catch((err) => console.error('Failed to load user data', err))
         .finally(() => setIsFetchingBookings(false));
     }
   }, [user]);
@@ -78,9 +102,78 @@ export const Profile: React.FC = () => {
 
   const getFallbackImage = () => 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800&auto=format&fit=crop&q=60';
 
-  const savedPayments = [
-    { id: 'pm_1', card: 'Visa', last4: '1234', exp: '12/28' }
-  ];
+  const [savedPayments, setSavedPayments] = useState<{ id: string; card: string; last4: string; exp: string }[]>(() => {
+    try {
+      const saved = localStorage.getItem('user_payment_methods');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return [{ id: 'pm_1', card: 'Visa', last4: '1234', exp: '12/28' }];
+  });
+
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [newPaymentData, setNewPaymentData] = useState({ cardName: '', cardNumber: '', exp: '', cvc: '' });
+
+  // Review state
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [selectedReviewBooking, setSelectedReviewBooking] = useState<any>(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
+  const handleAddPaymentSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      
+      const rawCard = newPaymentData.cardNumber.replace(/\s/g, '');
+      if (rawCard.length < 15) {
+          toast('Please enter a valid card number', 'error');
+          return;
+      }
+      
+      if (newPaymentData.exp.length !== 5 || !/^(0[1-9]|1[0-2])\/\d{2}$/.test(newPaymentData.exp)) {
+          toast('Please enter a valid expiry date (MM/YY)', 'error');
+          return;
+      }
+      
+      if (newPaymentData.cvc.length < 3) {
+          toast('Please enter a valid CVC', 'error');
+          return;
+      }
+
+      const last4 = rawCard.slice(-4) || 'XXXX';
+      const pName = newPaymentData.cardName.toLowerCase();
+      const cardTypeStr = pName.includes('master') ? 'MasterCard' : (pName.includes('amex') ? 'Amex' : 'Visa');
+      
+      const newPm = { id: `pm_${Date.now()}`, card: cardTypeStr, last4: last4, exp: newPaymentData.exp };
+      const updated = [...savedPayments, newPm];
+      setSavedPayments(updated);
+      localStorage.setItem('user_payment_methods', JSON.stringify(updated));
+      toast('Payment method added successfully', 'success');
+      setIsPaymentModalOpen(false);
+      setNewPaymentData({ cardName: '', cardNumber: '', exp: '', cvc: '' });
+  };
+
+  const handleRemovePayment = (id: string) => {
+      if (!window.confirm('Remove this payment method?')) return;
+      const updated = savedPayments.filter((pm) => pm.id !== id);
+      setSavedPayments(updated);
+      localStorage.setItem('user_payment_methods', JSON.stringify(updated));
+      toast('Payment method removed', 'success');
+  };
+
+  const handleUpdatePreferences = async () => {
+    if (!user) return;
+    setIsSavingPrefs(true);
+    try {
+      await AuthService.updateProfile(user.id, {
+        guestPreferences: JSON.stringify(preferences)
+      });
+      toast('Preferences updated successfully', 'success');
+    } catch (err: any) {
+      toast(err.message || 'Failed to update preferences', 'error');
+    } finally {
+      setIsSavingPrefs(false);
+    }
+  };
 
   const handleUpdateProfile = async () => {
     if (!user?.id) return;
@@ -146,13 +239,84 @@ export const Profile: React.FC = () => {
     }
   };
 
-  const handleViewReceipt = async (reservationId: number) => {
+  const handleViewReceipt = async (booking: any) => {
       try {
-          const receipt = await PaymentService.getPaymentByReservation(reservationId);
-          alert(`Receipt for BKG-${reservationId}\n\nAmount: $${receipt.amount}\nStatus: ${receipt.status}\nMethod: ${receipt.paymentMethod || 'Credit Card'}\nDate: ${new Date(receipt.createdAt || Date.now()).toLocaleDateString()}`);
+          const receipt = await PaymentService.getPaymentByReservation(booking.id);
+          const doc = new jsPDF();
+
+          // Title
+          doc.setFontSize(22);
+          doc.setTextColor(26, 26, 26);
+          doc.text("LUMIERE HOTEL", 105, 20, { align: "center" });
+          doc.setFontSize(14);
+          doc.setTextColor(212, 175, 55); // #D4AF37 gold
+          doc.text("INVOICE", 105, 30, { align: "center" });
+
+          // Basic details
+          doc.setFontSize(10);
+          doc.setTextColor(108, 104, 99);
+          doc.text(`Invoice ID: INV-BKG-${booking.id}`, 14, 45);
+          doc.text(`Date Issued: ${new Date(receipt.createdAt || Date.now()).toLocaleDateString()}`, 14, 52);
+
+          doc.text(`Billed To: ${user?.firstName} ${user?.lastName}`, 14, 65);
+          doc.text(`Email: ${user?.email}`, 14, 72);
+
+          // Table
+          autoTable(doc, {
+              startY: 85,
+              head: [['Description', 'Check-In', 'Check-Out', 'Amount']],
+              body: [
+                  [`Room ${booking.roomId} Reservation`, booking.checkInDate, booking.checkOutDate, `$${receipt.amount}`]
+              ],
+              theme: 'striped',
+              headStyles: { fillColor: [26, 26, 26] },
+          });
+
+          // Summary
+          const finalY = (doc as any).lastAutoTable.finalY + 15;
+          doc.setFontSize(12);
+          doc.setTextColor(26, 26, 26);
+          doc.text(`Total Paid: $${receipt.amount}`, 14, finalY);
+          
+          doc.setFontSize(10);
+          doc.text(`Payment Method: ${receipt.paymentMethod || 'Credit Card'}`, 14, finalY + 8);
+          doc.text(`Payment Status: ${receipt.status}`, 14, finalY + 15);
+
+          // Footer
+          doc.setFontSize(8);
+          doc.setTextColor(150, 150, 150);
+          doc.text("Thank you for staying with Lumiere Hotel.", 105, 280, { align: "center" });
+
+          doc.save(`Invoice_BKG_${booking.id}.pdf`);
+          toast('Invoice downloaded successfully', 'success');
       } catch (err: any) {
           toast(err.message || 'Receipt not found', 'error');
       }
+  };
+
+  const handleOpenReview = (booking: any) => {
+    setSelectedReviewBooking(booking);
+    setReviewRating(5);
+    setReviewComment('');
+    setReviewModalOpen(true);
+  };
+
+  const handleSubmitReview = async () => {
+    if (!reviewComment.trim()) {
+      toast('Please enter a review comment.', 'error');
+      return;
+    }
+    setIsSubmittingReview(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 800)); // Mock API delay
+      toast('Review submitted successfully!', 'success');
+      setReviewModalOpen(false);
+      setSelectedReviewBooking(null);
+    } catch (err: any) {
+      toast('Failed to submit review.', 'error');
+    } finally {
+      setIsSubmittingReview(false);
+    }
   };
 
   return (
@@ -339,8 +503,8 @@ export const Profile: React.FC = () => {
                         <p className="text-xs text-[#6C6863] mt-2">{booking.checkInDate} to {booking.checkOutDate}</p>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-3">
-                      <Button onClick={() => handleViewReceipt(booking.id)} variant="ghost" className="border border-[#1A1A1A]/20 text-xs h-9">{t('profile.manageBookings.downloadInvoice')}</Button>
-                      <Button onClick={() => alert('Available in v2.0')} variant="primary" className="text-xs h-9 bg-[#1A1A1A] text-white">{t('profile.manageBookings.leaveReview')}</Button>
+                      <Button onClick={() => handleViewReceipt(booking)} variant="ghost" className="border border-[#1A1A1A]/20 text-xs h-9">{t('profile.manageBookings.downloadInvoice')}</Button>
+                      <Button onClick={() => handleOpenReview(booking)} variant="primary" className="text-xs h-9 bg-[#1A1A1A] text-white">{t('profile.manageBookings.leaveReview')}</Button>
                     </div>
                   </Card>
                 )) : (
@@ -412,7 +576,6 @@ export const Profile: React.FC = () => {
                       <div className="flex bg-[#F9F8F6] p-1 border border-[#1A1A1A]/10">
                         <button onClick={() => setLanguage('EN')} className={`px-4 py-2 text-xs font-bold tracking-wider ${language === 'EN' ? 'bg-[#1A1A1A] text-white' : 'text-[#6C6863] hover:text-[#1A1A1A]'} transition-colors`}>EN</button>
                         <button onClick={() => setLanguage('VN')} className={`px-4 py-2 text-xs font-bold tracking-wider ${language === 'VN' ? 'bg-[#1A1A1A] text-white' : 'text-[#6C6863] hover:text-[#1A1A1A]'} transition-colors`}>VN</button>
-                        <button onClick={() => setLanguage('JA')} className={`px-4 py-2 text-xs font-bold tracking-wider ${language === 'JA' ? 'bg-[#1A1A1A] text-white' : 'text-[#6C6863] hover:text-[#1A1A1A]'} transition-colors`}>JA</button>
                       </div>
                     </div>
                  </div>
@@ -426,13 +589,13 @@ export const Profile: React.FC = () => {
 
                  {/* Danger Zone */}
                  <div className="mt-16 pt-8 border-t border-red-500/20">
-                     <h3 className="text-xl font-serif text-red-700 mb-4">Danger Zone</h3>
+                     <h3 className="text-xl font-serif text-red-700 mb-4">{t('profile.dangerZone.title')}</h3>
                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 border border-red-500/20 bg-red-50/50">
                         <div>
-                          <p className="font-serif text-[#1A1A1A] text-lg">Deactivate Account</p>
-                          <p className="text-xs text-[#6C6863] mt-1">Once you deactivate your account, there is no going back. Please be certain.</p>
+                          <p className="font-serif text-[#1A1A1A] text-lg">{t('profile.dangerZone.deactivate')}</p>
+                          <p className="text-xs text-[#6C6863] mt-1">{t('profile.dangerZone.warning')}</p>
                         </div>
-                        <Button disabled={isDeactivating} onClick={handleDeactivateAccount} variant="ghost" className="border border-red-700 text-red-700 text-xs bg-transparent hover:bg-red-700 hover:text-white transition-colors">{isDeactivating ? 'Deactivating...' : 'Deactivate Account'}</Button>
+                        <Button disabled={isDeactivating} onClick={handleDeactivateAccount} variant="ghost" className="border border-red-700 text-red-700 text-xs bg-transparent hover:bg-red-700 hover:text-white transition-colors">{isDeactivating ? t('profile.dangerZone.deactivating') : t('profile.dangerZone.deactivate')}</Button>
                      </div>
                  </div>
                </div>
@@ -458,11 +621,11 @@ export const Profile: React.FC = () => {
                           <p className="text-[10px] uppercase tracking-widest text-[#6C6863] mt-1">{t('profile.paymentMethods.expires')} {pm.exp}</p>
                         </div>
                       </div>
-                      <button onClick={() => alert('Available in v2.0')} className="text-xs text-[#6C6863] hover:text-red-600 transition-colors uppercase tracking-[0.2em] font-medium border-b border-transparent hover:border-red-600">{t('profile.paymentMethods.remove')}</button>
+                      <button onClick={() => handleRemovePayment(pm.id)} className="text-xs text-[#6C6863] hover:text-red-600 transition-colors uppercase tracking-[0.2em] font-medium border-b border-transparent hover:border-red-600">{t('profile.paymentMethods.remove')}</button>
                     </Card>
                   ))}
                   
-                  <button onClick={() => alert('Available in v2.0')} className="w-full py-8 border border-dashed border-[#1A1A1A]/20 bg-transparent hover:bg-[#1A1A1A]/5 transition-colors flex flex-col items-center justify-center gap-3 text-[#6C6863] hover:text-[#1A1A1A]">
+                  <button onClick={() => setIsPaymentModalOpen(true)} className="w-full py-8 border border-dashed border-[#1A1A1A]/20 bg-transparent hover:bg-[#1A1A1A]/5 transition-colors flex flex-col items-center justify-center gap-3 text-[#6C6863] hover:text-[#1A1A1A]">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M12 4v16m8-8H4"></path></svg>
                     <span className="text-[10px] uppercase font-bold tracking-[0.2em]">{t('profile.paymentMethods.addNew')}</span>
                   </button>
@@ -493,7 +656,15 @@ export const Profile: React.FC = () => {
                         { id: 'firmMattress', label: t('profile.guestPreferences.prefs.firmMattress') }
                       ].map(pref => (
                         <label key={pref.id} className="flex items-center gap-4 p-4 border border-[#1A1A1A]/10 bg-white cursor-pointer hover:border-[#D4AF37]/50 transition-colors">
-                          <input type="checkbox" className="w-4 h-4 rounded-none text-[#D4AF37] focus:ring-[#D4AF37] focus:ring-offset-0 border-[#1A1A1A]/20" />
+                          <input 
+                            type="checkbox" 
+                            checked={preferences.roomReqs.includes(pref.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) setPreferences({...preferences, roomReqs: [...preferences.roomReqs, pref.id]});
+                              else setPreferences({...preferences, roomReqs: preferences.roomReqs.filter(id => id !== pref.id)});
+                            }}
+                            className="w-4 h-4 rounded-none text-[#D4AF37] focus:ring-[#D4AF37] focus:ring-offset-0 border-[#1A1A1A]/20" 
+                          />
                           <span className="text-sm text-[#1A1A1A] font-serif">{pref.label}</span>
                         </label>
                       ))}
@@ -505,6 +676,8 @@ export const Profile: React.FC = () => {
                     <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#1A1A1A] mb-6">{t('profile.guestPreferences.dietary')}</h3>
                     <textarea 
                       placeholder={t('profile.guestPreferences.dietaryPlaceholder')}
+                      value={preferences.dietary}
+                      onChange={(e) => setPreferences({...preferences, dietary: e.target.value})}
                       className="w-full h-32 p-4 border border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] font-serif text-[#1A1A1A] resize-none"
                     ></textarea>
                   </div>
@@ -518,20 +691,20 @@ export const Profile: React.FC = () => {
                           <p className="text-sm font-bold text-[#1A1A1A] uppercase tracking-wider text-[11px] mb-1">{t('profile.guestPreferences.emailAlerts')}</p>
                           <p className="text-xs text-[#6C6863] font-serif">{t('profile.guestPreferences.emailDesc')}</p>
                         </div>
-                        <input type="checkbox" defaultChecked className="w-5 h-5 rounded-none text-[#D4AF37] focus:ring-[#D4AF37] border-[#1A1A1A]/20" />
+                        <input type="checkbox" checked={preferences.notifications.email} onChange={(e) => setPreferences({...preferences, notifications: {...preferences.notifications, email: e.target.checked}})} className="w-5 h-5 rounded-none text-[#D4AF37] focus:ring-[#D4AF37] border-[#1A1A1A]/20" />
                       </label>
                       <label className="flex justify-between items-center p-4 border border-[#1A1A1A]/10 bg-white cursor-pointer">
                         <div>
                           <p className="text-sm font-bold text-[#1A1A1A] uppercase tracking-wider text-[11px] mb-1">{t('profile.guestPreferences.smsAlerts')}</p>
                           <p className="text-xs text-[#6C6863] font-serif">{t('profile.guestPreferences.smsDesc')}</p>
                         </div>
-                        <input type="checkbox" defaultChecked className="w-5 h-5 rounded-none text-[#D4AF37] focus:ring-[#D4AF37] border-[#1A1A1A]/20" />
+                        <input type="checkbox" checked={preferences.notifications.sms} onChange={(e) => setPreferences({...preferences, notifications: {...preferences.notifications, sms: e.target.checked}})} className="w-5 h-5 rounded-none text-[#D4AF37] focus:ring-[#D4AF37] border-[#1A1A1A]/20" />
                       </label>
                     </div>
                   </div>
                   
                   <div className="flex justify-end pt-8">
-                    <Button onClick={() => alert('Available in v2.0')} variant="primary" className="bg-[#1A1A1A] text-white hover:bg-[#D4AF37] px-8 transition-colors duration-500">{t('profile.guestPreferences.update')}</Button>
+                    <Button disabled={isSavingPrefs} onClick={handleUpdatePreferences} variant="primary" className="bg-[#1A1A1A] text-white hover:bg-[#D4AF37] px-8 transition-colors duration-500">{isSavingPrefs ? 'Updating...' : t('profile.guestPreferences.update')}</Button>
                   </div>
 
                 </div>
@@ -540,6 +713,119 @@ export const Profile: React.FC = () => {
 
         </div>
       </div>
+
+      {/* Add Payment Method Modal */}
+      <Modal isOpen={isPaymentModalOpen} onClose={() => setIsPaymentModalOpen(false)} title="Add Payment Method">
+        <form onSubmit={handleAddPaymentSubmit} className="space-y-6">
+          <div className="space-y-4">
+            <Input 
+              label="Cardholder Name" 
+              required 
+              placeholder="JOHN DOE"
+              value={newPaymentData.cardName}
+              onChange={(e) => setNewPaymentData({...newPaymentData, cardName: e.target.value})}
+            />
+            <Input 
+              label="Card Number" 
+              required 
+              placeholder="0000 0000 0000 0000"
+              maxLength={19}
+              value={newPaymentData.cardNumber}
+              onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, '');
+                  const formatted = val.replace(/(.{4})/g, '$1 ').trim();
+                  setNewPaymentData({...newPaymentData, cardNumber: formatted});
+              }}
+            />
+            <div className="grid grid-cols-2 gap-4">
+              <Input 
+                label="Expiry Date" 
+                required 
+                placeholder="MM/YY"
+                maxLength={5}
+                value={newPaymentData.exp}
+                onChange={(e) => {
+                    let val = e.target.value.replace(/\D/g, '');
+                    if (val.length > 2) {
+                        val = val.substring(0, 2) + '/' + val.substring(2, 4);
+                    }
+                    setNewPaymentData({...newPaymentData, exp: val});
+                }}
+              />
+              <Input 
+                label="CVC" 
+                required 
+                type="password"
+                placeholder="123"
+                maxLength={4}
+                value={newPaymentData.cvc}
+                onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '');
+                    setNewPaymentData({...newPaymentData, cvc: val});
+                }}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-3 mt-8 pt-4 border-t border-[#1A1A1A]/10">
+            <Button type="button" variant="ghost" onClick={() => setIsPaymentModalOpen(false)} className="px-6 border border-[#1A1A1A]/20">
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary" className="bg-[#1A1A1A] text-white px-6">
+              Add Card
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Review Modal */}
+      <Modal isOpen={reviewModalOpen} onClose={() => setReviewModalOpen(false)} title="Review Your Stay">
+        <div className="space-y-6">
+          <p className="text-sm text-[#6C6863]">
+            How was your stay in <span className="font-semibold text-[#1A1A1A]">Room {selectedReviewBooking?.roomId}</span>?
+          </p>
+
+          <div className="flex flex-col items-center space-y-2">
+            <label className="text-xs uppercase tracking-[0.1em] font-medium text-[#6C6863]">Rating</label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button 
+                  key={star}
+                  onClick={() => setReviewRating(star)}
+                  className="focus:outline-none transition-transform hover:scale-110"
+                >
+                  <Star
+                    size={32}
+                    className={`transition-colors ${star <= reviewRating ? 'fill-[#D4AF37] text-[#D4AF37]' : 'text-gray-300'}`}
+                  />
+                </button>
+              ))}
+            </div>
+            <span className="text-xs text-[#D4AF37] font-medium mt-1">
+              {['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][reviewRating - 1]}
+            </span>
+          </div>
+
+          <div>
+            <label className="text-xs uppercase tracking-[0.1em] font-medium text-[#6C6863] mb-2 block">Comment</label>
+            <textarea 
+              value={reviewComment}
+              onChange={(e) => setReviewComment(e.target.value)}
+              className="w-full min-h-[120px] p-3 border border-[#1A1A1A]/20 focus:border-[#D4AF37] outline-none resize-none font-serif text-[#1A1A1A] transition-colors"
+              placeholder="Tell us about what you loved about your stay..."
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-[#1A1A1A]/10">
+            <Button variant="ghost" onClick={() => setReviewModalOpen(false)} className="border border-[#1A1A1A]/20">
+              Cancel
+            </Button>
+            <Button variant="primary" className="bg-[#1A1A1A] text-white" disabled={isSubmittingReview} onClick={handleSubmitReview}>
+              {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
     </div>
   );
 };

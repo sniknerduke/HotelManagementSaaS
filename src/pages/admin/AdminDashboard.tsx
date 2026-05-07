@@ -185,6 +185,22 @@ export const AdminDashboard: React.FC = () => {
         return u ? `${u.firstName} ${u.lastName}` : userId.substring(0, 8);
     };
 
+    const getUserPrefs = (userId: string) => {
+        const u = users.find(u => u.id === userId);
+        if (u?.guestPreferences) {
+            try {
+                const prefs = JSON.parse(u.guestPreferences);
+                let text = [];
+                if (prefs.roomReqs?.length) text.push(`Reqs: ${prefs.roomReqs.join(', ')}`);
+                if (prefs.dietary) text.push(`Dietary: ${prefs.dietary}`);
+                return text.join(' | ');
+            } catch (e) {
+                return u.guestPreferences;
+            }
+        }
+        return '';
+    };
+
     const getPaymentForBooking = (bookingId: number) => {
         return payments.find((p: any) => p.reservationId === bookingId);
     };
@@ -669,7 +685,22 @@ export const AdminDashboard: React.FC = () => {
                                 <tbody>
                                     {bookings.map((booking: any, index: number) => (
                                         <tr key={booking.id || index} className="border-b border-[#1A1A1A]/5 hover:bg-[#F9F8F6]/50 transition-colors group">
-                                            <td className="py-4 px-6 text-sm font-bold text-[#1A1A1A] font-serif">{getUserName(booking.userId)}</td>
+                                            <td className="py-4 px-6 relative group/tooltip">
+                                                <div className="text-sm font-bold text-[#1A1A1A] font-serif">{getUserName(booking.userId)}</div>
+                                                {getUserPrefs(booking.userId) && (
+                                                    <>
+                                                        <div className="inline-block mt-1 px-2 py-0.5 bg-[#D4AF37]/10 text-[#D4AF37] text-[9px] uppercase tracking-widest font-bold rounded cursor-help">
+                                                            View Prefs
+                                                        </div>
+                                                        <div className="absolute z-10 left-6 top-full mt-1 w-64 p-4 bg-white border border-[#1A1A1A]/10 shadow-[0_8px_32px_rgba(0,0,0,0.08)] opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-300">
+                                                            <div className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#1A1A1A] mb-3 border-b border-[#1A1A1A]/10 pb-2">Guest Preferences</div>
+                                                            <div className="text-xs text-[#6C6863] whitespace-pre-wrap leading-relaxed normal-case tracking-normal">
+                                                                {getUserPrefs(booking.userId).split(' | ').join('\n\n')}
+                                                            </div>
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </td>
                                             <td className="py-4 px-6 text-xs text-[#6C6863]">BKG-{booking.id}</td>
                                             <td className="py-4 px-6 text-sm text-[#1A1A1A] font-serif italic text-[#D4AF37]">Room {booking.roomId}</td>
                                             <td className="py-4 px-6 text-xs text-[#6C6863]">{booking.checkInDate} to {booking.checkOutDate}</td>

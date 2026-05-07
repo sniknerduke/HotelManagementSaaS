@@ -38,6 +38,9 @@ public class User extends PanacheEntityBase {
 
     public String address;
 
+    @Column(name = "guest_preferences", columnDefinition = "TEXT")
+    public String guestPreferences;
+
     @Column(name = "avatar_url")
     public String avatarUrl;
 

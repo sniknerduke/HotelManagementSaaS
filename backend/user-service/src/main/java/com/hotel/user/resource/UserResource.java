@@ -59,6 +59,7 @@ public class UserResource {
             @Size(min = 9, max = 12, message = "National ID must be between 9 and 12 characters") String nationalId, 
             @Past(message = "Date of birth must be in the past") java.time.LocalDate dateOfBirth, 
             @Size(max = 255, message = "Address length must be less than 255") String address, 
+            String guestPreferences,
             String avatarUrl) {}
 
     public record UpdateRoleRequest(
@@ -69,10 +70,10 @@ public class UserResource {
             @NotBlank(message = "New password is required") @Size(min = 6, message = "New password must be at least 6 characters") String newPassword) {}
 
     public record UserResponse(UUID id, String email, String firstName, String lastName, String role, String phoneNumber,
-                               String nationality, String nationalId, java.time.LocalDate dateOfBirth, String address, String avatarUrl, boolean isActive) {
+                               String nationality, String nationalId, java.time.LocalDate dateOfBirth, String address, String guestPreferences, String avatarUrl, boolean isActive) {
         public static UserResponse from(User u) {
             return new UserResponse(u.id, u.email, u.firstName, u.lastName, u.role.name(), u.phoneNumber,
-                    u.nationality, u.nationalId, u.dateOfBirth, u.address, u.avatarUrl, u.isActive);
+                    u.nationality, u.nationalId, u.dateOfBirth, u.address, u.guestPreferences, u.avatarUrl, u.isActive);
         }
     }
 
@@ -197,6 +198,7 @@ public class UserResource {
         if (req.nationalId() != null) user.nationalId = req.nationalId();
         if (req.dateOfBirth() != null) user.dateOfBirth = req.dateOfBirth();
         if (req.address() != null) user.address = req.address();
+        if (req.guestPreferences() != null) user.guestPreferences = req.guestPreferences();
         if (req.avatarUrl() != null) user.avatarUrl = req.avatarUrl();
 
         return Response.ok(UserResponse.from(user)).build();

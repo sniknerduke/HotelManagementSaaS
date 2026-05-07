@@ -99,6 +99,12 @@
       "langDesc": "Chọn ngôn ngữ giao diện ưu tiên của bạn",
       "saveChanges": "Lưu thay đổi"
     },
+    "dangerZone": {
+      "title": "Khu Vực Nguy Hiểm",
+      "deactivate": "Vô Hiệu Hóa Tài Khoản",
+      "warning": "Một khi bạn vô hiệu hóa tài khoản, bạn sẽ không thể lấy lại. Vui lòng chắc chắn.",
+      "deactivating": "Đang vô hiệu hóa..."
+    },
     "paymentMethods": {
       "title": "Phương thức",
       "titleItalic": "Thanh toán",
@@ -584,6 +590,7 @@
       "grandPenthouse": "The Grand Penthouse",
       "from": "Từ",
       "upToGuests": "Tối đa {{count}} Khách",
+      "available": "phòng trống",
       "viewDetails": "Xem Chi Tiết"
     },
     "amenities": {

@@ -83,16 +83,14 @@ export const Home: React.FC = () => {
     };
     window.addEventListener('scroll', handleScroll);
     
-    InventoryService.getAllRoomTypes()
-      .then(roomTypesData => {
-        if (Array.isArray(roomTypesData)) {
-          setRoomTypes(
-            roomTypesData
-              .filter((room: any) => Number(room.availableCount || 0) > 0)
-              .slice(0, 3)
-          );
-        }
-      })
+      InventoryService.getAllRoomTypes()
+        .then(roomTypesData => {
+          if (Array.isArray(roomTypesData)) {
+            setRoomTypes(
+              roomTypesData.slice(0, 3)
+            );
+          }
+        })
       .catch(err => console.error("Failed to fetch featured rooms:", err));
 
     return () => window.removeEventListener('scroll', handleScroll);
@@ -353,7 +351,7 @@ export const Home: React.FC = () => {
                     </span>
                   </div>
                   <div className="flex justify-between items-end">
-                    <p className="text-sm text-[#F9F8F6]/60">{t('home.accommodations.upToGuests', { count: room.maxGuests || 2 })} • {room.availableCount || 0} available</p>
+                    <p className="text-sm text-[#F9F8F6]/60">{t('home.accommodations.upToGuests', { count: room.maxGuests || 2 })} • {room.availableCount || 0} {t('home.accommodations.available')}</p>
                     <span className="text-[10px] uppercase tracking-[0.2em] font-bold border-b border-[#D4AF37] text-[#D4AF37] pb-1 group-hover:text-[#F9F8F6] group-hover:border-[#F9F8F6] transition-colors">{t('home.accommodations.viewDetails')}</span>
                   </div>
                 </motion.div>
@@ -448,7 +446,7 @@ export const Home: React.FC = () => {
         >
           <motion.div variants={fadeInUp} className="flex-1 w-full order-2 lg:order-1">
              <div className="aspect-square md:aspect-video lg:aspect-square w-full relative bg-[#F9F8F6]/10 overflow-hidden group">
-                <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1000&auto=format&fit=crop" alt="Map Location Placeholder" className="w-full h-full object-cover mix-blend-luminosity opacity-60 group-hover:scale-105 transition-transform duration-1000" />
+                <img src="https://images.unsplash.com/photo-1583417319070-4a69db38a482?q=80&w=1000&auto=format&fit=crop" alt="Map Location Placeholder" className="w-full h-full object-cover mix-blend-luminosity opacity-60 group-hover:scale-105 transition-transform duration-1000" />
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                    {/* Map Pin UI */}
                    <div className="w-16 h-16 bg-[#D4AF37] rounded-full flex items-center justify-center shadow-[0_0_0_10px_rgba(212,175,55,0.2)]">
@@ -462,8 +460,8 @@ export const Home: React.FC = () => {
              <h2 className="text-4xl md:text-5xl font-serif mb-12">{t('contact.info.location')}</h2>
              
              <div className="mb-10">
-               <h4 className="text-xs uppercase tracking-[0.1em] font-bold mb-4 border-b border-[#F9F8F6]/20 pb-2 text-[#D4AF37]">{t('contact.info.addressTitle')}</h4>
-               <p className="font-serif text-lg text-[#F9F8F6]/80 leading-relaxed">1 Le Duan Boulevard<br/>District 1, Ho Chi Minh City, Vietnam</p>
+               <h4 className="text-xs uppercase tracking-[0.1em] font-bold mb-4 border-b border-[#F9F8F6]/20 pb-2 text-[#D4AF37]">{t('contact.info.frontDesk')}</h4>
+               <p className="font-serif text-lg text-[#F9F8F6]/80 leading-relaxed">+84 386 957 361<br/>khoiserver1@gmail.com</p>
              </div>
              
              <div className="mb-10">

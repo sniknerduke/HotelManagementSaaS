@@ -99,6 +99,12 @@
       "langDesc": "Select your preferred interface language",
       "saveChanges": "Save Changes"
     },
+    "dangerZone": {
+      "title": "Danger Zone",
+      "deactivate": "Deactivate Account",
+      "warning": "Once you deactivate your account, there is no going back. Please be certain.",
+      "deactivating": "Deactivating..."
+    },
     "paymentMethods": {
       "title": "Payment",
       "titleItalic": "Methods",
@@ -583,6 +589,7 @@
       "grandPenthouse": "The Grand Penthouse",
       "from": "From",
       "upToGuests": "Up to {{count}} Guests",
+      "available": "available",
       "viewDetails": "View Details"
     },
     "amenities": {

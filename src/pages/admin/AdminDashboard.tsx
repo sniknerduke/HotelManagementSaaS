@@ -940,7 +940,7 @@ export const AdminDashboard: React.FC = () => {
                                                             <span className="text-[#D4AF37] font-mono text-sm">${rt.basePrice}</span>
                                                         </div>
                                                         <div className="flex justify-between items-center mt-2">
-                                                            <span className="text-[10px] uppercase text-[#6C6863] tracking-widest">Cap: {rt.defaultCapacity || rt.capacity}</span>
+                                                            <span className="text-[10px] uppercase text-[#6C6863] tracking-widest">Cap: {rt.maxGuests}</span>
                                                             <div className="flex gap-3">
                                                                 <button onClick={() => setEditingCategory(rt)} className="text-[9px] uppercase tracking-widest font-bold text-[#D4AF37] hover:text-[#1A1A1A]">Edit</button>
                                                                 <button onClick={() => handleDeleteCategory(rt.id)} className="text-[9px] uppercase tracking-widest font-bold text-red-500 hover:text-red-800">Delete</button>
@@ -1380,7 +1380,7 @@ export const AdminDashboard: React.FC = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <Input type="number" label="Base Price (USD)" value={editingCategory.basePrice} onChange={(e) => setEditingCategory({ ...editingCategory, basePrice: Number(e.target.value) })} required />
-                            <Input type="number" label="Capacity (Guests)" value={editingCategory.defaultCapacity || editingCategory.capacity} onChange={(e) => setEditingCategory({ ...editingCategory, defaultCapacity: Number(e.target.value) })} required />
+                            <Input type="number" label="Capacity (Guests)" value={editingCategory.maxGuests} onChange={(e) => setEditingCategory({ ...editingCategory, maxGuests: Number(e.target.value) })} required />
                         </div>
                         <Button type="submit" variant="primary" className="w-full mt-4 bg-[#1A1A1A] text-white">Save Changes</Button>
                     </form>

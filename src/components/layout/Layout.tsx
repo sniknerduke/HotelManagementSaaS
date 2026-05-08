@@ -4,6 +4,7 @@ import { Header } from './Header';
 import { Footer } from './Footer';
 import { GridLines } from './GridLines';
 import { NoiseOverlay } from './NoiseOverlay';
+import { ChatBot } from '../common/ChatBot';
 
 export const Layout: React.FC = () => {
   const location = useLocation();
@@ -22,6 +23,7 @@ export const Layout: React.FC = () => {
       </main>
 
       <Footer />
+      <ChatBot />
     </div>
   );
 };

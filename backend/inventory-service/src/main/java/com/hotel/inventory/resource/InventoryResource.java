@@ -313,13 +313,6 @@ public class InventoryResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        long attachedRooms = Room.count("roomType.id = ?1", id);
-        if (attachedRooms > 0) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"error\": \"Cannot delete room type because it has attached rooms\"}")
-                    .build();
-        }
-
         rt.delete();
         return Response.noContent().build();
     }

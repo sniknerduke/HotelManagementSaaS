@@ -52,6 +52,11 @@ export const AdminDashboard: React.FC = () => {
     const [currentRoomPage, setCurrentRoomPage] = useState(1);
     const ROOMS_PER_PAGE = 3;
 
+    // Search and Filter states
+    const [resSearchQuery, setResSearchQuery] = useState('');
+    const [resStatusFilter, setResStatusFilter] = useState('All');
+    const [roomSearchQuery, setRoomSearchQuery] = useState('');
+
     // Auto-calculate walk-in booking total price based on per-day/per-night rate
     useEffect(() => {
         if (walkInForm.checkInDate && walkInForm.checkOutDate && walkInForm.roomId) {
@@ -368,7 +373,7 @@ export const AdminDashboard: React.FC = () => {
     };
 
     const handleDeleteCategory = async (categoryId: number) => {
-        if (!window.confirm("Delete this room category forever?")) return;
+        if (!window.confirm("CAUTION: Deleting this room category will also PERMANENTLY DELETE all associated rooms. Are you absolutely sure you want to proceed?")) return;
         try {
             await InventoryService.deleteRoomType(categoryId);
             toast('Category deleted.', 'success');
@@ -502,6 +507,24 @@ export const AdminDashboard: React.FC = () => {
             toast(`${type} ${format} exported successfully.`, 'success');
         }, 1500);
     };
+
+    const filteredBookings = bookings.filter(b => {
+        const guestName = getUserName(b.userId).toLowerCase();
+        const bkgId = `BKG-${b.id}`.toLowerCase();
+        const roomNum = `Room ${b.roomId}`.toLowerCase();
+        const query = resSearchQuery.toLowerCase();
+        
+        const matchesSearch = guestName.includes(query) || bkgId.includes(query) || roomNum.includes(query);
+        const matchesStatus = resStatusFilter === 'All' || b.status === resStatusFilter.toUpperCase().replace(/\s/g, '_');
+        return matchesSearch && matchesStatus;
+    });
+
+    const filteredRoomsForAdmin = rooms.filter(r => {
+        const roomNum = r.roomNumber.toLowerCase();
+        const roomType = (r.roomType?.name || '').toLowerCase();
+        const query = roomSearchQuery.toLowerCase();
+        return roomNum.includes(query) || roomType.includes(query);
+    });
 
 
 
@@ -666,12 +689,24 @@ export const AdminDashboard: React.FC = () => {
 
                         {/* Searchable Directory */}
                         <div className="mb-0 flex flex-col md:flex-row gap-4 bg-[#F9F8F6] p-4 border border-[#1A1A1A]/10 border-b-0">
-                            <input type="text" placeholder={t('admin.reservations.searchPlaceholder')} className="flex-1 p-3 border border-[#1A1A1A]/10 bg-white text-sm focus:border-[#D4AF37] outline-none font-serif italic" />
-                            <select className="p-3 border border-[#1A1A1A]/10 bg-white text-sm focus:border-[#D4AF37] outline-none uppercase tracking-widest text-[10px] font-bold text-[#6C6863]">
-                                <option>{t('admin.reservations.statusAll')}</option>
-                                <option>{t('admin.reservations.checkedIn')}</option>
-                                <option>{t('admin.reservations.reserved')}</option>
-                                <option>{t('admin.reservations.checkedOut')}</option>
+                            <input 
+                                type="text" 
+                                placeholder={t('admin.reservations.searchPlaceholder')} 
+                                className="flex-1 p-3 border border-[#1A1A1A]/10 bg-white text-sm focus:border-[#D4AF37] outline-none font-serif italic" 
+                                value={resSearchQuery}
+                                onChange={(e) => setResSearchQuery(e.target.value)}
+                            />
+                            <select 
+                                className="p-3 border border-[#1A1A1A]/10 bg-white text-sm focus:border-[#D4AF37] outline-none uppercase tracking-widest text-[10px] font-bold text-[#6C6863]"
+                                value={resStatusFilter}
+                                onChange={(e) => setResStatusFilter(e.target.value)}
+                            >
+                                <option value="All">{t('admin.reservations.statusAll')}</option>
+                                <option value="CHECKED_IN">{t('admin.reservations.checkedIn')}</option>
+                                <option value="CONFIRMED">{t('admin.reservations.reserved')}</option>
+                                <option value="CHECKED_OUT">{t('admin.reservations.checkedOut')}</option>
+                                <option value="CANCELLED">Cancelled</option>
+                                <option value="PENDING">Pending</option>
                             </select>
                         </div>
 
@@ -689,7 +724,7 @@ export const AdminDashboard: React.FC = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {bookings.map((booking: any, index: number) => (
+                                    {filteredBookings.map((booking: any, index: number) => (
                                         <tr key={booking.id || index} className="border-b border-[#1A1A1A]/5 hover:bg-[#F9F8F6]/50 transition-colors group">
                                             <td className="py-4 px-6 relative group/tooltip">
                                                 <div className="text-sm font-bold text-[#1A1A1A] font-serif">{getUserName(booking.userId)}</div>
@@ -734,7 +769,7 @@ export const AdminDashboard: React.FC = () => {
                                             </td>
                                         </tr>
                                     ))}
-                                    {bookings.length === 0 && (
+                                    {filteredBookings.length === 0 && (
                                         <tr>
                                             <td colSpan={7} className="py-8 text-center text-[#6C6863] font-serif italic">
                                                 {t('admin.reservations.noData', 'No reservations found.')}
@@ -761,9 +796,21 @@ export const AdminDashboard: React.FC = () => {
 
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                             <div className="lg:col-span-8">
-                                <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#1A1A1A] mb-6">{t('admin.inventory.roomStatus')}</h3>
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#1A1A1A]">{t('admin.inventory.roomStatus')}</h3>
+                                    <input 
+                                        type="text" 
+                                        placeholder="Search by room # or type..." 
+                                        className="p-2 border border-[#1A1A1A]/10 bg-white text-xs focus:border-[#D4AF37] outline-none font-serif italic w-64" 
+                                        value={roomSearchQuery}
+                                        onChange={(e) => {
+                                            setRoomSearchQuery(e.target.value);
+                                            setCurrentRoomPage(1);
+                                        }}
+                                    />
+                                </div>
                                 <div className="space-y-4">
-                                    {rooms.slice((currentRoomPage - 1) * ROOMS_PER_PAGE, currentRoomPage * ROOMS_PER_PAGE).map((room, idx) => {
+                                    {filteredRoomsForAdmin.slice((currentRoomPage - 1) * ROOMS_PER_PAGE, currentRoomPage * ROOMS_PER_PAGE).map((room, idx) => {
                                         const statusColors: any = {
                                             'AVAILABLE': 'border-l-green-500 text-green-700',
                                             'OCCUPIED': 'border-l-blue-500 text-blue-700',
@@ -802,14 +849,14 @@ export const AdminDashboard: React.FC = () => {
                                             </div>
                                         </Card>
                                     )})}
-                                    {rooms.length === 0 && <p className="text-sm italic text-[#6C6863]">No rooms managed yet.</p>}
+                                    {filteredRoomsForAdmin.length === 0 && <p className="text-sm italic text-[#6C6863]">No rooms matched your search.</p>}
                                 </div>
 
                                 {/* Pagination Controls */}
-                                {rooms.length > ROOMS_PER_PAGE && (
+                                {filteredRoomsForAdmin.length > ROOMS_PER_PAGE && (
                                     <div className="flex items-center justify-between mt-8 pt-6 border-t border-[#1A1A1A]/10">
                                         <p className="text-[10px] uppercase tracking-widest font-bold text-[#6C6863]">
-                                            Showing {(currentRoomPage - 1) * ROOMS_PER_PAGE + 1} to {Math.min(currentRoomPage * ROOMS_PER_PAGE, rooms.length)} of {rooms.length}
+                                            Showing {(currentRoomPage - 1) * ROOMS_PER_PAGE + 1} to {Math.min(currentRoomPage * ROOMS_PER_PAGE, filteredRoomsForAdmin.length)} of {filteredRoomsForAdmin.length}
                                         </p>
                                         <div className="flex gap-2">
                                             <Button 
@@ -821,7 +868,7 @@ export const AdminDashboard: React.FC = () => {
                                                 ←
                                             </Button>
                                             <div className="flex gap-1">
-                                                {Array.from({ length: Math.ceil(rooms.length / ROOMS_PER_PAGE) }, (_, i) => i + 1).map(p => (
+                                                {Array.from({ length: Math.ceil(filteredRoomsForAdmin.length / ROOMS_PER_PAGE) }, (_, i) => i + 1).map(p => (
                                                     <button
                                                         key={p}
                                                         onClick={() => setCurrentRoomPage(p)}
@@ -833,7 +880,7 @@ export const AdminDashboard: React.FC = () => {
                                             </div>
                                             <Button 
                                                 variant="ghost" 
-                                                disabled={currentRoomPage >= Math.ceil(rooms.length / ROOMS_PER_PAGE)}
+                                                disabled={currentRoomPage >= Math.ceil(filteredRoomsForAdmin.length / ROOMS_PER_PAGE)}
                                                 onClick={() => setCurrentRoomPage(prev => prev + 1)}
                                                 className="border border-[#1A1A1A]/10 h-8 w-8 p-0 flex items-center justify-center disabled:opacity-30"
                                             >

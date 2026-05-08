@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Card } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Input';
 import { AuthService } from '../../api';
 import { GuestDetailModal } from '../../components/admin/GuestDetailModal';
 
 export const CRMModule: React.FC = () => {
-    const { t } = useTranslation();
     const [guests, setGuests] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');

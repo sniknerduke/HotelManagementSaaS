@@ -72,6 +72,7 @@ export const Profile: React.FC = () => {
       ])
         .then(([res, roomsRes, profileRes]: [any[], any[], any]) => {
             setDbBookings(res);
+            setAllRooms(roomsRes);
             const imageMap: Record<number, string> = {};
             roomsRes.forEach(r => {
                 if (r.imageUrl) {

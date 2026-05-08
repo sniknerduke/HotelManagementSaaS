@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X, Send, Bot, User, Loader2 } from 'lucide-react';
-import { Button } from '../ui/Button';
 
 interface Message {
   role: 'user' | 'assistant' | 'system';

@@ -6,7 +6,7 @@ import { BookingService, InventoryService, AmenityService } from '../api';
 
 export const SearchResults: React.FC = () => {
     const { t } = useTranslation();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams] = useSearchParams();
 
     // --- Date helpers ---
     const todayDate = new Date(); todayDate.setHours(0,0,0,0);

@@ -23,6 +23,7 @@ export default defineConfig({
     }
   },
   server: {
+    allowedHosts: ['sniknerduke.dev'],
     proxy: {
       '/api': {
         target: 'http://localhost:8000',

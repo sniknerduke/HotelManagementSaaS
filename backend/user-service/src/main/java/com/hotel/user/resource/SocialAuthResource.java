@@ -58,7 +58,7 @@ public class SocialAuthResource {
         String redirectUri = backendUrl + "/api/auth/google/callback";
         String googleAuthUrl = "https://accounts.google.com/o/oauth2/v2/auth" +
                 "?client_id=" + googleClientId +
-                "&redirect_uri=" + redirectUri +
+                "&redirect_uri=" + java.net.URLEncoder.encode(redirectUri, java.nio.charset.StandardCharsets.UTF_8) +
                 "&response_type=code" +
                 "&scope=email%20profile%20openid";
                 
@@ -142,8 +142,8 @@ public class SocialAuthResource {
         String redirectUri = backendUrl + "/api/auth/facebook/callback";
         String facebookAuthUrl = "https://www.facebook.com/v18.0/dialog/oauth" +
                 "?client_id=" + facebookClientId +
-                "&redirect_uri=" + redirectUri +
-                "&scope=email,public_profile";
+                "&redirect_uri=" + java.net.URLEncoder.encode(redirectUri, java.nio.charset.StandardCharsets.UTF_8) +
+                "&scope=public_profile,email";
                 
         return Response.temporaryRedirect(URI.create(facebookAuthUrl)).build();
     }

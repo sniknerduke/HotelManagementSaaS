@@ -97,6 +97,8 @@ services:
       QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://user-db:5432/hotel_user_db
       QUARKUS_DATASOURCE_USERNAME: hotel
       QUARKUS_DATASOURCE_PASSWORD: hotel_secret
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      API_GATEWAY_URL: ${API_GATEWAY_URL:-http://localhost:8000}
     depends_on:
       user-db:
         condition: service_healthy
@@ -155,6 +157,8 @@ services:
       QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://payment-db:5432/hotel_payment_db
       QUARKUS_DATASOURCE_USERNAME: hotel
       QUARKUS_DATASOURCE_PASSWORD: hotel_secret
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      API_GATEWAY_URL: ${API_GATEWAY_URL:-http://localhost:8000}
     depends_on:
       payment-db:
         condition: service_healthy

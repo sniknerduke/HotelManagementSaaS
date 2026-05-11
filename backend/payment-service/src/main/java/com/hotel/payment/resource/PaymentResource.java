@@ -9,9 +9,10 @@ import jakarta.validation.constraints.*;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
 import jakarta.inject.Inject;
-import com.hotel.payment.client.BookingClient;
+import com.hotel.payment.event.PaymentCompletedEvent;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 import com.hotel.payment.vnpay.VNPayService;
 import jakarta.annotation.security.PermitAll;
 import java.math.BigDecimal;
@@ -24,8 +25,8 @@ import java.util.UUID;
 public class PaymentResource {
 
     @Inject
-    @RestClient
-    BookingClient bookingClient;
+    @Channel("payment-completed")
+    Emitter<PaymentCompletedEvent> paymentCompletedEmitter;
 
     @Inject
     VNPayService vnPayService;
@@ -88,9 +89,9 @@ public class PaymentResource {
         payment.persist();
 
         try {
-            bookingClient.updateBookingStatus(req.reservationId(), new BookingClient.UpdateStatusRequest("CONFIRMED"));
+            paymentCompletedEmitter.send(new PaymentCompletedEvent(payment.reservationId, payment.transactionId, payment.status.name()));
         } catch (Exception e) {
-            System.err.println("Failed to update booking status after payment: " + e.getMessage());
+            System.err.println("Failed to emit payment completed event: " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -115,12 +116,7 @@ public class PaymentResource {
             if (payment != null && payment.status == PaymentStatus.PENDING) {
                 if ("00".equals(vnp_ResponseCode)) {
                     payment.status = PaymentStatus.COMPLETED;
-                    try {
-                        bookingClient.updateBookingStatus(payment.reservationId, new BookingClient.UpdateStatusRequest("CONFIRMED"));
-                    } catch (Exception e) {
-                        System.err.println("Failed to update booking status after VNPay payment: " + e.getMessage());
-                        e.printStackTrace();
-                    }
+                    // Do not emit event here, rely on IPN webhook for reliability
                     // Redirect to frontend success page
                     return Response.seeOther(URI.create("http://localhost:5173/payment/success?reservationId=" + payment.reservationId)).build();
                 } else {
@@ -154,9 +150,9 @@ public class PaymentResource {
                     if ("00".equals(vnp_ResponseCode)) {
                         payment.status = PaymentStatus.COMPLETED;
                         try {
-                            bookingClient.updateBookingStatus(payment.reservationId, new BookingClient.UpdateStatusRequest("CONFIRMED"));
+                            paymentCompletedEmitter.send(new PaymentCompletedEvent(payment.reservationId, payment.transactionId, payment.status.name()));
                         } catch (Exception e) {
-                            System.err.println("Failed to update booking after VNPay IPN: " + e.getMessage());
+                            System.err.println("Failed to emit payment completed event after VNPay IPN: " + e.getMessage());
                             e.printStackTrace();
                         }
                     } else {

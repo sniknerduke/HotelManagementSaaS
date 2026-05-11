@@ -1,7 +1,7 @@
 package com.hotel.user.filter;
 
-import com.bucket4j.BucketConfiguration;
-import com.bucket4j.distributed.ProxyManager;
+import io.github.bucket4j.BucketConfiguration;
+import io.github.bucket4j.distributed.proxy.ProxyManager;
 import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Priorities;

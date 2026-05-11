@@ -88,7 +88,20 @@ public class PaymentResource {
             
             // Generate payment URL
             String ipAddr = "127.0.0.1";
-            String returnUrl = uriInfo.getAbsolutePathBuilder().path("vnpay-return").build().toString();
+            
+            // Robustly determine the public base URL for the return URL
+            String host = uriInfo.getBaseUri().getHost();
+            String proto = uriInfo.getBaseUri().getScheme();
+            String publicBaseUrl;
+            
+            // If we detect the internal docker name, fallback to public URLs
+            if (host != null && (host.contains("hotel-") || host.contains("payment-service"))) {
+                publicBaseUrl = host.contains("localhost") ? "http://localhost:8000" : frontendProd;
+            } else {
+                publicBaseUrl = proto + "://" + host + (uriInfo.getBaseUri().getPort() != -1 ? ":" + uriInfo.getBaseUri().getPort() : "");
+            }
+            
+            String returnUrl = publicBaseUrl + "/api/payments/vnpay-return";
             String url = vnPayService.createOrder(amountInVnd, "Payment for reservation " + req.reservationId(), returnUrl, ipAddr, payment.transactionId);
             return Response.ok(PaymentResponse.from(payment, url)).build();
         }
@@ -123,7 +136,19 @@ public class PaymentResource {
                     .firstResult();
             if (payment != null && payment.status == PaymentStatus.PENDING) {
                 String host = uriInfo.getBaseUri().getHost();
-                String frontendBaseUrl = (host != null && (host.contains("localhost") || host.contains("127.0.0.1"))) ? frontendLocal : frontendProd;
+                // Check if host is internal docker name or matches prod domain
+                boolean isLocal = host == null || host.contains("localhost") || host.contains("127.0.0.1") || host.contains("hotel-") || host.contains("payment-service");
+                
+                // If it's an internal docker name, we need to decide if we are in local dev or prod
+                // A good hint is the presence of sniknerduke.dev in the property
+                if (host != null && (host.contains("hotel-") || host.contains("payment-service"))) {
+                    // If we are in docker, we check if the request originally came to sniknerduke.dev
+                    // But for simplicity, if host doesn't contain localhost, and we have a prod domain, use it
+                    isLocal = !frontendProd.contains(host) && (host.contains("localhost") || !frontendProd.contains("sniknerduke.dev"));
+                }
+                
+                // Simplified logic: if we are not on the production domain, assume localhost
+                String frontendBaseUrl = (host != null && host.contains("sniknerduke.dev")) ? frontendProd : frontendLocal;
 
                 if ("00".equals(vnp_ResponseCode)) {
                     payment.status = PaymentStatus.COMPLETED;
@@ -139,7 +164,7 @@ public class PaymentResource {
         }
         
         String host = uriInfo.getBaseUri().getHost();
-        String frontendBaseUrl = (host != null && (host.contains("localhost") || host.contains("127.0.0.1"))) ? frontendLocal : frontendProd;
+        String frontendBaseUrl = (host != null && host.contains("sniknerduke.dev")) ? frontendProd : frontendLocal;
         return Response.seeOther(URI.create(frontendBaseUrl + "/payment/failed")).build();
     }
 

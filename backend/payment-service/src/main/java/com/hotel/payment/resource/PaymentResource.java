@@ -32,11 +32,11 @@ public class PaymentResource {
     @Inject
     VNPayService vnPayService;
     
-    @ConfigProperty(name = "frontend.url.localhost")
-    String frontendLocal;
+    @ConfigProperty(name = "frontend.url")
+    String frontendUrl;
     
-    @ConfigProperty(name = "frontend.url.prod")
-    String frontendProd;
+    @ConfigProperty(name = "api.gateway.url")
+    String apiGatewayUrl;
 
     // --- DTOs ---
 
@@ -65,7 +65,7 @@ public class PaymentResource {
     @POST
     @RolesAllowed({"GUEST", "STAFF", "ADMIN"})
     @Transactional
-    public Response createPayment(@Valid CreatePaymentRequest req, @jakarta.ws.rs.core.Context jakarta.ws.rs.core.UriInfo uriInfo) {
+    public Response createPayment(@Valid CreatePaymentRequest req) {
         long completedPayments = Payment.count("reservationId = ?1 and status = ?2", req.reservationId(), PaymentStatus.COMPLETED);
         if (completedPayments > 0) {
             return Response.status(Response.Status.BAD_REQUEST)
@@ -83,25 +83,10 @@ public class PaymentResource {
             payment.persist();
             
             // Convert USD to VND (approx 1 USD = 25,400 VND)
-            // Ideally this would come from a configuration or an external API
             java.math.BigDecimal amountInVnd = req.amount().multiply(new java.math.BigDecimal(25400));
             
-            // Generate payment URL
             String ipAddr = "127.0.0.1";
-            
-            // Robustly determine the public base URL for the return URL
-            String host = uriInfo.getBaseUri().getHost();
-            String proto = uriInfo.getBaseUri().getScheme();
-            String publicBaseUrl;
-            
-            // If we detect the internal docker name, fallback to public URLs
-            if (host != null && (host.contains("hotel-") || host.contains("payment-service"))) {
-                publicBaseUrl = host.contains("localhost") ? "http://localhost:8000" : frontendProd;
-            } else {
-                publicBaseUrl = proto + "://" + host + (uriInfo.getBaseUri().getPort() != -1 ? ":" + uriInfo.getBaseUri().getPort() : "");
-            }
-            
-            String returnUrl = publicBaseUrl + "/api/payments/vnpay-return";
+            String returnUrl = apiGatewayUrl + "/api/payments/vnpay-return";
             String url = vnPayService.createOrder(amountInVnd, "Payment for reservation " + req.reservationId(), returnUrl, ipAddr, payment.transactionId);
             return Response.ok(PaymentResponse.from(payment, url)).build();
         }
@@ -135,37 +120,17 @@ public class PaymentResource {
                     .withLock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
                     .firstResult();
             if (payment != null && payment.status == PaymentStatus.PENDING) {
-                String host = uriInfo.getBaseUri().getHost();
-                // Check if host is internal docker name or matches prod domain
-                boolean isLocal = host == null || host.contains("localhost") || host.contains("127.0.0.1") || host.contains("hotel-") || host.contains("payment-service");
-                
-                // If it's an internal docker name, we need to decide if we are in local dev or prod
-                // A good hint is the presence of sniknerduke.dev in the property
-                if (host != null && (host.contains("hotel-") || host.contains("payment-service"))) {
-                    // If we are in docker, we check if the request originally came to sniknerduke.dev
-                    // But for simplicity, if host doesn't contain localhost, and we have a prod domain, use it
-                    isLocal = !frontendProd.contains(host) && (host.contains("localhost") || !frontendProd.contains("sniknerduke.dev"));
-                }
-                
-                // Simplified logic: if we are not on the production domain, assume localhost
-                String frontendBaseUrl = (host != null && host.contains("sniknerduke.dev")) ? frontendProd : frontendLocal;
-
                 if ("00".equals(vnp_ResponseCode)) {
                     payment.status = PaymentStatus.COMPLETED;
-                    // Do not emit event here, rely on IPN webhook for reliability
-                    // Redirect to frontend success page
-                    return Response.seeOther(URI.create(frontendBaseUrl + "/payment/success?reservationId=" + payment.reservationId)).build();
+                    return Response.seeOther(URI.create(frontendUrl + "/payment/success?reservationId=" + payment.reservationId)).build();
                 } else {
                     payment.status = PaymentStatus.FAILED;
-                    // Redirect to frontend failed page
-                    return Response.seeOther(URI.create(frontendBaseUrl + "/payment/failed?reservationId=" + payment.reservationId)).build();
+                    return Response.seeOther(URI.create(frontendUrl + "/payment/failed?reservationId=" + payment.reservationId)).build();
                 }
             }
         }
         
-        String host = uriInfo.getBaseUri().getHost();
-        String frontendBaseUrl = (host != null && host.contains("sniknerduke.dev")) ? frontendProd : frontendLocal;
-        return Response.seeOther(URI.create(frontendBaseUrl + "/payment/failed")).build();
+        return Response.seeOther(URI.create(frontendUrl + "/payment/failed")).build();
     }
 
     @GET

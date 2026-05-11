@@ -1,7 +1,9 @@
 // Centralized API Client for Hotel PMS Frontend
 // Using native fetch API to communicate via Vite proxy -> Kong Gateway -> Quarkus Microservices
 
-const BASE_URL = '/api'; // Proxied to localhost:8000 via vite.config.ts
+// Dev: Vite proxy forwards /api → Kong (localhost:8000)
+// Prod: Browser calls VITE_API_URL/api directly (e.g. https://sniknerduke.dev/api)
+const BASE_URL = import.meta.env.DEV ? '/api' : `${import.meta.env.VITE_API_URL}/api`;
 
 const handleResponse = async (response: Response) => {
     if (!response.ok) {

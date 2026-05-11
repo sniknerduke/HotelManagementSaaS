@@ -13,6 +13,7 @@ import jakarta.inject.Inject;
 import com.hotel.payment.event.PaymentCompletedEvent;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import com.hotel.payment.vnpay.VNPayService;
 import jakarta.annotation.security.PermitAll;
 import java.math.BigDecimal;
@@ -30,6 +31,12 @@ public class PaymentResource {
 
     @Inject
     VNPayService vnPayService;
+    
+    @ConfigProperty(name = "frontend.url.localhost")
+    String frontendLocal;
+    
+    @ConfigProperty(name = "frontend.url.prod")
+    String frontendProd;
 
     // --- DTOs ---
 
@@ -81,7 +88,8 @@ public class PaymentResource {
             
             // Generate payment URL
             String ipAddr = "127.0.0.1";
-            String url = vnPayService.createOrder(amountInVnd, "Payment for reservation " + req.reservationId(), null, ipAddr, payment.transactionId);
+            String returnUrl = uriInfo.getAbsolutePathBuilder().path("vnpay-return").build().toString();
+            String url = vnPayService.createOrder(amountInVnd, "Payment for reservation " + req.reservationId(), returnUrl, ipAddr, payment.transactionId);
             return Response.ok(PaymentResponse.from(payment, url)).build();
         }
 
@@ -114,20 +122,25 @@ public class PaymentResource {
                     .withLock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
                     .firstResult();
             if (payment != null && payment.status == PaymentStatus.PENDING) {
+                String host = uriInfo.getBaseUri().getHost();
+                String frontendBaseUrl = (host != null && (host.contains("localhost") || host.contains("127.0.0.1"))) ? frontendLocal : frontendProd;
+
                 if ("00".equals(vnp_ResponseCode)) {
                     payment.status = PaymentStatus.COMPLETED;
                     // Do not emit event here, rely on IPN webhook for reliability
                     // Redirect to frontend success page
-                    return Response.seeOther(URI.create("http://localhost:5173/payment/success?reservationId=" + payment.reservationId)).build();
+                    return Response.seeOther(URI.create(frontendBaseUrl + "/payment/success?reservationId=" + payment.reservationId)).build();
                 } else {
                     payment.status = PaymentStatus.FAILED;
                     // Redirect to frontend failed page
-                    return Response.seeOther(URI.create("http://localhost:5173/payment/failed?reservationId=" + payment.reservationId)).build();
+                    return Response.seeOther(URI.create(frontendBaseUrl + "/payment/failed?reservationId=" + payment.reservationId)).build();
                 }
             }
         }
         
-        return Response.seeOther(URI.create("http://localhost:5173/payment/failed")).build();
+        String host = uriInfo.getBaseUri().getHost();
+        String frontendBaseUrl = (host != null && (host.contains("localhost") || host.contains("127.0.0.1"))) ? frontendLocal : frontendProd;
+        return Response.seeOther(URI.create(frontendBaseUrl + "/payment/failed")).build();
     }
 
     @GET

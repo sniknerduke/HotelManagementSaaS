@@ -18,8 +18,9 @@ project_overview.txt
 !.vscode/extensions.json
 .idea
 .DS_Store
-.env
-*.env
+.env*
+!.env.example
+.env.production
 *.suo
 *.ntvs*
 *.njsproj

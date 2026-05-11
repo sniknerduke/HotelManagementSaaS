@@ -7,6 +7,7 @@ import io.lettuce.core.RedisClient;
 import io.lettuce.core.codec.ByteArrayCodec;
 import io.lettuce.core.codec.RedisCodec;
 import io.lettuce.core.codec.StringCodec;
+import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -18,11 +19,14 @@ public class RateLimitConfig {
     @ConfigProperty(name = "quarkus.redis.hosts", defaultValue = "redis://localhost:6379")
     String redisUrl;
 
+    private RedisClient client;
+
     @Produces
     @ApplicationScoped
     public RedisClient redisClient() {
         // If quarkus.redis.hosts starts with redis:// it uses it directly
-        return RedisClient.create(redisUrl);
+        this.client = RedisClient.create(redisUrl);
+        return this.client;
     }
 
     @Produces
@@ -35,4 +39,12 @@ public class RateLimitConfig {
                 .withExpirationStrategy(ExpirationAfterWriteStrategy.basedOnTimeForRefillingBucketUpToMax(Duration.ofHours(1)))
                 .build();
     }
+
+    @PreDestroy
+    void shutdown() {
+        if (client != null) {
+            client.shutdown();
+        }
+    }
 }
+

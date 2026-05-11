@@ -100,6 +100,8 @@ services:
     depends_on:
       user-db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - hotel-network
 

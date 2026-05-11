@@ -186,6 +186,22 @@ services:
       - booking-service
       - payment-service
 
+  # ========================
+  # Shared Infrastructure
+  # ========================
+  redis:
+    image: redis:7-alpine
+    container_name: hotel-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - hotel-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 volumes:
   user-db-data:
   inventory-db-data:

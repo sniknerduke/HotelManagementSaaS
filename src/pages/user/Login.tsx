@@ -26,12 +26,14 @@ export const Login: React.FC = () => {
 
   const handleGoogleLogin = () => {
     // Redirecting to Quarkus OIDC/OAuth2 endpoint via Kong Gateway
-    window.location.href = 'http://localhost:8000/api/auth/google';
+    // Using relative path to work with live domain and Vite proxy
+    window.location.href = '/api/auth/google';
   };
 
   const handleFacebookLogin = () => {
     // Redirecting to Quarkus OIDC/OAuth2 endpoint via Kong Gateway
-    window.location.href = 'http://localhost:8000/api/auth/facebook';
+    // Using relative path to work with live domain and Vite proxy
+    window.location.href = '/api/auth/facebook';
   };
 
   const handleLogin = async (e: React.FormEvent) => {

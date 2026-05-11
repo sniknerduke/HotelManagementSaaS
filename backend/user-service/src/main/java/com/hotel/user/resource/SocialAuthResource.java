@@ -40,7 +40,12 @@ public class SocialAuthResource {
     @ConfigProperty(name = "QUARKUS_OIDC_FACEBOOK_CLIENT_SECRET", defaultValue = "")
     String facebookClientSecret;
 
-    private static final String FRONTEND_OAUTH_CALLBACK = "http://localhost:5173/oauth/callback";
+    @ConfigProperty(name = "auth.frontend.url", defaultValue = "http://localhost:5173")
+    String frontendUrl;
+
+    @ConfigProperty(name = "auth.backend.url", defaultValue = "http://localhost:8000")
+    String backendUrl;
+
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -50,7 +55,7 @@ public class SocialAuthResource {
     @Path("/google")
     @PermitAll
     public Response loginWithGoogle() {
-        String redirectUri = "http://localhost:8000/api/auth/google/callback";
+        String redirectUri = backendUrl + "/api/auth/google/callback";
         String googleAuthUrl = "https://accounts.google.com/o/oauth2/v2/auth" +
                 "?client_id=" + googleClientId +
                 "&redirect_uri=" + redirectUri +
@@ -70,7 +75,7 @@ public class SocialAuthResource {
         }
         
         try {
-            String redirectUri = "http://localhost:8000/api/auth/google/callback";
+            String redirectUri = backendUrl + "/api/auth/google/callback";
             String tokenBody = "code=" + code +
                     "&client_id=" + googleClientId +
                     "&client_secret=" + googleClientSecret +
@@ -121,10 +126,10 @@ public class SocialAuthResource {
             // Real JWT Generation
             String generatedToken = jwtService.generateToken(user.id, user.email, user.role);
 
-            return Response.temporaryRedirect(URI.create(FRONTEND_OAUTH_CALLBACK + "?token=" + generatedToken + "&userId=" + user.id)).build();
+            return Response.temporaryRedirect(URI.create(frontendUrl + "/oauth/callback?token=" + generatedToken + "&userId=" + user.id)).build();
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.temporaryRedirect(URI.create("http://localhost:5173/login?error=GoogleAuthFailed")).build();
+            return Response.temporaryRedirect(URI.create(frontendUrl + "/login?error=GoogleAuthFailed")).build();
         }
     }
 
@@ -134,7 +139,7 @@ public class SocialAuthResource {
     @Path("/facebook")
     @PermitAll
     public Response loginWithFacebook() {
-        String redirectUri = "http://localhost:8000/api/auth/facebook/callback";
+        String redirectUri = backendUrl + "/api/auth/facebook/callback";
         String facebookAuthUrl = "https://www.facebook.com/v18.0/dialog/oauth" +
                 "?client_id=" + facebookClientId +
                 "&redirect_uri=" + redirectUri +
@@ -154,7 +159,7 @@ public class SocialAuthResource {
         
         try {
             // 1. Get Access Token
-            String redirectUri = "http://localhost:8000/api/auth/facebook/callback";
+            String redirectUri = backendUrl + "/api/auth/facebook/callback";
             String tokenUrl = "https://graph.facebook.com/v18.0/oauth/access_token" +
                     "?client_id=" + facebookClientId +
                     "&redirect_uri=" + redirectUri +
@@ -195,10 +200,10 @@ public class SocialAuthResource {
             // Real JWT Generation
             String generatedToken = jwtService.generateToken(user.id, user.email, user.role);
 
-            return Response.temporaryRedirect(URI.create(FRONTEND_OAUTH_CALLBACK + "?token=" + generatedToken + "&userId=" + user.id)).build();
+            return Response.temporaryRedirect(URI.create(frontendUrl + "/oauth/callback?token=" + generatedToken + "&userId=" + user.id)).build();
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.temporaryRedirect(URI.create("http://localhost:5173/login?error=FacebookAuthFailed")).build();
+            return Response.temporaryRedirect(URI.create(frontendUrl + "/login?error=FacebookAuthFailed")).build();
         }
     }
 }

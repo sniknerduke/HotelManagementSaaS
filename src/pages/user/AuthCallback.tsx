@@ -15,8 +15,8 @@ export const AuthCallback: React.FC = () => {
       // Simulate verifying token securely
       setTimeout(() => {
         login(token, userId).then((user) => {
-          // Redirect to profile or admin smoothly
-          navigate(user?.role === 'ADMIN' ? '/admin' : '/profile');
+          // Redirect to home or admin smoothly
+          navigate(user?.role === 'ADMIN' ? '/admin' : '/', { replace: true });
         });
       }, 1500);
     } else {

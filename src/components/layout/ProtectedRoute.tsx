@@ -1,12 +1,13 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth, type Role } from '../../context/AuthContext';
 
 interface ProtectedRouteProps {
-  requireAdmin?: boolean;
+  requireAdmin?: boolean; // Deprecated, use allowedRoles
+  allowedRoles?: Role[];
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requireAdmin = false }) => {
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requireAdmin = false, allowedRoles }) => {
   const { user, token, isLoading } = useAuth();
 
   if (isLoading) {
@@ -17,11 +18,15 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requireAdmin = f
     );
   }
 
-  if (!token) {
+  if (!token || !user) {
     return <Navigate to="/login" replace />;
   }
 
-  if (requireAdmin && user?.role !== 'ADMIN') {
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (requireAdmin && user.role !== 'ADMIN') {
     return <Navigate to="/dashboard" replace />;
   }
 

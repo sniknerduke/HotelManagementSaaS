@@ -13,6 +13,7 @@ dist-ssr
 implementation_plan.md
 *.local
 project_overview.txt
+STAFF_ROLE_PLAN.txt
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

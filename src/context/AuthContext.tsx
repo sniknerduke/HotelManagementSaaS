@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AuthService } from '../api';
 
-export type Role = 'GUEST' | 'USER' | 'ADMIN';
+export type Role = 'GUEST' | 'USER' | 'STAFF' | 'ADMIN';
 export type User = { id: string; email: string; firstName: string; lastName: string; role: Role; phoneNumber?: string } | null;
 
 interface AuthContextType {

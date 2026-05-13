@@ -22,6 +22,7 @@ const FAQ = lazy(() => import('./pages/footer/FAQ').then(module => ({ default: m
 const PrivacyPolicy = lazy(() => import('./pages/footer/PrivacyPolicy').then(module => ({ default: module.PrivacyPolicy })));
 const TermsOfService = lazy(() => import('./pages/footer/TermsOfService').then(module => ({ default: module.TermsOfService })));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard').then(module => ({ default: module.AdminDashboard })));
+const StaffDashboard = lazy(() => import('./pages/staff/StaffDashboard').then(module => ({ default: module.StaffDashboard })));
 
 function App() {
   const [showSplash, setShowSplash] = useState(() => {
@@ -63,8 +64,13 @@ function App() {
                     <Route path='profile' element={<Profile />} />
                   </Route>
 
+                  {/* Staff Routes */}
+                  <Route element={<ProtectedRoute allowedRoles={['STAFF', 'ADMIN']} />}>
+                    <Route path='staff' element={<StaffDashboard />} />
+                  </Route>
+
                   {/* Admin Routes */}
-                  <Route element={<ProtectedRoute requireAdmin />}>
+                  <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
                     <Route path='admin' element={<AdminDashboard />} />
                   </Route>
                 </Route>

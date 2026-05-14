@@ -313,23 +313,6 @@ README.md               # Project documentation
 
 
 
-<!-- ROADMAP -->
-## Roadmap
-
-- [x] Guest booking flow
-- [x] Authentication and account management
-- [x] Staff and admin portals
-- [x] VNPay payment callback flow
-- [x] Kong API gateway routing
-- [x] Dockerized local infrastructure
-- [ ] Add production deployment documentation
-- [ ] Add screenshots and live demo assets
-- [ ] Add API documentation links
-- [ ] Add a license file
-
-See the [open issues](https://github.com/sniknerduke/HotelManagementSaaS/issues) for a full list of proposed features and known issues.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 

@@ -249,6 +249,10 @@
     "startingFrom": "Giá chỉ từ",
     "night": "đêm",
     "reserve": "Đặt chỗ",
+    "pagination": {
+      "previous": "Trước",
+      "next": "Tiếp"
+    },
     "filters": {
       "amenities": "Tiện ích",
       "privatePool": "Bể bơi riêng",
@@ -334,7 +338,8 @@
       "seasonalMultipliers": "Hệ số Theo mùa",
       "highSeason": "Hệ số Mùa cao điểm",
       "activePromotions": "Ưu đãi Đang hoạt động",
-      "editPricing": "Sửa Quy tắc Giá"
+      "editPricing": "Sửa Quy tắc Giá",
+      "showingResults": "Đang hiển thị từ {{start}} đến {{end}} trong tổng số {{total}}"
     },
     "users": {
       "title": "Nhân viên",

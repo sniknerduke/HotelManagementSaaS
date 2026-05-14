@@ -182,7 +182,7 @@ public class PaymentResource {
     }
 
     @GET
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"STAFF", "ADMIN"})
     public Response getAllPayments(
             @QueryParam("status") PaymentStatus status,
             @QueryParam("startDate") String startDate,

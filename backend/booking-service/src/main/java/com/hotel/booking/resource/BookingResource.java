@@ -202,7 +202,7 @@ public class BookingResource {
     }
 
     @GET
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"STAFF", "ADMIN"})
     public Response getAllBookings() {
         List<BookingResponse> bookings = Reservation.<Reservation>listAll()
                 .stream()
@@ -316,7 +316,7 @@ public class BookingResource {
 
     @PATCH
     @Path("/{id}/status")
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"STAFF", "ADMIN"})
     @Transactional
     public Response updateStatus(@PathParam("id") Long id, @Valid UpdateStatusRequest req) {
         Reservation reservation = Reservation.findById(id);
@@ -381,7 +381,7 @@ public class BookingResource {
 
     @POST
     @Path("/{id}/check-in")
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"STAFF", "ADMIN"})
     @Transactional
     public Response checkIn(@PathParam("id") Long id) {
         Reservation reservation = Reservation.findById(id);
@@ -400,7 +400,7 @@ public class BookingResource {
 
     @POST
     @Path("/{id}/check-out")
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"STAFF", "ADMIN"})
     @Transactional
     public Response checkOut(@PathParam("id") Long id) {
         Reservation reservation = Reservation.findById(id);

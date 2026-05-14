@@ -162,7 +162,7 @@ public class HousekeepingResource {
      */
     @PATCH
     @Path("/tasks/{id}/assign")
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"STAFF", "ADMIN"})
     @Transactional
     public Response assignTask(@PathParam("id") Long id, @Valid AssignTaskRequest req) {
         HousekeepingTask task = HousekeepingTask.findById(id);

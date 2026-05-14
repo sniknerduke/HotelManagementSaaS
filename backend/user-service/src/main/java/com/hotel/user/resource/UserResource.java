@@ -87,7 +87,7 @@ public class UserResource {
     // --- Endpoints ---
 
     @GET
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"STAFF", "ADMIN"})
     public Response getAllUsers() {
         return Response.ok(User.<User>list("isActive = true").stream().map(UserResponse::from).toList()).build();
     }

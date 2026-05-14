@@ -15,6 +15,7 @@ const Profile = lazy(() => import('./pages/user/Profile').then(module => ({ defa
 const AuthCallback = lazy(() => import('./pages/user/AuthCallback').then(module => ({ default: module.AuthCallback })));
 const VNPayCallback = lazy(() => import('./pages/user/VNPayCallback').then(module => ({ default: module.VNPayCallback })));
 const Checkout = lazy(() => import('./pages/Checkout').then(module => ({ default: module.Checkout })));
+const RoomDetail = lazy(() => import('./pages/RoomDetail').then(module => ({ default: module.RoomDetail })));
 const Amenities = lazy(() => import('./pages/Amenities').then(module => ({ default: module.Amenities })));
 const Contact = lazy(() => import('./pages/Contact').then(module => ({ default: module.Contact })));
 const Experiences = lazy(() => import('./pages/footer/Experiences').then(module => ({ default: module.Experiences })));
@@ -45,6 +46,7 @@ function App() {
                 <Route path='/' element={<Layout />}>
                   <Route index element={<Home />} />
                   <Route path='search' element={<SearchResults />} />
+                  <Route path='room/:id' element={<RoomDetail />} />
                   <Route path='amenities' element={<Amenities />} />
                   <Route path='contact' element={<Contact />} />
                   <Route path='experiences' element={<Experiences />} />

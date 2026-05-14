@@ -249,6 +249,10 @@
     "startingFrom": "Starting from",
     "night": "night",
     "reserve": "Reserve",
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    },
     "filters": {
       "amenities": "Amenities",
       "privatePool": "Private Pool",
@@ -334,7 +338,8 @@
       "seasonalMultipliers": "Seasonal Multipliers",
       "highSeason": "High Season Multiplier",
       "activePromotions": "Active Promotions",
-      "editPricing": "Edit Pricing Rules"
+      "editPricing": "Edit Pricing Rules",
+      "showingResults": "Showing {{start}} to {{end}} of {{total}}"
     },
     "users": {
       "title": "Staff",

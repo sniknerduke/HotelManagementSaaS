@@ -856,7 +856,11 @@ export const AdminDashboard: React.FC = () => {
                                 {filteredRoomsForAdmin.length > ROOMS_PER_PAGE && (
                                     <div className="flex items-center justify-between mt-8 pt-6 border-t border-[#1A1A1A]/10">
                                         <p className="text-[10px] uppercase tracking-widest font-bold text-[#6C6863]">
-                                            Showing {(currentRoomPage - 1) * ROOMS_PER_PAGE + 1} to {Math.min(currentRoomPage * ROOMS_PER_PAGE, filteredRoomsForAdmin.length)} of {filteredRoomsForAdmin.length}
+                                            {t('admin.inventory.showingResults', {
+                                                start: (currentRoomPage - 1) * ROOMS_PER_PAGE + 1,
+                                                end: Math.min(currentRoomPage * ROOMS_PER_PAGE, filteredRoomsForAdmin.length),
+                                                total: filteredRoomsForAdmin.length
+                                            })}
                                         </p>
                                         <div className="flex gap-2">
                                             <Button 

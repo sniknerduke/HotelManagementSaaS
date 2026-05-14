@@ -51,7 +51,6 @@ export const SearchResults: React.FC = () => {
     // UI state
     const [activeDatePicker, setActiveDatePicker] = useState<'sticky' | 'normal' | null>(null);
     const [activeGuestPicker, setActiveGuestPicker] = useState<'sticky' | 'normal' | null>(null);
-    const [isScrolled, setIsScrolled] = useState(false);
     const [roomsData, setRoomsData] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [amenities, setAmenities] = useState<any[]>([]);
@@ -78,15 +77,6 @@ export const SearchResults: React.FC = () => {
 
     const totalPages = Math.ceil(filteredRooms.length / ITEMS_PER_PAGE);
     const paginatedRooms = filteredRooms.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            const scrolled = window.scrollY > 400;
-            setIsScrolled(scrolled);
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
 
     // Fetch availability: date-aware when dates selected, otherwise show all room types
     useEffect(() => {

@@ -65,16 +65,6 @@ export const RoomDetail: React.FC = () => {
 
     const [activeDatePicker, setActiveDatePicker] = useState<'sticky' | 'normal' | null>(null);
     const [activeGuestPicker, setActiveGuestPicker] = useState<'sticky' | 'normal' | null>(null);
-    const [isScrolled, setIsScrolled] = useState(false);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            const scrolled = window.scrollY > 200;
-            setIsScrolled(scrolled);
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
 
     useEffect(() => {
         const fetchRoomDetails = async () => {

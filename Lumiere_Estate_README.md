@@ -1,30 +1,37 @@
 <a id="readme-top"></a>
 
+
+
 <!-- PROJECT SHIELDS -->
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![License][license-shield]][license-url]
+[![LinkedIn][linkedin-shield]][linkedin-url]
 
 
 
-<!-- PROJECT HEADER -->
+<!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <h3 align="center">Lumiere Estate Hotel Management SaaS</h3>
+  <a href="https://github.com/github_username/lumiere-estate-hotel-management-saas">
+    <img src="images/logo.png" alt="Lumiere Estate Logo" width="80" height="80">
+  </a>
+
+<h3 align="center">Lumiere Estate Hotel Management SaaS</h3>
 
   <p align="center">
     Full-stack hotel booking and management platform built with a React 19 + TypeScript frontend and a Quarkus 3 + Java 21 microservice backend.
     <br />
-    <a href="https://github.com/sniknerduke/HotelManagementSaaS"><strong>Explore the docs &raquo;</strong></a>
+    <a href="https://github.com/github_username/lumiere-estate-hotel-management-saas"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://sniknerduke.dev">View Demo</a>
+    <a href="https://github.com/github_username/lumiere-estate-hotel-management-saas">View Demo</a>
     &middot;
-    <a href="https://github.com/sniknerduke/HotelManagementSaaS/issues/new?labels=bug"><strong>Report Bug</strong></a>
+    <a href="https://github.com/github_username/lumiere-estate-hotel-management-saas/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     &middot;
-    <a href="https://github.com/sniknerduke/HotelManagementSaaS/issues/new?labels=enhancement"><strong>Request Feature</strong></a>
+    <a href="https://github.com/github_username/lumiere-estate-hotel-management-saas/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 </div>
 
@@ -67,6 +74,8 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
+[![Product Name Screen Shot][product-screenshot]](https://example.com)
+
 **Lumiere Estate Hotel Management SaaS** is a connected hotel booking and operations platform. The frontend communicates with the backend through a centralized fetch client and the Kong API gateway, so the application runs as a real integrated system rather than a mock-only prototype.
 
 The platform supports the full guest journey, account management, staff operations, administration workflows, payments, and localization for English and Vietnamese users.
@@ -82,7 +91,6 @@ The platform supports the full guest journey, account management, staff operatio
 * Separate staff and admin portals at `/staff` and `/admin`.
 * English and Vietnamese localization.
 * Shared UI shell with splash screen, layout chrome, chatbot, and animated sections.
-* API-wired frontend with a centralized client in `src/api/client.ts` and service modules in `src/api/index.ts`.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -100,8 +108,6 @@ The platform supports the full guest journey, account management, staff operatio
 * [![RabbitMQ][RabbitMQ]][RabbitMQ-url]
 * [![Kong][Kong]][Kong-url]
 * [![Docker][Docker]][Docker-url]
-
-The frontend also uses Tailwind CSS v4, React Router, i18next/react-i18next, Framer Motion, Lucide React, Recharts, jsPDF, and jsPDF-AutoTable for styling, navigation, localization, motion, charts, and reporting.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -142,11 +148,11 @@ Make sure the following tools are installed:
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/sniknerduke/HotelManagementSaaS.git
+   git clone https://github.com/github_username/lumiere-estate-hotel-management-saas.git
    ```
 2. Navigate into the project
    ```sh
-   cd HotelManagementSaaS
+   cd lumiere-estate-hotel-management-saas
    ```
 3. Install frontend dependencies
    ```sh
@@ -293,9 +299,6 @@ backend/
   booking-service/      # Reservation, promotion, and analytics service
   payment-service/      # Payment and VNPay service
   docker-compose*.yml   # Local and production stack definitions
-prompt/                 # Objective and prompt documents
-public/                 # Static assets
-README.md               # Project documentation
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -323,11 +326,10 @@ README.md               # Project documentation
 - [x] Kong API gateway routing
 - [x] Dockerized local infrastructure
 - [ ] Add production deployment documentation
-- [ ] Add screenshots and live demo assets
+- [ ] Add screenshots and demo link
 - [ ] Add API documentation links
-- [ ] Add a license file
 
-See the [open issues](https://github.com/sniknerduke/HotelManagementSaaS/issues) for a full list of proposed features and known issues.
+See the [open issues](https://github.com/github_username/lumiere-estate-hotel-management-saas/issues) for a full list of proposed features and known issues.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -350,8 +352,8 @@ If you have a suggestion that would make this better, please fork the repo and c
 
 ### Top contributors:
 
-<a href="https://github.com/sniknerduke/HotelManagementSaaS/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=sniknerduke/HotelManagementSaaS" alt="contrib.rocks image" />
+<a href="https://github.com/github_username/lumiere-estate-hotel-management-saas/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=github_username/lumiere-estate-hotel-management-saas" alt="contrib.rocks image" />
 </a>
 
 
@@ -359,7 +361,7 @@ If you have a suggestion that would make this better, please fork the repo and c
 <!-- LICENSE -->
 ## License
 
-A license file has not been added yet.
+Distributed under the project license. See `LICENSE.txt` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -368,9 +370,9 @@ A license file has not been added yet.
 <!-- CONTACT -->
 ## Contact
 
-Project Link: [https://github.com/sniknerduke/HotelManagementSaaS](https://github.com/sniknerduke/HotelManagementSaaS)
+Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com
 
-Live Demo: [https://sniknerduke.dev](https://sniknerduke.dev)
+Project Link: [https://github.com/github_username/lumiere-estate-hotel-management-saas](https://github.com/github_username/lumiere-estate-hotel-management-saas)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -388,16 +390,19 @@ Live Demo: [https://sniknerduke.dev](https://sniknerduke.dev)
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[contributors-shield]: https://img.shields.io/github/contributors/sniknerduke/HotelManagementSaaS.svg?style=for-the-badge
-[contributors-url]: https://github.com/sniknerduke/HotelManagementSaaS/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/sniknerduke/HotelManagementSaaS.svg?style=for-the-badge
-[forks-url]: https://github.com/sniknerduke/HotelManagementSaaS/network/members
-[stars-shield]: https://img.shields.io/github/stars/sniknerduke/HotelManagementSaaS.svg?style=for-the-badge
-[stars-url]: https://github.com/sniknerduke/HotelManagementSaaS/stargazers
-[issues-shield]: https://img.shields.io/github/issues/sniknerduke/HotelManagementSaaS.svg?style=for-the-badge
-[issues-url]: https://github.com/sniknerduke/HotelManagementSaaS/issues
-[license-shield]: https://img.shields.io/github/license/sniknerduke/HotelManagementSaaS.svg?style=for-the-badge
-[license-url]: https://github.com/sniknerduke/HotelManagementSaaS#license
+[contributors-shield]: https://img.shields.io/github/contributors/github_username/lumiere-estate-hotel-management-saas.svg?style=for-the-badge
+[contributors-url]: https://github.com/github_username/lumiere-estate-hotel-management-saas/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/github_username/lumiere-estate-hotel-management-saas.svg?style=for-the-badge
+[forks-url]: https://github.com/github_username/lumiere-estate-hotel-management-saas/network/members
+[stars-shield]: https://img.shields.io/github/stars/github_username/lumiere-estate-hotel-management-saas.svg?style=for-the-badge
+[stars-url]: https://github.com/github_username/lumiere-estate-hotel-management-saas/stargazers
+[issues-shield]: https://img.shields.io/github/issues/github_username/lumiere-estate-hotel-management-saas.svg?style=for-the-badge
+[issues-url]: https://github.com/github_username/lumiere-estate-hotel-management-saas/issues
+[license-shield]: https://img.shields.io/github/license/github_username/lumiere-estate-hotel-management-saas.svg?style=for-the-badge
+[license-url]: https://github.com/github_username/lumiere-estate-hotel-management-saas/blob/master/LICENSE.txt
+[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
+[linkedin-url]: https://linkedin.com/in/linkedin_username
+[product-screenshot]: images/screenshot.png
 
 [React.js]: https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
 [React-url]: https://react.dev/

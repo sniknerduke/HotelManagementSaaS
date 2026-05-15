@@ -9,6 +9,7 @@ services:
         paths:
           - /api/users
           - /api/auth
+          - /api/user/ai
         strip_path: false
 
   - name: inventory-service
@@ -39,7 +40,6 @@ services:
           - /api/payments
         strip_path: false
 
-# Example of a global plugin: Add Rate Limiting globally
 plugins:
   - name: rate-limiting
     config:

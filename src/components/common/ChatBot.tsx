@@ -100,10 +100,11 @@ export const ChatBot: React.FC = () => {
           ...currentMessages
         ];
 
-        const response = await fetch('http://127.0.0.1:8317/v1/chat/completions', {
+        const token = localStorage.getItem('auth_token');
+        const response = await fetch('/api/user/ai/chat', {
           method: 'POST',
           headers: {
-            'Authorization': 'Bearer your-api-key-1',
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({

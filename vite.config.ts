@@ -4,6 +4,16 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    allowedHosts: ["sniknerduke.dev"],
+    proxy: {
+      '/api': {
+        target: process.env.VITE_API_URL || 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false,
+      }
+    }
+  },
   plugins: [react(), tailwindcss()],
   build: {
     rollupOptions: {
@@ -19,16 +29,6 @@ export default defineConfig({
              return 'dependencies';
           }
         }
-      }
-    }
-  },
-  server: {
-    allowedHosts: true,
-    proxy: {
-      '/api': {
-        target: process.env.VITE_API_URL || 'http://localhost:8000',
-        changeOrigin: true,
-        secure: false,
       }
     }
   }

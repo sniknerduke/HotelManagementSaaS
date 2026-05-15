@@ -98,7 +98,7 @@ export const Profile: React.FC = () => {
   }, [user]);
 
   const upcomingBookings = dbBookings.filter((b) => ['PENDING', 'CONFIRMED'].includes(b.status));
-  const pastBookings = dbBookings.filter((b) => ['COMPLETED', 'CANCELLED'].includes(b.status));
+  const pastBookings = dbBookings.filter((b) => ['CHECKED_OUT', 'COMPLETED', 'CANCELLED'].includes(b.status));
   const currentStay = dbBookings.find((b) => b.status === 'CONFIRMED' || b.status === 'CHECKED_IN');
 
   const getFallbackImage = () => 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800&auto=format&fit=crop&q=60';

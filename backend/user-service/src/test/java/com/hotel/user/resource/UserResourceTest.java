@@ -289,6 +289,25 @@ public class UserResourceTest {
 
     @Test
     @Order(14)
+    @DisplayName("POST /api/users/login - deactivated user returns 401")
+    void testLoginDeactivatedUser() {
+        given()
+                .contentType(ContentType.JSON)
+                .body("""
+                    {
+                        "email": "test@example.com",
+                        "password": "newsecret456"
+                    }
+                """)
+            .when()
+                .post("/api/users/login")
+            .then()
+                .statusCode(401)
+                .body("error", containsString("Invalid credentials"));
+    }
+
+    @Test
+    @Order(15)
     @TestSecurity(user = "admin@example.com", roles = "ADMIN")
     @DisplayName("GET /api/users/{id} - deactivated user returns 404")
     void testGetDeactivatedUser() {
@@ -302,7 +321,7 @@ public class UserResourceTest {
     // ==================== LOGOUT (RolesAllowed) ====================
 
     @Test
-    @Order(15)
+    @Order(16)
     @TestSecurity(user = "test@example.com", roles = "GUEST")
     @DisplayName("POST /api/users/logout - success")
     void testLogout() {

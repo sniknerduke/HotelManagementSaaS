@@ -20,6 +20,9 @@ public class RateLimitFilter implements ContainerRequestFilter {
     @Inject
     ProxyManager<String> proxyManager;
 
+    @ConfigProperty(name = "ratelimit.enabled", defaultValue = "true")
+    boolean enabled;
+
     @ConfigProperty(name = "ratelimit.capacity", defaultValue = "20")
     int capacity;
 
@@ -31,6 +34,10 @@ public class RateLimitFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
+        if (!enabled) {
+            return;
+        }
+
         // Simple identifier: IP Address (can be extended to use User ID from JWT)
         String remoteAddr = requestContext.getUriInfo().getQueryParameters().getFirst("remote_addr"); // Fallback for local testing
         if (remoteAddr == null) {

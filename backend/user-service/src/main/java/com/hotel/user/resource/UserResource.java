@@ -121,7 +121,7 @@ public class UserResource {
     @PermitAll
     public Response login(@Valid LoginRequest req) {
         User user = User.findByEmail(req.email());
-        if (user == null || !BcryptUtil.matches(req.password(), user.passwordHash)) {
+        if (user == null || !user.isActive || !BcryptUtil.matches(req.password(), user.passwordHash)) {
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity("{\"error\": \"Invalid credentials\"}")
                     .build();

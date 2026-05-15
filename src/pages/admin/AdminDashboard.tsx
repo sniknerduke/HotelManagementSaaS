@@ -121,54 +121,88 @@ export const AdminDashboard: React.FC = () => {
     };
 
     const refreshData = async () => {
+        const [bookingsRes, usersRes, roomsRes, roomTypesRes, paymentsRes, settingsRes, amenitiesRes, promotionsRes] = await Promise.allSettled([
+            BookingService.getAllBookings(),
+            AuthService.getAllUsers(),
+            InventoryService.getAllRooms(),
+            InventoryService.getAllRoomTypes(),
+            PaymentService.getAllPayments(),
+            SettingsService.getSettings(),
+            AmenityService.getAllAmenities(),
+            PromotionService.getAllPromotions()
+        ]);
+
+        if (bookingsRes.status === 'fulfilled') {
+            setBookings(bookingsRes.value);
+        } else {
+            console.error('Error fetching bookings', bookingsRes.reason);
+        }
+
+        if (usersRes.status === 'fulfilled') {
+            setUsers(usersRes.value);
+        } else {
+            console.error('Error fetching users', usersRes.reason);
+        }
+
+        if (roomsRes.status === 'fulfilled') {
+            setRooms(roomsRes.value);
+        } else {
+            console.error('Error fetching rooms', roomsRes.reason);
+        }
+
+        if (roomTypesRes.status === 'fulfilled') {
+            setRoomTypes(roomTypesRes.value);
+        } else {
+            console.error('Error fetching room types', roomTypesRes.reason);
+        }
+
+        if (paymentsRes.status === 'fulfilled') {
+            setPayments(paymentsRes.value);
+        } else {
+            console.error('Error fetching payments', paymentsRes.reason);
+        }
+
+        if (amenitiesRes.status === 'fulfilled') {
+            setAmenities(amenitiesRes.value);
+        } else {
+            console.error('Error fetching amenities', amenitiesRes.reason);
+        }
+
+        if (promotionsRes.status === 'fulfilled') {
+            setCoupons(promotionsRes.value);
+        } else {
+            console.error('Error fetching promotions', promotionsRes.reason);
+        }
+
+        if (settingsRes.status === 'fulfilled' && settingsRes.value) {
+            setSettings({
+                hotelName: settingsRes.value.hotelName || 'Lumière Hotel & Resort',
+                taxRate: settingsRes.value.taxRate !== undefined ? settingsRes.value.taxRate.toString() : '8.5',
+                currency: settingsRes.value.currency || 'USD',
+                breakfastPrice: settingsRes.value.breakfastPrice !== undefined ? Number(settingsRes.value.breakfastPrice) : 25.00,
+                minNights: settingsRes.value.minNights || 1,
+                maxNights: settingsRes.value.maxNights || 30,
+                maxGuestsPerBooking: settingsRes.value.maxGuestsPerBooking || 8,
+                checkInTime: settingsRes.value.checkInTime || '14:00',
+                checkOutTime: settingsRes.value.checkOutTime || '11:00'
+            });
+        } else if (settingsRes.status === 'rejected') {
+            console.error('Error fetching settings', settingsRes.reason);
+        }
+
         try {
-            const [bookingsRes, usersRes, roomsRes, roomTypesRes, paymentsRes, settingsRes, amenitiesRes, promotionsRes] = await Promise.all([
-                BookingService.getAllBookings(),
-                AuthService.getAllUsers(),
-                InventoryService.getAllRooms(),
-                InventoryService.getAllRoomTypes(),
-                PaymentService.getAllPayments(),
-                SettingsService.getSettings(),
-                AmenityService.getAllAmenities(),
-                PromotionService.getAllPromotions()
+            const [overview, today, revenueChart, occupancyChart] = await Promise.all([
+                AnalyticsService.getOverview(),
+                AnalyticsService.getTodayStats(),
+                AnalyticsService.getRevenue('30d'),
+                AnalyticsService.getOccupancy()
             ]);
-            setBookings(bookingsRes);
-            setUsers(usersRes);
-            setRooms(roomsRes);
-            setRoomTypes(roomTypesRes);
-            setPayments(paymentsRes);
-            setAmenities(amenitiesRes);
-            setCoupons(promotionsRes);
-            if (settingsRes) {
-                setSettings({
-                    hotelName: settingsRes.hotelName || 'Lumière Hotel & Resort',
-                    taxRate: settingsRes.taxRate !== undefined ? settingsRes.taxRate.toString() : '8.5',
-                    currency: settingsRes.currency || 'USD',
-                    breakfastPrice: settingsRes.breakfastPrice !== undefined ? Number(settingsRes.breakfastPrice) : 25.00,
-                    minNights: settingsRes.minNights || 1,
-                    maxNights: settingsRes.maxNights || 30,
-                    maxGuestsPerBooking: settingsRes.maxGuestsPerBooking || 8,
-                    checkInTime: settingsRes.checkInTime || '14:00',
-                    checkOutTime: settingsRes.checkOutTime || '11:00'
-                });
-            }
-            
-            try {
-                const [overview, today, revenueChart, occupancyChart] = await Promise.all([
-                    AnalyticsService.getOverview(),
-                    AnalyticsService.getTodayStats(),
-                    AnalyticsService.getRevenue('30d'),
-                    AnalyticsService.getOccupancy()
-                ]);
-                setAnalyticsOverview(overview);
-                setTodayStats(today);
-                setRevenueData(revenueChart);
-                setOccupancyData(occupancyChart);
-            } catch (analyticsError) {
-                console.error('Analytics fetching error', analyticsError);
-            }
-        } catch (error) {
-            console.error('Error fetching admin data', error);
+            setAnalyticsOverview(overview);
+            setTodayStats(today);
+            setRevenueData(revenueChart);
+            setOccupancyData(occupancyChart);
+        } catch (analyticsError) {
+            console.error('Analytics fetching error', analyticsError);
         }
     };
 

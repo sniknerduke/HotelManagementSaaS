@@ -121,6 +121,8 @@ public class SocialAuthResource {
                 user.passwordHash = UUID.randomUUID().toString(); // Random secure placeholder
                 user.role = User.UserRole.GUEST;
                 user.persist();
+            } else if (!user.isActive) {
+                return Response.temporaryRedirect(URI.create(frontendUrl + "/login?error=AccountInactive")).build();
             }
 
             // Real JWT Generation
@@ -195,6 +197,8 @@ public class SocialAuthResource {
                 user.passwordHash = UUID.randomUUID().toString();
                 user.role = User.UserRole.GUEST;
                 user.persist();
+            } else if (!user.isActive) {
+                return Response.temporaryRedirect(URI.create(frontendUrl + "/login?error=AccountInactive")).build();
             }
 
             // Real JWT Generation

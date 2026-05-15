@@ -19,6 +19,7 @@ public class NoAuthTestProfile implements QuarkusTestProfile {
                 Map.entry("quarkus.http.auth.permission.permit-all.paths", "/*"),
                 Map.entry("quarkus.http.auth.permission.permit-all.policy", "permit"),
                 Map.entry("quarkus.http.auth.proactive", "false"),
+                Map.entry("ratelimit.enabled", "false"),
                 // Use H2 in-memory database (no Docker needed)
                 Map.entry("quarkus.datasource.db-kind", "h2"),
                 Map.entry("quarkus.datasource.jdbc.url", "jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1"),

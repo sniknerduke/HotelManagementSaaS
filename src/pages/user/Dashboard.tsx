@@ -43,7 +43,7 @@ export const Dashboard: React.FC = () => {
         }
     };
 
-    const totalStays = bookings.filter(b => b.status === 'CHECKED_OUT').length;
+    const totalStays = bookings.filter(b => ['CHECKED_OUT', 'COMPLETED'].includes(b.status)).length;
     const upcoming = bookings.filter(b => b.status === 'PENDING' || b.status === 'CONFIRMED').length;
     const totalSpent = bookings.filter(b => b.status !== 'CANCELLED').reduce((sum, b) => sum + (b.totalPrice || 0), 0);
 
@@ -115,6 +115,7 @@ export const Dashboard: React.FC = () => {
                                             b.status === 'CONFIRMED' ? 'bg-blue-100/50 text-blue-700 border-blue-200' :
                                             b.status === 'CHECKED_IN' ? 'bg-green-100/50 text-green-700 border-green-200' :
                                             b.status === 'CHECKED_OUT' ? 'bg-gray-100/50 text-gray-700 border-gray-200' :
+                                            b.status === 'COMPLETED' ? 'bg-gray-100/50 text-gray-700 border-gray-200' :
                                             b.status === 'CANCELLED' ? 'bg-red-100/50 text-red-700 border-red-200' :
                                             'bg-orange-100/50 text-orange-700 border-orange-200'
                                         }`}>
@@ -125,7 +126,7 @@ export const Dashboard: React.FC = () => {
                                         {['PENDING', 'CONFIRMED'].includes(b.status) && (
                                             <button onClick={() => handleCancelReservation(b.id)} className="text-[10px] uppercase tracking-[0.2em] text-red-600 hover:text-red-800 underline underline-offset-4">Cancel</button>
                                         )}
-                                        {['COMPLETED', 'CONFIRMED', 'CHECKED_IN'].includes(b.status) && (
+                                        {['CHECKED_OUT', 'COMPLETED', 'CONFIRMED', 'CHECKED_IN'].includes(b.status) && (
                                             <button onClick={() => handleViewReceipt(b.id)} className="text-[10px] uppercase tracking-[0.2em] text-[#6C6863] hover:text-[#1A1A1A] underline underline-offset-4">Receipt</button>
                                         )}
                                     </td>

@@ -417,8 +417,8 @@ export const StaffDashboard: React.FC = () => {
                                                 </span>
                                             </td>
                                             <td className="py-4 px-6 text-xs text-right space-x-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button onClick={() => setEditingBooking(booking)} className="text-[#D4AF37] hover:text-[#1A1A1A] uppercase tracking-widest font-bold text-[9px]">Edit</button>
-                                                <button onClick={() => handleCancelBooking(booking.id)} className="text-red-500 hover:text-red-800 uppercase tracking-widest font-bold text-[9px]">Cancel</button>
+                                                <button onClick={() => setEditingBooking(booking)} className="text-[#1A1A1A] hover:text-[#D4AF37] uppercase tracking-widest font-bold text-[9px]">Edit</button>
+                                                <button onClick={() => handleCancelBooking(booking.id)} className="text-[#1A1A1A] hover:text-red-600 uppercase tracking-widest font-bold text-[9px]">Cancel</button>
                                                 {booking.status === 'CHECKED_IN' ? (
                                                     <button onClick={() => handleCheckOut(booking.id)} className="text-[#1A1A1A] hover:text-red-600 uppercase tracking-widest font-bold text-[9px]">Check Out</button>
                                                 ) : booking.status === 'CONFIRMED' || booking.status === 'PENDING' ? (

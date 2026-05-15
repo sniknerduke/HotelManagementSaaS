@@ -20,15 +20,15 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
     if (!isOpen) return null;
 
     return createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div className={cn("bg-white border border-[#1A1A1A]/10 shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200", className)}>
-                <div className="p-6 border-b border-[#1A1A1A]/10 flex justify-between items-center bg-[#F9F8F6]">
+        <div className="fixed inset-0 z-[200] flex justify-center bg-black/40 backdrop-blur-sm p-4 md:p-8 overflow-y-auto animate-in fade-in duration-200">
+            <div className={cn("bg-white border border-[#1A1A1A]/10 shadow-2xl w-full max-w-lg h-fit my-auto overflow-hidden animate-in zoom-in-95 duration-200", className)}>
+                <div className="p-6 border-b border-[#1A1A1A]/10 flex justify-between items-center bg-[#F9F8F6] sticky top-0 z-10">
                     <h2 className="text-xl font-serif text-[#1A1A1A]">{title}</h2>
                     <button onClick={onClose} className="p-2 text-[#6C6863] hover:text-[#1A1A1A] hover:bg-black/5 transition-colors">
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                 </div>
-                <div className="p-6 max-h-[80vh] overflow-y-auto font-sans">
+                <div className="p-6 font-sans">
                     {children}
                 </div>
             </div>

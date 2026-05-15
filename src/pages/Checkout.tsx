@@ -66,33 +66,42 @@ export const Checkout: React.FC = () => {
 
     useEffect(() => {
         const resolveRoom = async () => {
+            setRoomLoading(true);
             try {
-                // Fetch room type info for display and pricing
-                try {
-                    const rtInfo = await InventoryService.getRoomType(roomTypeId);
-                    if (rtInfo) {
-                        setRoomTypeName(rtInfo.name || '');
-                        setRoomTypeImage(rtInfo.imageUrl || '');
-                        setRoomPrice(Number(rtInfo.basePrice) || 0);
-                    }
-                } catch (_) { /* non-critical */ }
+                const [rtInfo, availability] = await Promise.all([
+                    InventoryService.getRoomType(roomTypeId).catch(() => null),
+                    checkInDate && checkOutDate
+                        ? BookingService.getAvailability(checkInDate, checkOutDate, adultsParam + childrenParam).catch(() => [])
+                        : Promise.resolve([])
+                ]);
 
-                // Find first available room of this type
-                const allRooms = await InventoryService.getAllRooms();
-                const available = allRooms.find(
-                    (r: any) => r.roomTypeId === roomTypeId && r.status === 'AVAILABLE'
-                );
-                if (available) {
-                    setRoomId(available.id);
+                if (rtInfo) {
+                    setRoomTypeName(rtInfo.name || '');
+                    setRoomTypeImage(rtInfo.imageUrl || '');
+                    setRoomPrice(Number(rtInfo.basePrice) || 0);
+                }
+
+                const selectedRoomType = Array.isArray(availability)
+                    ? availability.find((room: any) => Number(room.roomTypeId) === roomTypeId)
+                    : null;
+
+                if (selectedRoomType) {
+                    setRoomTypeName(selectedRoomType.name || rtInfo?.name || '');
+                    setRoomTypeImage(selectedRoomType.imageUrl || rtInfo?.imageUrl || '');
+                    setRoomPrice(Number(selectedRoomType.basePrice) || Number(rtInfo?.basePrice) || 0);
+                    setRoomId(selectedRoomType.availableRoomIds?.[0] ?? null);
+                } else {
+                    setRoomId(null);
                 }
             } catch (e) {
                 console.error('Failed to resolve available room', e);
+                setRoomId(null);
             } finally {
                 setRoomLoading(false);
             }
         };
         resolveRoom();
-    }, [roomTypeId]);
+    }, [roomTypeId, checkInDate, checkOutDate, adultsParam, childrenParam]);
 
     // Per-night pricing with 10% VAT
     const subtotal = roomPrice * nights;

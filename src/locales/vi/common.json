@@ -542,7 +542,8 @@
     "signInGuest": "Đăng nhập với tư cách Khách",
     "signInAdmin": "Đăng nhập với tư cách Admin",
     "noAccount": "Chưa có tài khoản?",
-    "createAccount": "Tạo tài khoản"
+    "createAccount": "Tạo tài khoản",
+    "success": "Đăng nhập thành công!"
   },
   "register": {
     "title": "Gia nhập",

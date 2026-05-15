@@ -11,6 +11,8 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 
+import java.time.LocalDate;
+
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,6 +35,14 @@ public class BookingResourceTest {
 
     private static Integer createdBookingId;
 
+    private static String testCheckInDate() {
+        return LocalDate.now().plusDays(30).toString();
+    }
+
+    private static String testCheckOutDate() {
+        return LocalDate.now().plusDays(34).toString();
+    }
+
     @BeforeEach
     void setupMocks() {
         // Mock RoomType for pricing
@@ -41,13 +51,21 @@ public class BookingResourceTest {
                 "img", java.util.Collections.emptyList(), 5L);
         Mockito.when(inventoryClient.getRoomType(1L)).thenReturn(roomTypeMock);
 
+        InventoryClient.RoomDTO room1Available = new InventoryClient.RoomDTO(1L, "101", "AVAILABLE", 1L, roomTypeMock);
+        InventoryClient.RoomDTO room2Available = new InventoryClient.RoomDTO(2L, "102", "AVAILABLE", 1L, roomTypeMock);
+
         // Mock: room 1 is AVAILABLE
         Mockito.when(inventoryClient.getRoom(1L))
-                .thenReturn(new InventoryClient.RoomDTO(1L, "101", "AVAILABLE", 1L, roomTypeMock));
+            .thenReturn(room1Available);
 
-        // Mock: room 2 is OCCUPIED
+        // Mock: room 2 is in a permanently unavailable state
         Mockito.when(inventoryClient.getRoom(2L))
-                .thenReturn(new InventoryClient.RoomDTO(2L, "102", "OCCUPIED", 1L, roomTypeMock));
+            .thenReturn(new InventoryClient.RoomDTO(2L, "102", "MAINTENANCE", 1L, roomTypeMock));
+
+        Mockito.when(inventoryClient.getAllRooms(null, null, null))
+            .thenReturn(java.util.List.of(room1Available, room2Available));
+        Mockito.when(inventoryClient.getAllRoomTypes())
+            .thenReturn(java.util.List.of(roomTypeMock));
 
         // Mock: updateRoomStatus always succeeds
         Mockito.when(inventoryClient.updateRoomStatus(any(), any()))
@@ -66,20 +84,20 @@ public class BookingResourceTest {
                     {
                         "roomId": 1,
                         "userId": "00000000-0000-0000-0000-000000000001",
-                        "checkInDate": "2026-12-01",
-                        "checkOutDate": "2026-12-05",
+                        "checkInDate": "%s",
+                        "checkOutDate": "%s",
                         "totalPrice": 400.00,
                         "adultCount": 2,
                         "childCount": 0
                     }
-                """)
+                """.formatted(testCheckInDate(), testCheckOutDate()))
             .when()
                 .post("/api/bookings")
             .then()
                 .statusCode(201)
                 .body("roomId", equalTo(1))
                 .body("status", equalTo("PENDING"))
-                .body("totalPrice", equalTo(400.00f))
+                .body("totalPrice", equalTo(440.00f))
                 .body("adultCount", equalTo(2))
                 .body("id", notNullValue())
             .extract()
@@ -96,13 +114,13 @@ public class BookingResourceTest {
                     {
                         "roomId": 2,
                         "userId": "00000000-0000-0000-0000-000000000001",
-                        "checkInDate": "2026-12-01",
-                        "checkOutDate": "2026-12-05",
+                        "checkInDate": "%s",
+                        "checkOutDate": "%s",
                         "totalPrice": 400.00,
                         "adultCount": 2,
                         "childCount": 0
                     }
-                """)
+                """.formatted(testCheckInDate(), testCheckOutDate()))
             .when()
                 .post("/api/bookings")
             .then()
@@ -120,13 +138,13 @@ public class BookingResourceTest {
                     {
                         "roomId": 1,
                         "userId": "00000000-0000-0000-0000-000000000001",
-                        "checkInDate": "2026-12-10",
-                        "checkOutDate": "2026-12-05",
+                        "checkInDate": "%s",
+                        "checkOutDate": "%s",
                         "totalPrice": 400.00,
                         "adultCount": 2,
                         "childCount": 0
                     }
-                """)
+                """.formatted(testCheckOutDate(), testCheckInDate()))
             .when()
                 .post("/api/bookings")
             .then()
@@ -213,6 +231,23 @@ public class BookingResourceTest {
 
     @Test
     @Order(9)
+    @DisplayName("GET /api/bookings/availability - returns date-aware room ids")
+    void testCheckAvailabilityReturnsRoomIds() {
+        given()
+                .queryParam("checkIn", testCheckInDate())
+                .queryParam("checkOut", testCheckOutDate())
+                .queryParam("guests", 2)
+            .when()
+                .get("/api/bookings/availability")
+            .then()
+                .statusCode(200)
+                .body("size()", equalTo(1))
+                .body("[0].availableCount", equalTo(1))
+                .body("[0].availableRoomIds[0]", equalTo(2));
+    }
+
+    @Test
+    @Order(10)
     @DisplayName("PATCH /api/bookings/{id}/status - invalid status returns 400")
     void testUpdateStatusInvalid() {
         given()
@@ -229,7 +264,7 @@ public class BookingResourceTest {
     // ==================== CHECK-IN / CHECK-OUT ====================
 
     @Test
-    @Order(10)
+    @Order(11)
     @DisplayName("POST /api/bookings/{id}/check-in - success")
     void testCheckIn() {
         given()
@@ -242,7 +277,7 @@ public class BookingResourceTest {
     }
 
     @Test
-    @Order(11)
+    @Order(12)
     @DisplayName("POST /api/bookings/{id}/check-out - success")
     void testCheckOut() {
         // Re-setup mock for check-out (room goes to DIRTY)
@@ -261,7 +296,7 @@ public class BookingResourceTest {
     // ==================== CANCEL BOOKING ====================
 
     @Test
-    @Order(20)
+    @Order(21)
     @DisplayName("POST + DELETE - create and cancel booking")
     void testCancelBooking() {
         // Create a new booking to cancel
@@ -271,13 +306,13 @@ public class BookingResourceTest {
                     {
                         "roomId": 1,
                         "userId": "00000000-0000-0000-0000-000000000002",
-                        "checkInDate": "2027-01-10",
-                        "checkOutDate": "2027-01-15",
+                        "checkInDate": "%s",
+                        "checkOutDate": "%s",
                         "totalPrice": 500.00,
                         "adultCount": 1,
                         "childCount": 0
                     }
-                """)
+                """.formatted(testCheckInDate(), testCheckOutDate()))
             .when()
                 .post("/api/bookings")
             .then()
@@ -304,7 +339,7 @@ public class BookingResourceTest {
     // ==================== GET ALL (Admin) ====================
 
     @Test
-    @Order(30)
+    @Order(31)
     @DisplayName("GET /api/bookings - list all bookings")
     void testGetAllBookings() {
         given()

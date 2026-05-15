@@ -89,7 +89,7 @@ public class BookingResource {
             Long roomTypeId, String name, String description,
             BigDecimal basePrice, int maxGuests, String imageUrl,
             List<InventoryClient.AmenityDTO> amenities,
-            long availableCount, long nights,
+            long availableCount, List<Long> availableRoomIds, long nights,
             BigDecimal subtotal, BigDecimal vat, BigDecimal total) {}
 
     // --- Endpoints ---
@@ -180,6 +180,11 @@ public class BookingResource {
         Map<Long, Long> availableByType = availableRooms.stream()
                 .filter(r -> r.roomTypeId() != null)
                 .collect(Collectors.groupingBy(InventoryClient.RoomDTO::roomTypeId, Collectors.counting()));
+        Map<Long, List<Long>> availableRoomIdsByType = availableRooms.stream()
+            .filter(r -> r.roomTypeId() != null)
+            .collect(Collectors.groupingBy(
+                InventoryClient.RoomDTO::roomTypeId,
+                Collectors.mapping(InventoryClient.RoomDTO::id, Collectors.toList())));
 
         // 6. Build response: room types with enough capacity, at least 1 available room
         List<AvailabilityResponse> result = allRoomTypes.stream()
@@ -189,11 +194,12 @@ public class BookingResource {
                     BigDecimal subtotal = rt.basePrice().multiply(BigDecimal.valueOf(nights));
                     BigDecimal vat = subtotal.multiply(VAT_RATE).setScale(2, RoundingMode.HALF_UP);
                     BigDecimal total = subtotal.add(vat);
+                    List<Long> availableRoomIds = availableRoomIdsByType.getOrDefault(rt.id(), List.of());
                     return new AvailabilityResponse(
                             rt.id(), rt.name(), rt.description(),
                             rt.basePrice(), rt.maxGuests(), rt.imageUrl(),
                             rt.amenities(),
-                            availableByType.getOrDefault(rt.id(), 0L),
+                        availableByType.getOrDefault(rt.id(), 0L), availableRoomIds,
                             nights, subtotal, vat, total);
                 })
                 .toList();
@@ -228,7 +234,7 @@ public class BookingResource {
             String status = room.status();
             if ("OUT_OF_ORDER".equals(status) || "MAINTENANCE".equals(status)) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("{\"error\": \"Room is not available (\" + status + \")\"}")
+                        .entity("{\"error\": \"Room is not available (" + status + ")\"}")
                         .build();
             }
         } catch (Exception e) {

@@ -9,7 +9,7 @@ import { useToast } from '../../context/ToastContext';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { CRMModule } from './CRMModule';
 
-type AdminTab = 'overview' | 'reservations' | 'inventory' | 'users' | 'crm' | 'reports' | 'settings' | 'payments';
+type AdminTab = 'overview' | 'reservations' | 'inventory' | 'users' | 'crm' | 'payments';
 
 export const AdminDashboard: React.FC = () => {
     const { t } = useTranslation();
@@ -79,17 +79,7 @@ export const AdminDashboard: React.FC = () => {
 
     const [viewingPayment, setViewingPayment] = useState<any>(null);
 
-    const [settings, setSettings] = useState({
-        hotelName: 'Lumière Hotel & Resort',
-        taxRate: '8.5',
-        currency: 'USD',
-        breakfastPrice: 25.00,
-        minNights: 1,
-        maxNights: 30,
-        maxGuestsPerBooking: 8,
-        checkInTime: '14:00',
-        checkOutTime: '11:00'
-    });
+
 
     const [coupons, setCoupons] = useState<any[]>([]);
     const [newCoupon, setNewCoupon] = useState({ code: '', discountPercentage: 0 });
@@ -121,54 +111,73 @@ export const AdminDashboard: React.FC = () => {
     };
 
     const refreshData = async () => {
+        const [bookingsRes, usersRes, roomsRes, roomTypesRes, paymentsRes, amenitiesRes, promotionsRes] = await Promise.allSettled([
+            BookingService.getAllBookings(),
+            AuthService.getAllUsers(),
+            InventoryService.getAllRooms(),
+            InventoryService.getAllRoomTypes(),
+            PaymentService.getAllPayments(),
+            AmenityService.getAllAmenities(),
+            PromotionService.getAllPromotions()
+        ]);
+
+        if (bookingsRes.status === 'fulfilled') {
+            setBookings(bookingsRes.value);
+        } else {
+            console.error('Error fetching bookings', bookingsRes.reason);
+        }
+
+        if (usersRes.status === 'fulfilled') {
+            setUsers(usersRes.value);
+        } else {
+            console.error('Error fetching users', usersRes.reason);
+        }
+
+        if (roomsRes.status === 'fulfilled') {
+            setRooms(roomsRes.value);
+        } else {
+            console.error('Error fetching rooms', roomsRes.reason);
+        }
+
+        if (roomTypesRes.status === 'fulfilled') {
+            setRoomTypes(roomTypesRes.value);
+        } else {
+            console.error('Error fetching room types', roomTypesRes.reason);
+        }
+
+        if (paymentsRes.status === 'fulfilled') {
+            setPayments(paymentsRes.value);
+        } else {
+            console.error('Error fetching payments', paymentsRes.reason);
+        }
+
+        if (amenitiesRes.status === 'fulfilled') {
+            setAmenities(amenitiesRes.value);
+        } else {
+            console.error('Error fetching amenities', amenitiesRes.reason);
+        }
+
+        if (promotionsRes.status === 'fulfilled') {
+            setCoupons(promotionsRes.value);
+        } else {
+            console.error('Error fetching promotions', promotionsRes.reason);
+        }
+
+
+
         try {
-            const [bookingsRes, usersRes, roomsRes, roomTypesRes, paymentsRes, settingsRes, amenitiesRes, promotionsRes] = await Promise.all([
-                BookingService.getAllBookings(),
-                AuthService.getAllUsers(),
-                InventoryService.getAllRooms(),
-                InventoryService.getAllRoomTypes(),
-                PaymentService.getAllPayments(),
-                SettingsService.getSettings(),
-                AmenityService.getAllAmenities(),
-                PromotionService.getAllPromotions()
+            const [overview, today, revenueChart, occupancyChart] = await Promise.all([
+                AnalyticsService.getOverview(),
+                AnalyticsService.getTodayStats(),
+                AnalyticsService.getRevenue('30d'),
+                AnalyticsService.getOccupancy()
             ]);
-            setBookings(bookingsRes);
-            setUsers(usersRes);
-            setRooms(roomsRes);
-            setRoomTypes(roomTypesRes);
-            setPayments(paymentsRes);
-            setAmenities(amenitiesRes);
-            setCoupons(promotionsRes);
-            if (settingsRes) {
-                setSettings({
-                    hotelName: settingsRes.hotelName || 'Lumière Hotel & Resort',
-                    taxRate: settingsRes.taxRate !== undefined ? settingsRes.taxRate.toString() : '8.5',
-                    currency: settingsRes.currency || 'USD',
-                    breakfastPrice: settingsRes.breakfastPrice !== undefined ? Number(settingsRes.breakfastPrice) : 25.00,
-                    minNights: settingsRes.minNights || 1,
-                    maxNights: settingsRes.maxNights || 30,
-                    maxGuestsPerBooking: settingsRes.maxGuestsPerBooking || 8,
-                    checkInTime: settingsRes.checkInTime || '14:00',
-                    checkOutTime: settingsRes.checkOutTime || '11:00'
-                });
-            }
-            
-            try {
-                const [overview, today, revenueChart, occupancyChart] = await Promise.all([
-                    AnalyticsService.getOverview(),
-                    AnalyticsService.getTodayStats(),
-                    AnalyticsService.getRevenue('30d'),
-                    AnalyticsService.getOccupancy()
-                ]);
-                setAnalyticsOverview(overview);
-                setTodayStats(today);
-                setRevenueData(revenueChart);
-                setOccupancyData(occupancyChart);
-            } catch (analyticsError) {
-                console.error('Analytics fetching error', analyticsError);
-            }
-        } catch (error) {
-            console.error('Error fetching admin data', error);
+            setAnalyticsOverview(overview);
+            setTodayStats(today);
+            setRevenueData(revenueChart);
+            setOccupancyData(occupancyChart);
+        } catch (analyticsError) {
+            console.error('Analytics fetching error', analyticsError);
         }
     };
 
@@ -488,25 +497,6 @@ export const AdminDashboard: React.FC = () => {
         }
     };
 
-    const handleSaveSettings = async () => {
-        try {
-            await SettingsService.updateSettings({
-                ...settings,
-                taxRate: Number(settings.taxRate)
-            });
-            toast(`Global changes committed. ${settings.hotelName} config updated.`, 'success');
-        } catch (error) {
-            toast('Failed to save settings.', 'error');
-            console.error(error);
-        }
-    };
-
-    const handleExport = (type: string, format: 'CSV' | 'PDF') => {
-        toast(`Generating ${type} in ${format}...`, 'info');
-        setTimeout(() => {
-            toast(`${type} ${format} exported successfully.`, 'success');
-        }, 1500);
-    };
 
     const filteredBookings = bookings.filter(b => {
         const guestName = getUserName(b.userId).toLowerCase();
@@ -545,8 +535,8 @@ export const AdminDashboard: React.FC = () => {
                     <button onClick={() => setActiveTab('users')} className={`text-left py-4 border-t border-[#1A1A1A]/5 transition-colors relative ${activeTab === 'users' ? 'text-[#1A1A1A] after:-left-4 after:top-1/2 after:-translate-y-1/2 after:absolute after:h-px after:w-2 after:bg-[#D4AF37]' : 'hover:text-[#D4AF37]'}`}>{t('admin.sidebar.users')}</button>
                     <button onClick={() => setActiveTab('crm')} className={`text-left py-4 border-t border-[#1A1A1A]/5 transition-colors relative ${activeTab === 'crm' ? 'text-[#1A1A1A] after:-left-4 after:top-1/2 after:-translate-y-1/2 after:absolute after:h-px after:w-2 after:bg-[#D4AF37]' : 'hover:text-[#D4AF37]'}`}>Guest CRM</button>
                     <button onClick={() => setActiveTab('payments')} className={`text-left py-4 border-t border-[#1A1A1A]/5 transition-colors relative ${activeTab === 'payments' ? 'text-[#1A1A1A] after:-left-4 after:top-1/2 after:-translate-y-1/2 after:absolute after:h-px after:w-2 after:bg-[#D4AF37]' : 'hover:text-[#D4AF37]'}`}>Payments</button>
-                    <button onClick={() => setActiveTab('reports')} className={`text-left py-4 border-t border-[#1A1A1A]/5 transition-colors relative ${activeTab === 'reports' ? 'text-[#1A1A1A] after:-left-4 after:top-1/2 after:-translate-y-1/2 after:absolute after:h-px after:w-2 after:bg-[#D4AF37]' : 'hover:text-[#D4AF37]'}`}>{t('admin.sidebar.reports')}</button>
-                    <button onClick={() => setActiveTab('settings')} className={`text-left py-4 border-t border-[#1A1A1A]/5 transition-colors relative ${activeTab === 'settings' ? 'text-[#1A1A1A] after:-left-4 after:top-1/2 after:-translate-y-1/2 after:absolute after:h-px after:w-2 after:bg-[#D4AF37]' : 'hover:text-[#D4AF37]'}`}>{t('admin.sidebar.settings')}</button>
+
+
                 </nav>
             </div>
 
@@ -759,8 +749,8 @@ export const AdminDashboard: React.FC = () => {
                                                 </span>
                                             </td>
                                             <td className="py-4 px-6 text-xs text-right space-x-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button onClick={() => setEditingBooking(booking)} className="text-[#D4AF37] hover:text-[#1A1A1A] uppercase tracking-widest font-bold text-[9px]">{t('admin.reservations.table.edit')}</button>
-                                                <button onClick={() => handleCancelBooking(booking.id)} className="text-red-500 hover:text-red-800 uppercase tracking-widest font-bold text-[9px]">Cancel</button>
+                                                <button onClick={() => setEditingBooking(booking)} className="text-[#1A1A1A] hover:text-[#D4AF37] uppercase tracking-widest font-bold text-[9px]">{t('admin.reservations.table.edit')}</button>
+                                                <button onClick={() => handleCancelBooking(booking.id)} className="text-[#1A1A1A] hover:text-red-600 uppercase tracking-widest font-bold text-[9px]">Cancel</button>
                                                 {booking.status === 'CHECKED_IN' ? (
                                                     <button onClick={() => handleCheckOut(booking.id)} className="text-[#1A1A1A] hover:text-red-600 uppercase tracking-widest font-bold text-[9px]">{t('admin.reservations.table.checkOut')}</button>
                                                 ) : booking.status === 'CONFIRMED' || booking.status === 'PENDING' ? (
@@ -1046,7 +1036,7 @@ export const AdminDashboard: React.FC = () => {
                                         <th className="py-4 px-6 font-medium">Amount</th>
                                         <th className="py-4 px-6 font-medium">Method</th>
                                         <th className="py-4 px-6 font-medium">Status</th>
-                                        <th className="py-4 px-6 font-medium text-right">Actions</th>
+                                        <th className="py-4 px-6 font-medium text-right">Payment Date</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1060,11 +1050,8 @@ export const AdminDashboard: React.FC = () => {
                                                 <td className="py-4 px-6">
                                                     <span className={`text-[10px] uppercase tracking-widest font-bold px-2 py-1 ${p.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : p.status === 'REFUNDED' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>{p.status}</span>
                                                 </td>
-                                                <td className="py-4 px-6 text-xs text-right opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button onClick={() => setViewingPayment(p)} className="text-[#D4AF37] hover:text-[#1A1A1A] uppercase tracking-widest font-bold text-[9px] mr-4">View</button>
-                                                    {p.status === 'COMPLETED' && (
-                                                        <button onClick={() => handleProcessRefund(p.id)} className="text-red-500 hover:text-red-800 uppercase tracking-widest font-bold text-[9px]">Refund</button>
-                                                    )}
+                                                <td className="py-4 px-6 text-xs text-[#6C6863] text-right font-serif">
+                                                    {p.createdAt ? new Date(p.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
                                                 </td>
                                             </tr>
                                         ))
@@ -1081,129 +1068,7 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                 )}
 
-                {/* 5. Reports & Analytics */}
-                {activeTab === 'reports' && (
-                    <div className="animate-in fade-in duration-500">
-                        <div className="border-b border-[#1A1A1A]/20 pb-4 mb-8">
-                            <h2 className="text-3xl font-serif text-[#1A1A1A]">{t('admin.reports.title')} <span className="italic text-[#D4AF37]">{t('admin.reports.titleItalic')}</span></h2>
-                        </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <Card className="p-8 border border-[#1A1A1A]/10 bg-white">
-                                <div className="border-b border-[#1A1A1A]/10 pb-6 mb-6">
-                                    <h3 className="text-lg font-serif text-[#1A1A1A] mb-1">{t('admin.reports.financial')}</h3>
-                                    <p className="text-xs text-[#6C6863]">{t('admin.reports.financialDesc')}</p>
-                                </div>
-                                <div className="space-y-4 flex flex-col">
-                                    <Button onClick={() => handleExport('Revenue Ledger', 'CSV')} variant="ghost" className="border border-[#1A1A1A]/20 justify-between text-[10px] h-12 uppercase tracking-widest font-bold border-[#1A1A1A]/20 hover:border-[#1A1A1A] group"><span>{t('admin.reports.revenueLedger')}</span> <span className="text-[#D4AF37] group-hover:text-[#1A1A1A]">{t('admin.reports.exportCSV')}</span></Button>
-                                    <Button onClick={() => handleExport('Tax Remittance', 'PDF')} variant="ghost" className="border border-[#1A1A1A]/20 justify-between text-[10px] h-12 uppercase tracking-widest font-bold border-[#1A1A1A]/20 hover:border-[#1A1A1A] group"><span>{t('admin.reports.taxRemittance')}</span> <span className="text-red-600 group-hover:text-[#1A1A1A]">{t('admin.reports.downloadPDF')}</span></Button>
-                                </div>
-                            </Card>
-
-                            <Card className="p-8 border border-[#1A1A1A]/10 bg-white">
-                                <div className="border-b border-[#1A1A1A]/10 pb-6 mb-6">
-                                    <h3 className="text-lg font-serif text-[#1A1A1A] mb-1">{t('admin.reports.operational')}</h3>
-                                    <p className="text-xs text-[#6C6863]">{t('admin.reports.operationalDesc')}</p>
-                                </div>
-                                <div className="space-y-4 flex flex-col">
-                                    <Button onClick={() => handleExport('Housekeeping Route', 'PDF')} variant="ghost" className="border border-[#1A1A1A]/20 justify-between text-[10px] h-12 uppercase tracking-widest font-bold border-[#1A1A1A]/20 hover:border-[#1A1A1A] group"><span>{t('admin.reports.housekeepingRoute')}</span> <span className="text-red-600 group-hover:text-[#1A1A1A]">{t('admin.reports.printPDF')}</span></Button>
-                                    <Button onClick={() => handleExport('Occupancy Forecast', 'CSV')} variant="ghost" className="border border-[#1A1A1A]/20 justify-between text-[10px] h-12 uppercase tracking-widest font-bold border-[#1A1A1A]/20 hover:border-[#1A1A1A] group"><span>{t('admin.reports.occupancyForecast')}</span> <span className="text-[#D4AF37] group-hover:text-[#1A1A1A]">{t('admin.reports.exportCSV')}</span></Button>
-                                </div>
-                            </Card>
-                        </div>
-                    </div>
-                )}
-
-                {/* 6. System Settings */}
-                {activeTab === 'settings' && (
-                    <div className="animate-in fade-in duration-500">
-                        <div className="border-b border-[#1A1A1A]/20 pb-4 mb-8">
-                            <h2 className="text-3xl font-serif text-[#1A1A1A]">{t('admin.settings.title')} <span className="italic text-[#D4AF37]">{t('admin.settings.titleItalic')}</span></h2>
-                        </div>
-
-                        <div className="max-w-3xl space-y-12">
-                            {/* Property Details */}
-                            <Card className="p-8 border border-[#1A1A1A]/10 bg-white">
-                                <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#1A1A1A] mb-8 pb-4 border-b border-[#1A1A1A]/10">{t('admin.settings.propertyMeta')}</h3>
-                                <div className="space-y-6">
-                                    <div>
-                                        <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">{t('admin.settings.hotelName')}</label>
-                                        <input type="text" value={settings.hotelName} onChange={(e) => setSettings({ ...settings, hotelName: e.target.value })} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-serif text-xl text-[#1A1A1A]" />
-                                    </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                                        <div>
-                                            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">{t('admin.settings.taxRate')}</label>
-                                            <input type="text" value={settings.taxRate} onChange={(e) => setSettings({ ...settings, taxRate: e.target.value })} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-mono text-lg text-[#1A1A1A]" />
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">{t('admin.settings.currency')}</label>
-                                            <select value={settings.currency} onChange={(e) => setSettings({ ...settings, currency: e.target.value })} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-mono text-lg text-[#1A1A1A]">
-                                                <option value="USD">USD ($)</option>
-                                                <option value="EUR">EUR (€)</option>
-                                                <option value="VND">VND (₫)</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                                        <div>
-                                            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">Breakfast Price</label>
-                                            <input type="number" min="0" step="0.5" value={settings.breakfastPrice} onChange={(e) => setSettings({ ...settings, breakfastPrice: Number(e.target.value) })} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-mono text-lg text-[#1A1A1A]" />
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">Max Guests per Booking</label>
-                                            <input type="number" min="1" value={settings.maxGuestsPerBooking} onChange={(e) => setSettings({ ...settings, maxGuestsPerBooking: Number(e.target.value) })} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-mono text-lg text-[#1A1A1A]" />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                                        <div>
-                                            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">Min Nights</label>
-                                            <input type="number" min="1" value={settings.minNights} onChange={(e) => setSettings({ ...settings, minNights: Number(e.target.value) })} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-mono text-lg text-[#1A1A1A]" />
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">Max Nights</label>
-                                            <input type="number" min="1" value={settings.maxNights} onChange={(e) => setSettings({ ...settings, maxNights: Number(e.target.value) })} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-mono text-lg text-[#1A1A1A]" />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                                        <div>
-                                            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">Check-in Time</label>
-                                            <input type="time" value={settings.checkInTime} onChange={(e) => setSettings({ ...settings, checkInTime: e.target.value })} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-mono text-lg text-[#1A1A1A]" />
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] uppercase tracking-[0.2em] font-medium text-[#6C6863] mb-2 block">Check-out Time</label>
-                                            <input type="time" value={settings.checkOutTime} onChange={(e) => setSettings({ ...settings, checkOutTime: e.target.value })} className="w-full border-b border-[#1A1A1A]/20 bg-transparent outline-none focus:border-[#D4AF37] pb-2 font-mono text-lg text-[#1A1A1A]" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </Card>
-
-                            {/* Integrations */}
-                            <Card className="p-8 border border-[#1A1A1A]/10 bg-[#1A1A1A] hover:!bg-[#2A2A2A] text-white transition-colors duration-300">
-                                <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#F9F8F6]/50 mb-8 pb-4 border-b border-white/10">{t('admin.settings.integrations')}</h3>
-                                <div className="space-y-6">
-                                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 bg-white/5 p-6 border border-white/10">
-                                        <div>
-                                            <p className="text-sm font-bold text-white mb-1">Payment Gateway (Stripe)</p>
-                                            <p className="text-[10px] uppercase tracking-widest text-[#D4AF37]">● {t('admin.settings.apiActive')}</p>
-                                        </div>
-                                        <Button onClick={() => toast('Stripe Token refreshed successfully.', 'success')} variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase tracking-widest font-bold h-8 border-white/20 hover:border-white text-white hover:text-[#1A1A1A] hover:bg-white transition-colors">{t('admin.settings.renewToken')}</Button>
-                                    </div>
-                                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 bg-white/5 p-6 border border-white/10">
-                                        <div>
-                                            <p className="text-sm font-bold text-white mb-1">SMS Notifications (Twilio)</p>
-                                            <p className="text-[10px] uppercase tracking-widest text-red-500">○ {t('admin.settings.disconnected')}</p>
-                                        </div>
-                                        <Button onClick={() => toast('Redirecting to Twilio Connect...', 'info')} variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase tracking-widest font-bold h-8 border-white/20 hover:border-white text-white bg-white/10 hover:text-[#1A1A1A] hover:bg-white transition-colors">{t('admin.settings.provideKey')}</Button>
-                                    </div>
-                                </div>
-                            </Card>
-
-                            <div className="flex justify-end pt-4">
-                                <Button onClick={handleSaveSettings} variant="primary" className="bg-[#D4AF37] hover:bg-[#1A1A1A] text-white text-[10px] uppercase tracking-[0.2em] font-bold h-12 px-12 transition-colors">{t('admin.settings.saveChanges')}</Button>
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
 
             {/* Modals placed here for safe DOM rendering */}

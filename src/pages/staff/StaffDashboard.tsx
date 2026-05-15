@@ -460,7 +460,7 @@ export const StaffDashboard: React.FC = () => {
                                         <th className="py-4 px-6 font-medium">Amount</th>
                                         <th className="py-4 px-6 font-medium">Method</th>
                                         <th className="py-4 px-6 font-medium">Status</th>
-                                        <th className="py-4 px-6 font-medium text-right">Actions</th>
+                                        <th className="py-4 px-6 font-medium text-right">Payment Date</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -474,8 +474,8 @@ export const StaffDashboard: React.FC = () => {
                                                 <td className="py-4 px-6">
                                                     <span className={`text-[10px] uppercase tracking-widest font-bold px-2 py-1 ${p.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : p.status === 'REFUNDED' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>{p.status}</span>
                                                 </td>
-                                                <td className="py-4 px-6 text-xs text-right opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button onClick={() => setViewingPayment(p)} className="text-[#D4AF37] hover:text-[#1A1A1A] uppercase tracking-widest font-bold text-[9px]">View</button>
+                                                <td className="py-4 px-6 text-xs text-[#6C6863] text-right font-serif">
+                                                    {p.createdAt ? new Date(p.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
                                                 </td>
                                             </tr>
                                         ))

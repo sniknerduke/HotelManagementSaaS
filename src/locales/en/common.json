@@ -541,7 +541,8 @@
     "signInGuest": "Sign In as Guest",
     "signInAdmin": "Sign In as Admin",
     "noAccount": "Don't have an account?",
-    "createAccount": "Create an Account"
+    "createAccount": "Create an Account",
+    "success": "Login successful!"
   },
   "register": {
     "title": "Join the",

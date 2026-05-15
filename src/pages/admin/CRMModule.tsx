@@ -10,6 +10,10 @@ export const CRMModule: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedGuest, setSelectedGuest] = useState<any>(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    
+    // Pagination states
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(10);
 
     const fetchGuests = async () => {
         setIsLoading(true);
@@ -33,6 +37,16 @@ export const CRMModule: React.FC = () => {
         (`${g.firstName || ''} ${g.lastName || ''}`).toLowerCase().includes(searchQuery.toLowerCase()) ||
         (g.email || '').toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    const totalPages = Math.ceil(filteredGuests.length / itemsPerPage);
+    const paginatedGuests = filteredGuests.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
 
     const handleOpenGuest = (guest: any) => {
         setSelectedGuest(guest);
@@ -106,7 +120,7 @@ export const CRMModule: React.FC = () => {
                             <tr>
                                 <td colSpan={5} className="py-20 text-center text-[#6C6863] animate-pulse font-serif italic">Synchronizing Guest Database...</td>
                             </tr>
-                        ) : filteredGuests.map((guest, idx) => (
+                        ) : paginatedGuests.map((guest, idx) => (
                             <tr key={idx} className="border-b border-[#1A1A1A]/5 hover:bg-[#F9F8F6]/50 transition-colors group">
                                 <td className="py-4 px-6">
                                     <div className="flex items-center gap-3">
@@ -152,6 +166,42 @@ export const CRMModule: React.FC = () => {
                         )}
                     </tbody>
                 </table>
+
+                {/* Pagination Controls */}
+                {!isLoading && totalPages > 1 && (
+                    <div className="flex flex-col sm:flex-row justify-between items-center mt-4 px-4 pb-4 gap-4 border-t border-[#1A1A1A]/10 pt-4">
+                        <p className="text-xs text-[#6C6863] font-serif italic">
+                            Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredGuests.length)} of {filteredGuests.length} guests
+                        </p>
+                        <div className="flex gap-2">
+                            <button 
+                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1}
+                                className="text-[10px] uppercase font-bold tracking-widest px-4 h-8 border border-[#1A1A1A]/20 hover:bg-[#F9F8F6] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Previous
+                            </button>
+                            <div className="flex items-center gap-1 mx-2 overflow-x-auto max-w-[200px] sm:max-w-none no-scrollbar">
+                                {Array.from({ length: totalPages }).map((_, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => setCurrentPage(i + 1)}
+                                        className={`min-w-[32px] h-8 flex items-center justify-center text-xs font-serif ${currentPage === i + 1 ? 'bg-[#1A1A1A] text-white' : 'hover:bg-[#F9F8F6] border border-transparent hover:border-[#1A1A1A]/10'}`}
+                                    >
+                                        {i + 1}
+                                    </button>
+                                ))}
+                            </div>
+                            <button 
+                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                disabled={currentPage === totalPages}
+                                className="text-[10px] uppercase font-bold tracking-widest px-4 h-8 border border-[#1A1A1A]/20 hover:bg-[#F9F8F6] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <GuestDetailModal 

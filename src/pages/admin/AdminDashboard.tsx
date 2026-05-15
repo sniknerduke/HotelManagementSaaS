@@ -4,7 +4,7 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Modal } from '../../components/ui/Modal';
-import { BookingService, AuthService, InventoryService, PaymentService, AnalyticsService, SettingsService, AmenityService, PromotionService } from '../../api';
+import { BookingService, AuthService, InventoryService, PaymentService, AnalyticsService, AmenityService, PromotionService } from '../../api';
 import { useToast } from '../../context/ToastContext';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { CRMModule } from './CRMModule';
@@ -15,7 +15,7 @@ export const AdminDashboard: React.FC = () => {
     const { t } = useTranslation();
     const { toast } = useToast();
     const [activeTab, setActiveTab] = useState<AdminTab>('overview');
-    
+
     const [bookings, setBookings] = useState<any[]>([]);
     const [users, setUsers] = useState<any[]>([]);
     const [rooms, setRooms] = useState<any[]>([]);
@@ -32,7 +32,7 @@ export const AdminDashboard: React.FC = () => {
 
     const [isWalkInModalOpen, setWalkInModalOpen] = useState(false);
     const [walkInForm, setWalkInForm] = useState({ userId: '', roomId: '', checkInDate: '', checkOutDate: '', totalPrice: 0 });
-    
+
     const [editingBooking, setEditingBooking] = useState<any>(null);
 
     const [isAddCategoryModalOpen, setAddCategoryModalOpen] = useState(false);
@@ -47,7 +47,7 @@ export const AdminDashboard: React.FC = () => {
     const [addStaffForm, setAddStaffForm] = useState({ firstName: '', lastName: '', email: '', password: '', phoneNumber: '' });
     const [editingStaffRole, setEditingStaffRole] = useState<any>(null);
     const [editingUser, setEditingUser] = useState<any>(null);
-    
+
     // Pagination state for Inventory
     const [currentRoomPage, setCurrentRoomPage] = useState(1);
     const ROOMS_PER_PAGE = 3;
@@ -188,12 +188,12 @@ export const AdminDashboard: React.FC = () => {
     // Calculate metrics
     const totalRooms = rooms.length || 24; // fallback to 24 if no rooms
     const bookedRooms = bookings.filter(b => ['CONFIRMED', 'CHECKED_IN'].includes(b.status)).length;
-    
+
     const displayOccupancy = analyticsOverview ? Math.round(analyticsOverview.occupancyRate) : (totalRooms > 0 ? Math.round((bookedRooms / totalRooms) * 100) : 0);
     const displayRevenue = analyticsOverview ? analyticsOverview.totalRevenue.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : bookings.reduce((acc, curr) => acc + (Number(curr.totalPrice) || 0), 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
     const displayAdr = analyticsOverview ? analyticsOverview.adr.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : '$0.00';
     const displayRevPar = analyticsOverview ? analyticsOverview.revPar.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : '$0.00';
-    
+
     // Additional Operations Metrics
     const expectedCheckins = todayStats ? todayStats.arrivals : bookings.filter(b => b.status === 'CONFIRMED').length;
     const expectedCheckouts = todayStats ? todayStats.departures : bookings.filter(b => b.status === 'CHECKED_IN').length; // simple approximation
@@ -406,7 +406,7 @@ export const AdminDashboard: React.FC = () => {
             setFormState({ ...formState, amenities: newAmenities });
         } else {
             const currentIds = formState.amenityIds || [];
-            const newIds = currentIds.includes(amenityId) 
+            const newIds = currentIds.includes(amenityId)
                 ? currentIds.filter((id: number) => id !== amenityId)
                 : [...currentIds, amenityId];
             setFormState({ ...formState, amenityIds: newIds });
@@ -503,7 +503,7 @@ export const AdminDashboard: React.FC = () => {
         const bkgId = `BKG-${b.id}`.toLowerCase();
         const roomNum = `Room ${b.roomId}`.toLowerCase();
         const query = resSearchQuery.toLowerCase();
-        
+
         const matchesSearch = guestName.includes(query) || bkgId.includes(query) || roomNum.includes(query);
         const matchesStatus = resStatusFilter === 'All' || b.status === resStatusFilter.toUpperCase().replace(/\s/g, '_');
         return matchesSearch && matchesStatus;
@@ -520,14 +520,14 @@ export const AdminDashboard: React.FC = () => {
 
     return (
         <div className="max-w-[1600px] mx-auto w-full pt-16 md:pt-32 pb-40 px-8 flex flex-col lg:flex-row gap-12">
-            
+
             {/* Sidebar Nav */}
             <div className="lg:w-1/4 border-r border-[#1A1A1A]/10 pr-8 min-h-screen">
                 <h1 className="text-3xl md:text-5xl font-serif text-[#1A1A1A] mb-12 mt-8">
                     <span className="italic">Lumière</span><br />
                     {t('admin.sidebar.title')}
                 </h1>
-                
+
                 <nav className="flex flex-col space-y-2 text-xs uppercase tracking-[0.2em] font-medium text-[#6C6863]">
                     <button onClick={() => setActiveTab('overview')} className={`text-left py-4 border-t border-[#1A1A1A]/20 transition-colors relative ${activeTab === 'overview' ? 'text-[#1A1A1A] after:-left-4 after:top-1/2 after:-translate-y-1/2 after:absolute after:h-px after:w-2 after:bg-[#D4AF37]' : 'hover:text-[#D4AF37]'}`}>{t('admin.sidebar.overview')}</button>
                     <button onClick={() => setActiveTab('reservations')} className={`text-left py-4 border-t border-[#1A1A1A]/5 transition-colors relative ${activeTab === 'reservations' ? 'text-[#1A1A1A] after:-left-4 after:top-1/2 after:-translate-y-1/2 after:absolute after:h-px after:w-2 after:bg-[#D4AF37]' : 'hover:text-[#D4AF37]'}`}>{t('admin.sidebar.reservations')}</button>
@@ -542,7 +542,7 @@ export const AdminDashboard: React.FC = () => {
 
             {/* Dynamic Content Pane */}
             <div className="flex-1 w-full pt-8 min-w-0">
-                
+
                 {/* 1. Global Overview */}
                 {activeTab === 'overview' && (
                     <div className="animate-in fade-in duration-500">
@@ -550,7 +550,7 @@ export const AdminDashboard: React.FC = () => {
                             <h2 className="text-3xl font-serif text-[#1A1A1A]">{t('admin.overview.title')} <span className="italic text-[#D4AF37]">{t('admin.overview.titleItalic')}</span></h2>
                             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#6C6863]">{t('admin.overview.metrics')}</p>
                         </div>
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
                             <Card className="p-8 border border-[#1A1A1A]/10 bg-white">
                                 <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#6C6863] mb-2">{t('admin.overview.occupancy')}</p>
@@ -612,7 +612,7 @@ export const AdminDashboard: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div>
                                 <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#1A1A1A] mb-6 flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> {t('admin.overview.actionNeeded')}</h3>
                                 <div className="space-y-4">
@@ -679,14 +679,14 @@ export const AdminDashboard: React.FC = () => {
 
                         {/* Searchable Directory */}
                         <div className="mb-0 flex flex-col md:flex-row gap-4 bg-[#F9F8F6] p-4 border border-[#1A1A1A]/10 border-b-0">
-                            <input 
-                                type="text" 
-                                placeholder={t('admin.reservations.searchPlaceholder')} 
-                                className="flex-1 p-3 border border-[#1A1A1A]/10 bg-white text-sm focus:border-[#D4AF37] outline-none font-serif italic" 
+                            <input
+                                type="text"
+                                placeholder={t('admin.reservations.searchPlaceholder')}
+                                className="flex-1 p-3 border border-[#1A1A1A]/10 bg-white text-sm focus:border-[#D4AF37] outline-none font-serif italic"
                                 value={resSearchQuery}
                                 onChange={(e) => setResSearchQuery(e.target.value)}
                             />
-                            <select 
+                            <select
                                 className="p-3 border border-[#1A1A1A]/10 bg-white text-sm focus:border-[#D4AF37] outline-none uppercase tracking-widest text-[10px] font-bold text-[#6C6863]"
                                 value={resStatusFilter}
                                 onChange={(e) => setResStatusFilter(e.target.value)}
@@ -737,14 +737,13 @@ export const AdminDashboard: React.FC = () => {
                                             <td className="py-4 px-6 text-xs text-[#6C6863]">{booking.checkInDate} to {booking.checkOutDate}</td>
                                             <td className="py-4 px-6 text-xs text-[#6C6863]">{formatPaymentDate(booking.id)}</td>
                                             <td className="py-4 px-6">
-                                                <span className={`text-[9px] uppercase font-bold tracking-widest px-2 py-1 border ${
-                                                    booking.status === 'PENDING' ? 'bg-[#D4AF37]/10 text-[#D4AF37] border-[#D4AF37]/20' : 
+                                                <span className={`text-[9px] uppercase font-bold tracking-widest px-2 py-1 border ${booking.status === 'PENDING' ? 'bg-[#D4AF37]/10 text-[#D4AF37] border-[#D4AF37]/20' :
                                                     booking.status === 'CONFIRMED' ? 'bg-blue-100/50 text-blue-700 border-blue-200' :
-                                                    booking.status === 'CHECKED_IN' ? 'bg-green-100/50 text-green-700 border-green-200' :
-                                                    booking.status === 'CHECKED_OUT' ? 'bg-gray-100/50 text-gray-700 border-gray-200' :
-                                                    booking.status === 'CANCELLED' ? 'bg-red-100/50 text-red-700 border-red-200' :
-                                                    'bg-orange-100/50 text-orange-700 border-orange-200'
-                                                }`}>
+                                                        booking.status === 'CHECKED_IN' ? 'bg-green-100/50 text-green-700 border-green-200' :
+                                                            booking.status === 'CHECKED_OUT' ? 'bg-gray-100/50 text-gray-700 border-gray-200' :
+                                                                booking.status === 'CANCELLED' ? 'bg-red-100/50 text-red-700 border-red-200' :
+                                                                    'bg-orange-100/50 text-orange-700 border-orange-200'
+                                                    }`}>
                                                     {booking.status}
                                                 </span>
                                             </td>
@@ -788,10 +787,10 @@ export const AdminDashboard: React.FC = () => {
                             <div className="lg:col-span-8">
                                 <div className="flex justify-between items-center mb-6">
                                     <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#1A1A1A]">{t('admin.inventory.roomStatus')}</h3>
-                                    <input 
-                                        type="text" 
-                                        placeholder="Search by room # or type..." 
-                                        className="p-2 border border-[#1A1A1A]/10 bg-white text-xs focus:border-[#D4AF37] outline-none font-serif italic w-64" 
+                                    <input
+                                        type="text"
+                                        placeholder="Search by room # or type..."
+                                        className="p-2 border border-[#1A1A1A]/10 bg-white text-xs focus:border-[#D4AF37] outline-none font-serif italic w-64"
                                         value={roomSearchQuery}
                                         onChange={(e) => {
                                             setRoomSearchQuery(e.target.value);
@@ -810,35 +809,36 @@ export const AdminDashboard: React.FC = () => {
                                         const colorClass = statusColors[room.status] || 'border-l-gray-500';
 
                                         return (
-                                        <Card key={idx} className={`p-0 border border-[#1A1A1A]/10 border-l-4 bg-white ${colorClass.split(' ')[0]} shadow-sm`}>
-                                            <div className="flex flex-col sm:flex-row justify-between sm:items-center p-6 gap-4">
-                                                <div className="flex items-center gap-4">
-                                                    {room.imageUrl && (
-                                                        <div className="w-12 h-12 rounded-sm overflow-hidden shrink-0">
-                                                            <img src={room.imageUrl} alt={room.roomNumber} className="w-full h-full object-cover" />
+                                            <Card key={idx} className={`p-0 border border-[#1A1A1A]/10 border-l-4 bg-white ${colorClass.split(' ')[0]} shadow-sm`}>
+                                                <div className="flex flex-col sm:flex-row justify-between sm:items-center p-6 gap-4">
+                                                    <div className="flex items-center gap-4">
+                                                        {room.imageUrl && (
+                                                            <div className="w-12 h-12 rounded-sm overflow-hidden shrink-0">
+                                                                <img src={room.imageUrl} alt={room.roomNumber} className="w-full h-full object-cover" />
+                                                            </div>
+                                                        )}
+                                                        <div className="flex items-baseline gap-4">
+                                                            <span className="font-serif text-3xl text-[#1A1A1A]">{room.roomNumber}</span>
+                                                            <span className="text-sm font-serif italic text-[#6C6863]">Type {room.roomType?.id}</span>
                                                         </div>
-                                                    )}
-                                                    <div className="flex items-baseline gap-4">
-                                                        <span className="font-serif text-3xl text-[#1A1A1A]">{room.roomNumber}</span>
-                                                        <span className="text-sm font-serif italic text-[#6C6863]">Type {room.roomType?.id}</span>
+                                                    </div>
+                                                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                                        <span className={`text-[10px] uppercase tracking-widest font-bold ${colorClass.split(' ')[1]}`}>{room.status}</span>
+                                                        <select value={room.status} onChange={(e) => handleRoomStatusChange(room.id, e.target.value)} className="text-[10px] uppercase font-bold tracking-widest border border-[#1A1A1A]/20 p-2 bg-[#F9F8F6] outline-none hover:border-[#D4AF37] transition-colors cursor-pointer">
+                                                            <option value="AVAILABLE">{t('admin.inventory.available')}</option>
+                                                            <option value="OCCUPIED">{t('admin.inventory.occupied')}</option>
+                                                            <option value="CLEANING">{t('admin.inventory.cleaning')}</option>
+                                                            <option value="OUT_OF_ORDER">{t('admin.inventory.maintenance')}</option>
+                                                        </select>
+                                                        <div className="flex gap-2">
+                                                            <button onClick={() => setEditingRoom(room)} className="text-[#D4AF37] hover:text-[#1A1A1A] uppercase tracking-widest font-bold text-[9px]">Edit</button>
+                                                            <button onClick={() => handleDeleteRoom(room.id)} className="text-red-500 hover:text-red-800 uppercase tracking-widest font-bold text-[9px]">Delete</button>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                                                    <span className={`text-[10px] uppercase tracking-widest font-bold ${colorClass.split(' ')[1]}`}>{room.status}</span>
-                                                    <select value={room.status} onChange={(e) => handleRoomStatusChange(room.id, e.target.value)} className="text-[10px] uppercase font-bold tracking-widest border border-[#1A1A1A]/20 p-2 bg-[#F9F8F6] outline-none hover:border-[#D4AF37] transition-colors cursor-pointer">
-                                                        <option value="AVAILABLE">{t('admin.inventory.available')}</option>
-                                                        <option value="OCCUPIED">{t('admin.inventory.occupied')}</option>
-                                                        <option value="CLEANING">{t('admin.inventory.cleaning')}</option>
-                                                        <option value="OUT_OF_ORDER">{t('admin.inventory.maintenance')}</option>
-                                                    </select>
-                                                    <div className="flex gap-2">
-                                                        <button onClick={() => setEditingRoom(room)} className="text-[#D4AF37] hover:text-[#1A1A1A] uppercase tracking-widest font-bold text-[9px]">Edit</button>
-                                                        <button onClick={() => handleDeleteRoom(room.id)} className="text-red-500 hover:text-red-800 uppercase tracking-widest font-bold text-[9px]">Delete</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Card>
-                                    )})}
+                                            </Card>
+                                        )
+                                    })}
                                     {filteredRoomsForAdmin.length === 0 && <p className="text-sm italic text-[#6C6863]">No rooms matched your search.</p>}
                                 </div>
 
@@ -853,8 +853,8 @@ export const AdminDashboard: React.FC = () => {
                                             })}
                                         </p>
                                         <div className="flex gap-2">
-                                            <Button 
-                                                variant="ghost" 
+                                            <Button
+                                                variant="ghost"
                                                 disabled={currentRoomPage === 1}
                                                 onClick={() => setCurrentRoomPage(prev => prev - 1)}
                                                 className="border border-[#1A1A1A]/10 h-8 w-8 p-0 flex items-center justify-center disabled:opacity-30"
@@ -872,8 +872,8 @@ export const AdminDashboard: React.FC = () => {
                                                     </button>
                                                 ))}
                                             </div>
-                                            <Button 
-                                                variant="ghost" 
+                                            <Button
+                                                variant="ghost"
                                                 disabled={currentRoomPage >= Math.ceil(filteredRoomsForAdmin.length / ROOMS_PER_PAGE)}
                                                 onClick={() => setCurrentRoomPage(prev => prev + 1)}
                                                 className="border border-[#1A1A1A]/10 h-8 w-8 p-0 flex items-center justify-center disabled:opacity-30"
@@ -891,20 +891,20 @@ export const AdminDashboard: React.FC = () => {
                                     <div className="space-y-6">
                                         <div>
                                             <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#6C6863] mb-2 block">{t('admin.inventory.activePromotions')}</label>
-                                            
+
                                             <div className="flex gap-2 mb-4">
-                                                <Input 
-                                                    placeholder="CODE (e.g. SUMMER20)" 
-                                                    value={newCoupon.code} 
-                                                    onChange={e => setNewCoupon({...newCoupon, code: e.target.value.toUpperCase()})}
+                                                <Input
+                                                    placeholder="CODE (e.g. SUMMER20)"
+                                                    value={newCoupon.code}
+                                                    onChange={e => setNewCoupon({ ...newCoupon, code: e.target.value.toUpperCase() })}
                                                     className="w-1/2 uppercase font-mono text-sm"
                                                 />
-                                                <Input 
+                                                <Input
                                                     type="number"
                                                     min="0" max="100"
-                                                    placeholder="Discount %" 
-                                                    value={newCoupon.discountPercentage} 
-                                                    onChange={e => setNewCoupon({...newCoupon, discountPercentage: Number(e.target.value)})}
+                                                    placeholder="Discount %"
+                                                    value={newCoupon.discountPercentage}
+                                                    onChange={e => setNewCoupon({ ...newCoupon, discountPercentage: Number(e.target.value) })}
                                                     className="w-1/2 text-sm"
                                                 />
                                                 <Button type="button" onClick={handleAddCoupon} variant="primary" className="bg-[#1A1A1A] hover:bg-[#D4AF37] text-white text-[10px] uppercase px-4 h-10">Add</Button>
@@ -960,7 +960,7 @@ export const AdminDashboard: React.FC = () => {
                             <h2 className="text-3xl font-serif text-[#1A1A1A]">{t('admin.users.title')} <span className="italic text-[#D4AF37]">{t('admin.users.titleItalic')}</span></h2>
                             <Button onClick={() => setAddStaffModalOpen(true)} variant="ghost" className="border border-[#1A1A1A]/20 text-[10px] uppercase tracking-widest font-bold h-10 px-6">{t('admin.users.addNew')}</Button>
                         </div>
-                        
+
                         <div className="overflow-x-auto border border-[#1A1A1A]/10 bg-white">
                             <table className="w-full text-left border-collapse whitespace-nowrap">
                                 <thead>
@@ -1004,7 +1004,7 @@ export const AdminDashboard: React.FC = () => {
                         <div className="mt-16 pt-16 border-t border-[#1A1A1A]/10">
                             <h3 className="text-[10px] uppercase font-bold tracking-[0.3em] text-[#1A1A1A] mb-2">{t('admin.users.crm.title')}</h3>
                             <p className="text-sm text-[#6C6863] font-serif italic mb-8">{t('admin.users.crm.description')}</p>
-                            <Card 
+                            <Card
                                 onClick={() => setActiveTab('crm')}
                                 className="p-8 border-dashed border-2 border-[#1A1A1A]/10 bg-transparent flex flex-col items-center justify-center gap-4 hover:border-[#D4AF37]/50 hover:bg-white transition-all cursor-pointer group"
                             >
@@ -1169,8 +1169,8 @@ export const AdminDashboard: React.FC = () => {
                             <Input type="text" label="Image URL" value={addRoomForm.imageUrl} onChange={(e) => setAddRoomForm({ ...addRoomForm, imageUrl: e.target.value })} placeholder="Enter URL or upload local image" />
                         </div>
                         <div className="relative mb-[2px]">
-                            <input 
-                                type="file" 
+                            <input
+                                type="file"
                                 accept="image/*"
                                 onChange={(e) => {
                                     const file = e.target.files?.[0];

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X, Send, Bot, User, Loader2 } from 'lucide-react';
 import ReCAPTCHA from 'react-google-recaptcha';
+import { useTranslation } from 'react-i18next';
 
 import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -68,6 +69,7 @@ STRICT GUIDELINES:
 `;
 
 export const ChatBot: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   
   const [isOpen, setIsOpen] = useState(false);
@@ -79,7 +81,7 @@ export const ChatBot: React.FC = () => {
   const [captchaError, setCaptchaError] = useState('');
 
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Welcome to The Lumière Estate. How may I assist you with your stay today?' }
+    { role: 'assistant', content: t('chatbot.welcome') }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -94,7 +96,7 @@ export const ChatBot: React.FC = () => {
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
     if (!recaptchaToken) {
-      setCaptchaError('Please complete the verification.');
+      setCaptchaError(t('chatbot.verificationRequired'));
       return;
     }
     setCaptchaError('');
@@ -102,7 +104,7 @@ export const ChatBot: React.FC = () => {
     // Add personalization to the first message based on input or Auth user
     const guestName = guestInfo.name || (user ? user.lastName || user.firstName : 'Guest');
     setMessages([
-      { role: 'assistant', content: `Welcome to The Lumière Estate, ${guestName}. How may I assist you with your stay today?` }
+      { role: 'assistant', content: t('chatbot.welcomeGuest', { guestName }) }
     ]);
   };
 
@@ -139,7 +141,7 @@ export const ChatBot: React.FC = () => {
           })
         });
 
-        if (!response.ok) throw new Error('Failed to connect to concierge service');
+        if (!response.ok) throw new Error(t('chatbot.failedConnection'));
 
         const data = await response.json();
         const assistantMessage = data.choices[0].message;

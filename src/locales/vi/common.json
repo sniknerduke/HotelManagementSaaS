@@ -6,7 +6,37 @@
     "contact": "Liên Hệ",
     "signIn": "Đăng Nhập",
     "bookNow": "Đặt Ngay",
-    "profile": "Hồ sơ"
+    "profile": "Hồ sơ",
+    "dashboard": "Bảng điều khiển",
+    "staffDashboard": "Bảng điều khiển nhân viên",
+    "logout": "Đăng xuất"
+  },
+  "ui": {
+    "showPassword": "Hiện mật khẩu",
+    "hidePassword": "Ẩn mật khẩu"
+  },
+  "roomDetail": {
+    "goBack": "Quay lại",
+    "notFound": "Không tìm thấy phòng",
+    "loadError": "Không thể tải chi tiết phòng. Vui lòng thử lại sau."
+  },
+  "vnpay": {
+    "processing": "Đang xử lý thanh toán...",
+    "wait": "Vui lòng chờ trong khi chúng tôi xác minh giao dịch của bạn.",
+    "successBadge": "Thanh toán thành công",
+    "successTitle": "Cảm ơn bạn đã đặt phòng.",
+    "successSubtitle": "Chúng tôi mong được đón tiếp bạn.",
+    "reference": "Mã tham chiếu đặt phòng:",
+    "viewStays": "Xem các kỳ nghỉ của bạn",
+    "failedBadge": "Thanh toán thất bại",
+    "failedTitle": "Chúng tôi không thể xử lý thanh toán của bạn.",
+    "failedSubtitle": "Vui lòng thử lại.",
+    "returnToCheckout": "Quay lại thanh toán",
+    "invalidToast": "Đường dẫn thanh toán không hợp lệ."
+  },
+  "authCallback": {
+    "verifying": "Đang xác minh qua nhà cung cấp",
+    "finalizing": "Đang hoàn tất truy cập an toàn của bạn..."
   },
   "dashboard": {
     "title": "Quản lý",
@@ -41,7 +71,24 @@
     "rooms": {
       "grandSuite": "Căn hộ Grand Suite",
       "oceanVilla": "Biệt thự Hướng biển"
-    }
+    },
+    "totalStays": "Tổng số kỳ nghỉ",
+    "upcoming": "Sắp tới",
+    "totalSpent": "Tổng đã chi",
+    "booking": "Đặt phòng",
+    "cancel": "Hủy",
+    "receipt": "Biên lai",
+    "noReservations": "Không tìm thấy đặt phòng nào.",
+    "cancelConfirm": "Hủy đặt phòng này?",
+    "reservationCancelled": "Đã hủy đặt phòng thành công",
+    "failedCancelReservation": "Không thể hủy đặt phòng.",
+    "receiptFor": "Biên lai cho",
+    "amount": "Số tiền",
+    "status": "Trạng thái",
+    "method": "Phương thức",
+    "date": "Ngày",
+    "creditCard": "Thẻ tín dụng",
+    "receiptNotFound": "Không tìm thấy biên lai"
   },
   "profile": {
     "welcome": "Chào mừng,",
@@ -293,7 +340,6 @@
       "completed": "Đã xong",
       "stayOvers": "Khách lưu trú",
       "bookedRooms": "Số phòng đang đặt",
-      "availableRooms": "Số phòng trống",
       "actionNeeded": "Cần Xử lý (Cảnh báo)",
       "overbooked": "Loại phòng vượt mức",
       "overbookedDesc": "Standard King đang bị đặt vượt 2 phòng cho ngày 15/10.",
@@ -445,6 +491,12 @@
       "instagram": "Trang Instagram",
       "twitter": "Cập nhật X (Twitter)"
     }
+  },
+  "chatbot": {
+    "welcome": "Chào mừng đến với The Lumière Estate. Tôi có thể hỗ trợ gì cho kỳ nghỉ của bạn hôm nay?",
+    "welcomeGuest": "Chào mừng đến với The Lumière Estate, {{guestName}}. Tôi có thể hỗ trợ gì cho kỳ nghỉ của bạn hôm nay?",
+    "verificationRequired": "Vui lòng hoàn tất xác minh.",
+    "failedConnection": "Không thể kết nối tới dịch vụ concierge"
   },
   "experiences": {
     "title": "Trải nghiệm",

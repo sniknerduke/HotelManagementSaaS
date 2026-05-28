@@ -32,7 +32,7 @@ export const Register: React.FC = () => {
     setSuccess('');
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
+      setError(t('register.passwordsDoNotMatch'));
       return;
     }
 
@@ -45,10 +45,10 @@ export const Register: React.FC = () => {
         lastName: formData.lastName,
         phoneNumber: formData.phoneNumber
       });
-      setSuccess("Account created successfully! Redirecting to login...");
+      setSuccess(t('register.accountCreated'));
       setTimeout(() => navigate('/login'), 800);
     } catch (err: any) {
-      setError(err.message || 'Failed to register account');
+      setError(err.message || t('register.failedToRegister'));
     } finally {
       setLoading(false);
     }
@@ -71,11 +71,11 @@ export const Register: React.FC = () => {
           {success && <div className="text-green-600 text-sm text-center mb-4 font-bold">{success}</div>}
 
           <div className="grid grid-cols-2 gap-4">
-            <Input label={t('register.firstName')} name="firstName" value={formData.firstName} onChange={handleChange} type="text" placeholder="John" required />
-            <Input label={t('register.lastName')} name="lastName" value={formData.lastName} onChange={handleChange} type="text" placeholder="Doe" required />
+            <Input label={t('register.firstName')} name="firstName" value={formData.firstName} onChange={handleChange} type="text" placeholder={t('register.firstNamePlaceholder')} required />
+            <Input label={t('register.lastName')} name="lastName" value={formData.lastName} onChange={handleChange} type="text" placeholder={t('register.lastNamePlaceholder')} required />
           </div>
-          <Input label={t('register.email')} name="email" value={formData.email} onChange={handleChange} type="email" placeholder="john.doe@example.com" required />            <Input label={t('register.phone', 'Phone Number')} name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} type="tel" placeholder="+1 (555) 123-4567" required />          <Input label={t('register.password')} name="password" value={formData.password} onChange={handleChange} type="password" placeholder="••••••••" required />
-          <Input label={t('register.confirmPassword')} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} type="password" placeholder="••••••••" required />
+          <Input label={t('register.email')} name="email" value={formData.email} onChange={handleChange} type="email" placeholder={t('register.emailPlaceholder')} required />            <Input label={t('register.phone')} name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} type="tel" placeholder={t('register.phonePlaceholder')} required />          <Input label={t('register.password')} name="password" value={formData.password} onChange={handleChange} type="password" placeholder={t('register.passwordPlaceholder')} required />
+          <Input label={t('register.confirmPassword')} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} type="password" placeholder={t('register.confirmPasswordPlaceholder')} required />
 
           <label className="flex items-start gap-3 cursor-pointer group mt-4">
             <input type="checkbox" className="mt-1 accent-[#1A1A1A] w-4 h-4 shrink-0 cursor-pointer border border-[#1A1A1A] appearance-none checked:bg-[#D4AF37] transition-colors" required />
@@ -85,7 +85,7 @@ export const Register: React.FC = () => {
           </label>
 
           <Button type="submit" disabled={loading} className="w-full mt-8">
-            {loading ? 'Processing...' : t('register.registerNow')}
+            {loading ? t('register.processing') : t('register.registerNow')}
           </Button>
         </form>
 

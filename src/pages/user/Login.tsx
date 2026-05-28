@@ -39,7 +39,7 @@ export const Login: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
-      setError('Please fill in all fields');
+      setError(t('login.fillAllFields'));
       return;
     }
     
@@ -65,13 +65,13 @@ export const Login: React.FC = () => {
       // Fade out cleanly before leaving
       setTimeout(() => setLoadingPhase('fading'), 2000);
 
-      toast(t('login.success') || "Login successful!", 'success');
+      toast(t('login.success'), 'success');
 
       // 4. Redirect after welcome animation
       setTimeout(() => navigate(userData?.role === 'ADMIN' ? '/admin' : '/', { replace: true }), 2800);
     } catch (err: any) {
-      toast(err.message || "Invalid credentials or server error.", "error");
-      setError(err.message || 'Invalid email or password');
+      toast(err.message || t('login.invalidCredentials'), "error");
+      setError(err.message || t('login.invalidEmailOrPassword'));
       setLoadingPhase('idle');
     }
   };
@@ -79,38 +79,38 @@ export const Login: React.FC = () => {
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!forgotPasswordEmail) {
-      setError('Please enter your email address');
+      setError(t('login.emailRequired'));
       return;
     }
     setError('');
     try {
       await AuthService.forgotPassword({ email: forgotPasswordEmail });
-      toast('If an account exists, an OTP has been sent to your email.', 'success');
+      toast(t('login.forgotPasswordSent'), 'success');
       setForgotPasswordStep('otp');
     } catch (err: any) {
-      toast(err.message || "Failed to send reset email.", "error");
-      setError(err.message || 'Failed to send reset email');
+      toast(err.message || t('login.failedToSendResetEmail'), "error");
+      setError(err.message || t('login.failedToSendResetEmail'));
     }
   };
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!otp || !newPassword) {
-      setError('Please fill in all fields');
+      setError(t('login.fillAllFields'));
       return;
     }
     setError('');
     try {
       await AuthService.resetPassword({ email: forgotPasswordEmail, otp, newPassword });
-      toast('Password reset successfully! You can now log in.', 'success');
+      toast(t('login.passwordResetSuccess'), 'success');
       setIsForgotPassword(false);
       setForgotPasswordStep('email');
       setForgotPasswordEmail('');
       setOtp('');
       setNewPassword('');
     } catch (err: any) {
-      toast(err.message || "Failed to reset password.", "error");
-      setError(err.message || 'Failed to reset password');
+      toast(err.message || t('login.failedToResetPassword'), "error");
+      setError(err.message || t('login.failedToResetPassword'));
     }
   };
 
@@ -144,10 +144,10 @@ export const Login: React.FC = () => {
 
               <div className="space-y-4 pt-4">
                 <Button type="submit" className="w-full">
-                  Send OTP
+                  {t('login.sendOtp')}
                 </Button>
                 <Button type="button" variant="secondary" onClick={() => { setIsForgotPassword(false); setError(''); }} className="w-full">
-                  Back to Login
+                  {t('login.backToLogin')}
                 </Button>
               </div>
             </form>
@@ -157,17 +157,17 @@ export const Login: React.FC = () => {
               
               <div className="space-y-6">
                 <Input 
-                  label="OTP Code" 
+                  label={t('login.otpLabel')} 
                   type="text" 
-                  placeholder="Enter 6-digit OTP" 
+                  placeholder={t('login.otpPlaceholder')} 
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
                   required
                 />
                 <Input 
-                  label="New Password" 
+                  label={t('login.newPasswordLabel')} 
                   type="password" 
-                  placeholder="Enter new password" 
+                  placeholder={t('login.newPasswordPlaceholder')} 
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
@@ -176,10 +176,10 @@ export const Login: React.FC = () => {
 
               <div className="space-y-4 pt-4">
                 <Button type="submit" className="w-full">
-                  Reset Password
+                  {t('login.resetPassword')}
                 </Button>
                 <Button type="button" variant="secondary" onClick={() => { setForgotPasswordStep('email'); setError(''); }} className="w-full">
-                  Back
+                  {t('login.back')}
                 </Button>
               </div>
             </form>
@@ -226,7 +226,7 @@ export const Login: React.FC = () => {
             <div className="mt-8 flex items-center justify-center gap-4">
               <div className="h-px bg-[#1A1A1A]/10 w-1/4"></div>
               <span className="text-[10px] uppercase tracking-[0.2em] text-[#6C6863] whitespace-nowrap">
-                Or continue with
+                {t('login.orContinue')}
               </span>
               <div className="h-px bg-[#1A1A1A]/10 w-1/4"></div>
             </div>
@@ -243,7 +243,7 @@ export const Login: React.FC = () => {
                   <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                 </svg>
-                <span className="text-[10px] uppercase tracking-[0.2em] font-bold">Google</span>
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold">{t('login.google')}</span>
               </button>
 
               <button 
@@ -255,7 +255,7 @@ export const Login: React.FC = () => {
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                   <path fill="#ffffff" d="M15.83 12.073v-2.25c0-.949.465-1.874 1.956-1.874h2.25v-2.953s-1.374-.235-2.686-.235c-2.741 0-4.533 1.662-4.533 4.669v3.469h-3.047v3.469h3.047v8.385A12.09 12.09 0 0 0 16 23.927v-8.385h2.796l.532-3.469H15.83z" />
                 </svg>
-                <span className="text-[10px] uppercase tracking-[0.2em] font-bold">Facebook</span>
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold">{t('login.facebook')}</span>
               </button>
             </div>
           </form>
@@ -284,10 +284,10 @@ export const Login: React.FC = () => {
               </div>
             </div>
             <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-[#1A1A1A] font-bold animate-pulse">
-              Welcome Back
+              {t('login.welcomeBack')}
             </p>
             <p className="text-xs text-[#6C6863] mt-3 font-serif italic">
-              Curating your personalized experience...
+              {t('login.curatingExperience')}
             </p>
           </div>
           
@@ -299,10 +299,10 @@ export const Login: React.FC = () => {
               </svg>
             </div>
             <h2 className="text-4xl md:text-5xl font-serif text-[#1A1A1A] mb-4 tracking-tight">
-                Welcome, <span className="italic text-[#D4AF37]">{welcomeName}</span>.
+                {t('login.welcomeUser')} <span className="italic text-[#D4AF37]">{welcomeName}</span>.
               </h2>
               <p className="text-[#6C6863] text-sm uppercase tracking-[0.2em] font-medium animate-pulse">
-                Your suite awaits
+                {t('login.yourSuiteAwaits')}
               </p>
               <div className="mt-8 relative w-48 h-px bg-[#1A1A1A]/10 overflow-hidden">
                 <div className="absolute top-0 bottom-0 left-0 w-1/2 bg-[#D4AF37] opacity-60 animate-[slide-right_2s_ease-in-out_infinite]" style={{ animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite" }}></div>

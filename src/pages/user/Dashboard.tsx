@@ -24,22 +24,22 @@ export const Dashboard: React.FC = () => {
     }, [user]);
 
     const handleCancelReservation = async (id: number) => {
-        if (!window.confirm("Cancel this reservation?")) return;
+        if (!window.confirm(t('dashboard.cancelConfirm'))) return;
         try {
             await BookingService.cancelBooking(id);
-            toast('Reservation cancelled successfully', 'success');
+            toast(t('dashboard.reservationCancelled'), 'success');
             setBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'CANCELLED' } : b));
         } catch (err: any) {
-            toast(err.message || 'Failed to cancel reservation.', 'error');
+            toast(err.message || t('dashboard.failedCancelReservation'), 'error');
         }
     };
 
     const handleViewReceipt = async (reservationId: number) => {
         try {
             const receipt = await PaymentService.getPaymentByReservation(reservationId);
-            alert(`Receipt for BKG-${reservationId}\n\nAmount: $${receipt.amount}\nStatus: ${receipt.status}\nMethod: ${receipt.paymentMethod || 'Credit Card'}\nDate: ${new Date(receipt.createdAt || Date.now()).toLocaleDateString()}`);
+            alert(`${t('dashboard.receiptFor')} BKG-${reservationId}\n\n${t('dashboard.amount')}: $${receipt.amount}\n${t('dashboard.status')}: ${receipt.status}\n${t('dashboard.method')}: ${receipt.paymentMethod || t('dashboard.creditCard')}\n${t('dashboard.date')}: ${new Date(receipt.createdAt || Date.now()).toLocaleDateString()}`);
         } catch (err: any) {
-            toast(err.message || 'Receipt not found', 'error');
+            toast(err.message || t('dashboard.receiptNotFound'), 'error');
         }
     };
 
@@ -73,15 +73,15 @@ export const Dashboard: React.FC = () => {
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
                         <Card className="py-8 border-t border-[#1A1A1A]/20 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-shadow duration-[700ms]">
-                            <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-4">Total Stays</p>
+                            <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-4">{t('dashboard.totalStays')}</p>
                             <p className="text-4xl md:text-6xl font-serif">{totalStays}</p>
                         </Card>
                         <Card className="py-8 border-t border-[#1A1A1A]/20 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-shadow duration-[700ms]">
-                            <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-4">Upcoming</p>
+                            <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-4">{t('dashboard.upcoming')}</p>
                             <p className="text-4xl md:text-6xl font-serif text-[#D4AF37]">{upcoming}</p>
                         </Card>
                         <Card className="py-8 border-t border-[#1A1A1A]/20 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-shadow duration-[700ms]">
-                            <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-4">Total Spent</p>
+                            <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-4">{t('dashboard.totalSpent')}</p>
                             <p className="text-4xl md:text-6xl font-serif">${totalSpent}</p>
                         </Card>
                     </div>
@@ -96,7 +96,7 @@ export const Dashboard: React.FC = () => {
                     <table className="w-full text-left font-sans text-sm text-[#1A1A1A] border-collapse">
                         <thead>
                             <tr className="border-b border-[#1A1A1A]/10 text-[10px] uppercase tracking-[0.25em] text-[#6C6863]">
-                                <th className="pb-4 font-normal">Booking</th>
+                                <th className="pb-4 font-normal">{t('dashboard.booking')}</th>
                                 <th className="pb-4 font-normal">{t('dashboard.table.dates')}</th>
                                 <th className="pb-4 font-normal">{t('dashboard.table.residence')}</th>
                                 <th className="pb-4 font-normal">{t('dashboard.table.status')}</th>
@@ -124,17 +124,17 @@ export const Dashboard: React.FC = () => {
                                     </td>
                                     <td className="py-6 text-right space-x-3">
                                         {['PENDING', 'CONFIRMED'].includes(b.status) && (
-                                            <button onClick={() => handleCancelReservation(b.id)} className="text-[10px] uppercase tracking-[0.2em] text-red-600 hover:text-red-800 underline underline-offset-4">Cancel</button>
+                                            <button onClick={() => handleCancelReservation(b.id)} className="text-[10px] uppercase tracking-[0.2em] text-red-600 hover:text-red-800 underline underline-offset-4">{t('dashboard.cancel')}</button>
                                         )}
                                         {['CHECKED_OUT', 'COMPLETED', 'CONFIRMED', 'CHECKED_IN'].includes(b.status) && (
-                                            <button onClick={() => handleViewReceipt(b.id)} className="text-[10px] uppercase tracking-[0.2em] text-[#6C6863] hover:text-[#1A1A1A] underline underline-offset-4">Receipt</button>
+                                            <button onClick={() => handleViewReceipt(b.id)} className="text-[10px] uppercase tracking-[0.2em] text-[#6C6863] hover:text-[#1A1A1A] underline underline-offset-4">{t('dashboard.receipt')}</button>
                                         )}
                                     </td>
                                 </tr>
                             ))}
                             {bookings.length === 0 && (
                                 <tr>
-                                    <td colSpan={5} className="py-8 text-center text-[#6C6863] italic">No reservations found.</td>
+                                    <td colSpan={5} className="py-8 text-center text-[#6C6863] italic">{t('dashboard.noReservations')}</td>
                                 </tr>
                             )}
                         </tbody>

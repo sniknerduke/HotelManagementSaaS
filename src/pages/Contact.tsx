@@ -68,18 +68,18 @@ export const Contact: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="flex flex-col">
                                 <label className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-2">{t('contact.form.fullName')}</label>
-                                <input type="text" required className="w-full bg-transparent border-b border-[#1A1A1A]/20 py-3 outline-none focus:border-[#D4AF37] transition-colors font-serif text-lg text-[#1A1A1A]" placeholder="Jane Doe" />
+                                <input type="text" required className="w-full bg-transparent border-b border-[#1A1A1A]/20 py-3 outline-none focus:border-[#D4AF37] transition-colors font-serif text-lg text-[#1A1A1A]" placeholder={t('contact.form.namePlaceholder')} />
                             </div>
                             <div className="flex flex-col">
                                 <label className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-2">{t('contact.form.email')}</label>
-                                <input type="email" required className="w-full bg-transparent border-b border-[#1A1A1A]/20 py-3 outline-none focus:border-[#D4AF37] transition-colors font-serif text-lg text-[#1A1A1A]" placeholder="jane@example.com" />
+                                <input type="email" required className="w-full bg-transparent border-b border-[#1A1A1A]/20 py-3 outline-none focus:border-[#D4AF37] transition-colors font-serif text-lg text-[#1A1A1A]" placeholder={t('contact.form.emailPlaceholder')} />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="flex flex-col">
                                 <label className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-2">{t('contact.form.phone')} <span className="lowercase normal-case font-normal">{t('contact.form.optional')}</span></label>
-                                <input type="tel" className="w-full bg-transparent border-b border-[#1A1A1A]/20 py-3 outline-none focus:border-[#D4AF37] transition-colors font-serif text-lg text-[#1A1A1A]" placeholder="+1 (234) 567-8900" />
+                                <input type="tel" className="w-full bg-transparent border-b border-[#1A1A1A]/20 py-3 outline-none focus:border-[#D4AF37] transition-colors font-serif text-lg text-[#1A1A1A]" placeholder={t('contact.form.phonePlaceholder')} />
                             </div>
                             <div className="flex flex-col">
                                 <label className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-2">{t('contact.form.subject.label')}</label>
@@ -117,7 +117,7 @@ export const Contact: React.FC = () => {
                         
                         <div className="mb-8">
                             <h4 className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-3">{t('contact.info.addressTitle')}</h4>
-                            <p className="font-serif text-xl text-[#1A1A1A] leading-relaxed">1 Le Duan Boulevard<br/>District 1, Ho Chi Minh City, Vietnam</p>
+                            <p className="font-serif text-xl text-[#1A1A1A] leading-relaxed">{t('contact.info.address')}</p>
                         </div>
                         
                         {/* Embedded Interactive Map (Google Maps iframe) */}

@@ -61,29 +61,26 @@ public class VNPayService {
         Collections.sort(fieldNames);
         StringBuilder hashData = new StringBuilder();
         StringBuilder query = new StringBuilder();
-        Iterator<String> itr = fieldNames.iterator();
-        while (itr.hasNext()) {
-            String fieldName = (String) itr.next();
-            String fieldValue = (String) vnp_Params.get(fieldName);
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                //Build hash data
-                hashData.append(fieldName);
-                hashData.append('=');
+        
+        for (String fieldName : fieldNames) {
+            String fieldValue = vnp_Params.get(fieldName);
+            if (fieldValue != null && !fieldValue.isEmpty()) {
+                if (hashData.length() > 0) {
+                    hashData.append('&');
+                    query.append('&');
+                }
                 try {
-                    hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-                    //Build query
-                    query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
-                    query.append('=');
-                    query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                    String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()).replace("+", "%20");
+                    String encodedName = URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()).replace("+", "%20");
+                    
+                    hashData.append(encodedName).append('=').append(encodedValue);
+                    query.append(encodedName).append('=').append(encodedValue);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                if (itr.hasNext()) {
-                    query.append('&');
-                    hashData.append('&');
-                }
             }
         }
+        
         String queryUrl = query.toString();
         String vnp_SecureHash = VNPayUtil.hmacSHA512(vnpHashSecret, hashData.toString());
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
@@ -95,38 +92,35 @@ public class VNPayService {
         for (Map.Entry<String, String> entry : params.entrySet()) {
             String fieldName = entry.getKey();
             String fieldValue = entry.getValue();
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                fields.put(fieldName, fieldValue);
+            if (fieldName != null && fieldName.startsWith("vnp_") && !fieldName.equals("vnp_SecureHash") && !fieldName.equals("vnp_SecureHashType")) {
+                if (fieldValue != null && !fieldValue.isEmpty()) {
+                    fields.put(fieldName, fieldValue);
+                }
             }
         }
         
-        String vnp_SecureHash = fields.remove("vnp_SecureHash");
-        if (fields.containsKey("vnp_SecureHashType")) {
-            fields.remove("vnp_SecureHashType");
-        }
+        String vnp_SecureHash = params.get("vnp_SecureHash");
         
         List<String> fieldNames = new ArrayList<>(fields.keySet());
         Collections.sort(fieldNames);
         StringBuilder hashData = new StringBuilder();
-        Iterator<String> itr = fieldNames.iterator();
-        while (itr.hasNext()) {
-            String fieldName = (String) itr.next();
-            String fieldValue = (String) fields.get(fieldName);
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                hashData.append(fieldName);
-                hashData.append('=');
-                try {
-                    hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if (itr.hasNext()) {
-                    hashData.append('&');
-                }
+        
+        for (String fieldName : fieldNames) {
+            String fieldValue = fields.get(fieldName);
+            if (hashData.length() > 0) {
+                hashData.append('&');
+            }
+            try {
+                String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()).replace("+", "%20");
+                String encodedName = URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()).replace("+", "%20");
+                hashData.append(encodedName).append('=').append(encodedValue);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
+        
         String signValue = VNPayUtil.hmacSHA512(vnpHashSecret, hashData.toString());
-        return signValue.equals(vnp_SecureHash);
+        return signValue.equalsIgnoreCase(vnp_SecureHash);
     }
 
     private String removeAccents(String str) {

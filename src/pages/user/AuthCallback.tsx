@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 export const AuthCallback: React.FC = () => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -36,10 +38,10 @@ export const AuthCallback: React.FC = () => {
         </div>
       </div>
       <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-[#1A1A1A] font-bold animate-pulse mb-3">
-        Verifying via Provider
+        {t('authCallback.verifying')}
       </p>
       <p className="text-xs text-[#6C6863] font-serif italic">
-        Finalizing your secure access...
+        {t('authCallback.finalizing')}
       </p>
     </div>
   );

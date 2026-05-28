@@ -80,7 +80,7 @@ export const RoomDetail: React.FC = () => {
                 setOtherRooms(filtered);
             } catch (err: any) {
                 console.error("Failed to fetch room details", err);
-                setError("Could not load room details. Please try again later.");
+                setError(t('roomDetail.loadError'));
             } finally {
                 setIsLoading(false);
             }
@@ -105,8 +105,8 @@ export const RoomDetail: React.FC = () => {
     if (error || !roomType) {
         return (
             <div className="max-w-[1600px] mx-auto w-full px-8 md:px-16 pt-24 pb-40 text-center">
-                <h1 className="text-4xl font-serif text-[#1A1A1A] mb-6">{error || 'Room not found'}</h1>
-                <Button onClick={() => navigate(-1)} variant="secondary">Go Back</Button>
+                <h1 className="text-4xl font-serif text-[#1A1A1A] mb-6">{error || t('roomDetail.notFound')}</h1>
+                <Button onClick={() => navigate(-1)} variant="secondary">{t('roomDetail.goBack')}</Button>
             </div>
         );
     }

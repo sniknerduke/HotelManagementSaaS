@@ -23,6 +23,7 @@ STAFF_ROLE_PLAN.txt
 !.env.example
 .env.production
 *.suo
+graduation_defense_questions.txt
 *.ntvs*
 *.njsproj
 *.sln

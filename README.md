@@ -186,9 +186,6 @@ Make sure the following tools are installed:
 
 1. Clone the repo
    ```sh
-<<<<<<< HEAD
-   git clone [https://github.com/sniknerduke/HotelManagementSaaS.git](https://github.com/sniknerduke/HotelManagementSaaS.git)
-=======
    git clone https://github.com/sniknerduke/HotelManagementSaaS.git
    ```
 2. Navigate into the project
@@ -455,4 +452,3 @@ Live Demo: [https://sniknerduke.dev](https://sniknerduke.dev)
 [Kong-url]: https://konghq.com/
 [Docker]: https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white
 [Docker-url]: https://www.docker.com/
->>>>>>> b0deb3f (readme fix)

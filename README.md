@@ -67,7 +67,7 @@
 
 The platform supports the full guest journey, account management, staff operations, administration workflows, payments, and localization for English and Vietnamese users.
 
-<p align="center"><a href="#readme-top">🔼</a></p>
+<p align="left"><a href="#readme-top">🔼</a></p>
 
 
 
@@ -80,7 +80,7 @@ The platform supports the full guest journey, account management, staff operatio
 * Shared UI shell with splash screen, layout chrome, chatbot, and animated sections.
 * API-wired frontend with a centralized client in `src/api/client.ts` and service modules in `src/api/index.ts`.
 
-<p align="center"><a href="#readme-top">🔼</a></p>
+<p align="left"><a href="#readme-top">🔼</a></p>
 
 
 
@@ -99,7 +99,7 @@ The platform supports the full guest journey, account management, staff operatio
 
 The frontend also uses Tailwind CSS v4, React Router, i18next/react-i18next, Framer Motion, Lucide React, Recharts, jsPDF, and jsPDF-AutoTable for styling, navigation, localization, motion, charts, and reporting.
 
-<p align="center"><a href="#readme-top">🔼</a></p>
+<p align="left"><a href="#readme-top">🔼</a></p>
 
 
 
@@ -116,7 +116,7 @@ In development, Vite proxies `/api` to Kong at `http://localhost:8000`. Kong rou
 
 Shared infrastructure in the Docker stack includes PostgreSQL, Redis, RabbitMQ, and Kong.
 
-<p align="center"><a href="#readme-top">🔼</a></p>
+<p align="left"><a href="#readme-top">🔼</a></p>
 
 
 

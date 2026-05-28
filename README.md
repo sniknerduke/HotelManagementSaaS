@@ -6,13 +6,23 @@
   <h3 align="center">Lumière Estate Hotel Management SaaS</h3>
 
   <!-- PROJECT SHIELDS -->
-  <div align="center">
-    [![Contributors][contributors-shield]][contributors-url]
-    [![Forks][forks-shield]][forks-url]
-    [![Stargazers][stars-shield]][stars-url]
-    [![Issues][issues-shield]][issues-url]
-    [![MIT License][license-shield]][license-url]
-  </div>
+  <p align="center">
+    <a href="https://github.com/sniknerduke/HotelManagementSaaS/graphs/contributors">
+      <img src="https://img.shields.io/github/contributors/sniknerduke/HotelManagementSaaS.svg?style=for-the-badge" alt="Contributors" />
+    </a>
+    <a href="https://github.com/sniknerduke/HotelManagementSaaS/network/members">
+      <img src="https://img.shields.io/github/forks/sniknerduke/HotelManagementSaaS.svg?style=for-the-badge" alt="Forks" />
+    </a>
+    <a href="https://github.com/sniknerduke/HotelManagementSaaS/stargazers">
+      <img src="https://img.shields.io/github/stars/sniknerduke/HotelManagementSaaS.svg?style=for-the-badge" alt="Stargazers" />
+    </a>
+    <a href="https://github.com/sniknerduke/HotelManagementSaaS/issues">
+      <img src="https://img.shields.io/github/issues/sniknerduke/HotelManagementSaaS.svg?style=for-the-badge" alt="Issues" />
+    </a>
+    <a href="https://github.com/sniknerduke/HotelManagementSaaS/blob/main/LICENSE">
+      <img src="https://img.shields.io/github/license/sniknerduke/HotelManagementSaaS.svg?style=for-the-badge" alt="MIT License" />
+    </a>
+  </p>
 
   <p align="center">
     Full-stack hotel booking and management platform built with a React 19 + TypeScript frontend and a Quarkus 3 + Java 21 microservice backend.

@@ -174,8 +174,7 @@
       "smsAlerts": "SMS Notifications",
       "smsDesc": "Receive booking updates and check-in reminders",
       "update": "Update Preferences"
-    }
-  },
+    },
   "footer": {
     "title1": "Sign up",
     "title2": " for our",
@@ -588,7 +587,32 @@
     "signInAdmin": "Sign In as Admin",
     "noAccount": "Don't have an account?",
     "createAccount": "Create an Account",
-    "success": "Login successful!"
+    "success": "Login successful!",
+    "google": "Google",
+    "facebook": "Facebook",
+    "gg": "Google",
+    "fb": "Facebook",
+    "orContinue": "Or continue with",
+    "welcomeBack": "Welcome Back",
+    "curatingExperience": "Curating your experience...",
+    "welcomeUser": "Welcome",
+    "yourSuiteAwaits": "Your suite awaits",
+    "fillAllFields": "Please fill in all fields",
+    "invalidCredentials": "Invalid credentials",
+    "invalidEmailOrPassword": "Invalid email or password",
+    "emailRequired": "Email is required",
+    "forgotPasswordSent": "Reset link sent to your email",
+    "failedToSendResetEmail": "Failed to send reset email",
+    "passwordResetSuccess": "Password reset successful",
+    "failedToResetPassword": "Failed to reset password",
+    "sendOtp": "Send OTP",
+    "backToLogin": "Back to Login",
+    "otpLabel": "Verification Code",
+    "otpPlaceholder": "Enter the 6-digit code",
+    "newPasswordLabel": "New Password",
+    "newPasswordPlaceholder": "Enter your new password",
+    "resetPassword": "Reset Password",
+    "back": "Back"
   },
   "register": {
     "title": "Join the",

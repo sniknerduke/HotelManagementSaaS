@@ -90,9 +90,15 @@
         "creditCard": "Credit Card",
         "receiptNotFound": "Receipt not found"
       },
-    "preferences": "Guest Preferences",
-    "signOut": "Sign Out",
-    "currentStay": {
+      "profile": {
+        "welcome": "Welcome,",
+        "activeStay": "Active Stay",
+        "reservations": "Room Reservations",
+        "management": "Profile Management",
+        "payment": "Payment Methods",
+        "preferences": "Guest Preferences",
+        "signOut": "Sign Out",
+        "currentStay": {
       "title": "Your",
       "titleItalic": "Current Stay",
       "checkedIn": "Checked In",
@@ -130,16 +136,17 @@
       "email": "Email Address",
       "phone": "Phone Number"
     },
-    "accountSettings": {
-      "title": "Account",
-      "titleItalic": "Settings",
-      "password": "Password",
-      "lastChanged": "Last updated {{count}} months ago",
-      "resetPassword": "Reset Password",
-      "langPref": "Language Preference",
-      "langDesc": "Select your preferred interface language",
-      "saveChanges": "Save Changes"
-    },
+      "accountSettings": {
+        "title": "Account",
+        "titleItalic": "Settings",
+        "password": "Password",
+        "lastChanged": "Last updated {{count}} months ago",
+        "resetPassword": "Reset Password",
+        "updateSuccess": "Profile updated successfully!",
+        "langPref": "Language Preference",
+        "langDesc": "Select your preferred interface language",
+        "saveChanges": "Save Changes"
+      },
     "dangerZone": {
       "title": "Danger Zone",
       "deactivate": "Deactivate Account",
@@ -174,7 +181,8 @@
       "smsAlerts": "SMS Notifications",
       "smsDesc": "Receive booking updates and check-in reminders",
       "update": "Update Preferences"
-    },
+    }
+  },
   "footer": {
     "title1": "Sign up",
     "title2": " for our",
@@ -242,6 +250,10 @@
   "checkout": {
     "title": "Complete your",
     "titleItalic": "reservation.",
+    "vnpayRedirect": "Redirecting to VNPay for secure payment...",
+    "payWithVnPay": "Pay with VNPay",
+    "processing": "Processing your reservation...",
+    "checkAvailability": "Checking room availability...",
     "steps": {
       "details": "01 Details",
       "payment": "02 Payment",
@@ -253,6 +265,7 @@
       "lastName": "Last Name",
       "email": "Email Address",
       "phone": "Phone Number",
+      "phonePlaceholder": "Enter your phone number",
       "continue": "Continue to Payment"
     },
     "paymentDetails": {

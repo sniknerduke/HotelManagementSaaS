@@ -142,6 +142,7 @@
       "password": "Mật khẩu",
       "lastChanged": "Cập nhật {{count}} tháng trước",
       "resetPassword": "Đặt lại mật khẩu",
+      "updateSuccess": "Cập nhật hồ sơ thành công!",
       "langPref": "Sở thích ngôn ngữ",
       "langDesc": "Chọn ngôn ngữ giao diện ưu tiên của bạn",
       "saveChanges": "Lưu thay đổi"
@@ -249,6 +250,10 @@
   "checkout": {
     "title": "Hoàn tất",
     "titleItalic": "đặt phòng của bạn.",
+    "vnpayRedirect": "Đang chuyển hướng tới VNPay để thanh toán an toàn...",
+    "payWithVnPay": "Thanh toán bằng VNPay",
+    "processing": "Đang xử lý đặt phòng của bạn...",
+    "checkAvailability": "Đang kiểm tra phòng trống...",
     "steps": {
       "details": "01 Thông tin",
       "payment": "02 Thanh toán",
@@ -260,6 +265,7 @@
       "lastName": "Họ",
       "email": "Địa chỉ Email",
       "phone": "Số Điện Thoại",
+      "phonePlaceholder": "Nhập số điện thoại của bạn",
       "continue": "Tiếp tục thanh toán"
     },
     "paymentDetails": {

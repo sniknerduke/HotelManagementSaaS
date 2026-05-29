@@ -2,6 +2,7 @@ package com.hotel.payment.vnpay;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.jboss.logging.Logger;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -10,6 +11,8 @@ import java.util.*;
 
 @ApplicationScoped
 public class VNPayService {
+
+    private static final Logger LOG = Logger.getLogger(VNPayService.class);
 
     @ConfigProperty(name = "vnpay.tmnCode")
     String vnpTmnCode;
@@ -61,20 +64,26 @@ public class VNPayService {
         Collections.sort(fieldNames);
         StringBuilder hashData = new StringBuilder();
         StringBuilder query = new StringBuilder();
+        Iterator<String> itr = fieldNames.iterator();
         
-        for (String fieldName : fieldNames) {
+        while (itr.hasNext()) {
+            String fieldName = itr.next();
             String fieldValue = vnp_Params.get(fieldName);
-            if (fieldValue != null && !fieldValue.isEmpty()) {
-                if (hashData.length() > 0) {
-                    hashData.append('&');
-                    query.append('&');
-                }
+            if (fieldValue != null && fieldValue.length() > 0) {
                 try {
-                    String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()).replace("+", "%20");
-                    String encodedName = URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()).replace("+", "%20");
-                    
-                    hashData.append(encodedName).append('=').append(encodedValue);
-                    query.append(encodedName).append('=').append(encodedValue);
+                    // Build hash data: raw field name + URL-encoded value (matching VNPay official Java code)
+                    // IMPORTANT: Do NOT replace "+" with "%20" — VNPay uses + for spaces
+                    hashData.append(fieldName);
+                    hashData.append('=');
+                    hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                    // Build query string: URL-encoded field name + URL-encoded value
+                    query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
+                    query.append('=');
+                    query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                    if (itr.hasNext()) {
+                        query.append('&');
+                        hashData.append('&');
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -83,11 +92,17 @@ public class VNPayService {
         
         String queryUrl = query.toString();
         String vnp_SecureHash = VNPayUtil.hmacSHA512(vnpHashSecret, hashData.toString());
+        queryUrl += "&vnp_SecureHashType=HmacSHA512";
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
-        return vnpPayUrl + "?" + queryUrl;
+        
+        String paymentUrl = vnpPayUrl + "?" + queryUrl;
+        LOG.info("VNPAY Payment URL hash data: " + hashData.toString());
+        LOG.info("VNPAY Payment URL: " + paymentUrl);
+        return paymentUrl;
     }
 
     public boolean verifyIPN(Map<String, String> params) {
+        LOG.info("Verifying VNPay IPN signature. Received params: " + params);
         Map<String, String> fields = new HashMap<>();
         for (Map.Entry<String, String> entry : params.entrySet()) {
             String fieldName = entry.getKey();
@@ -104,23 +119,38 @@ public class VNPayService {
         List<String> fieldNames = new ArrayList<>(fields.keySet());
         Collections.sort(fieldNames);
         StringBuilder hashData = new StringBuilder();
+        Iterator<String> itr = fieldNames.iterator();
         
-        for (String fieldName : fieldNames) {
+        while (itr.hasNext()) {
+            String fieldName = itr.next();
             String fieldValue = fields.get(fieldName);
-            if (hashData.length() > 0) {
-                hashData.append('&');
-            }
-            try {
-                String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()).replace("+", "%20");
-                String encodedName = URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()).replace("+", "%20");
-                hashData.append(encodedName).append('=').append(encodedValue);
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (fieldValue != null && fieldValue.length() > 0) {
+                try {
+                    // Match VNPay official code: raw field name, URL-encoded value, NO replace("+", "%20")
+                    hashData.append(fieldName);
+                    hashData.append('=');
+                    hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                    if (itr.hasNext()) {
+                        hashData.append('&');
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         
         String signValue = VNPayUtil.hmacSHA512(vnpHashSecret, hashData.toString());
-        return signValue.equalsIgnoreCase(vnp_SecureHash);
+        boolean isMatch = signValue.equalsIgnoreCase(vnp_SecureHash);
+        if (isMatch) {
+            LOG.info("VNPay IPN signature verified successfully.");
+        } else {
+            LOG.error("VNPay IPN signature verification failed!");
+            LOG.error("  Reconstructed hashData: " + hashData.toString());
+            LOG.error("  Computed signValue: " + signValue);
+            LOG.error("  Received vnp_SecureHash: " + vnp_SecureHash);
+            LOG.error("  Using vnpHashSecret: " + vnpHashSecret);
+        }
+        return isMatch;
     }
 
     private String removeAccents(String str) {

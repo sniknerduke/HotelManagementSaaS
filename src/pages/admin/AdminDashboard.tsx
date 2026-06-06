@@ -831,8 +831,8 @@ export const AdminDashboard: React.FC = () => {
                                                             <option value="OUT_OF_ORDER">{t('admin.inventory.maintenance')}</option>
                                                         </select>
                                                         <div className="flex gap-2">
-                                                            <button onClick={() => setEditingRoom(room)} className="text-[#D4AF37] hover:text-[#1A1A1A] uppercase tracking-widest font-bold text-[9px]">Edit</button>
-                                                            <button onClick={() => handleDeleteRoom(room.id)} className="text-red-500 hover:text-red-800 uppercase tracking-widest font-bold text-[9px]">Delete</button>
+                                                            <button onClick={() => setEditingRoom(room)} className="text-[#1A1A1A] hover:text-[#D4AF37] uppercase tracking-widest font-bold text-[9px]">Edit</button>
+                                                            <button onClick={() => handleDeleteRoom(room.id)} className="text-[#1A1A1A] hover:text-red-600 uppercase tracking-widest font-bold text-[9px]">Delete</button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -984,9 +984,9 @@ export const AdminDashboard: React.FC = () => {
                                                 </td>
                                                 <td className="py-4 px-6 text-sm text-[#1A1A1A] font-serif">{staff.phoneNumber || 'N/A'}</td>
                                                 <td className="py-4 px-6 text-xs text-right opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button onClick={() => setEditingUser(staff)} className="text-[#D4AF37] hover:text-[#1A1A1A] uppercase tracking-widest font-bold text-[9px] mr-4">Edit Profile</button>
-                                                    <button onClick={() => setEditingStaffRole(staff)} className="text-[#D4AF37] hover:text-[#1A1A1A] uppercase tracking-widest font-bold text-[9px] mr-4">{t('admin.users.actions.edit')}</button>
-                                                    <button onClick={() => handleSuspendAccount(staff.id)} className="text-red-500 hover:text-red-800 uppercase tracking-widest font-bold text-[9px]">{t('admin.users.actions.suspend')}</button>
+                                                    <button onClick={() => setEditingUser(staff)} className="text-[#1A1A1A] hover:text-[#D4AF37] uppercase tracking-widest font-bold text-[9px] mr-4">Edit Profile</button>
+                                                    <button onClick={() => setEditingStaffRole(staff)} className="text-[#1A1A1A] hover:text-[#D4AF37] uppercase tracking-widest font-bold text-[9px] mr-4">{t('admin.users.actions.edit')}</button>
+                                                    <button onClick={() => handleSuspendAccount(staff.id)} className="text-[#1A1A1A] hover:text-red-600 uppercase tracking-widest font-bold text-[9px]">{t('admin.users.actions.suspend')}</button>
                                                 </td>
                                             </tr>
                                         ))

@@ -32,13 +32,13 @@ export const Checkout: React.FC = () => {
             const promo = await PromotionService.validatePromotion(promoCode);
             if (promo && promo.discountPercentage) {
                 setDiscountPercentage(promo.discountPercentage);
-                toast('Promotion applied successfully!', 'success');
+                toast(t('checkout.promoApplied'), 'success');
             } else {
-                setPromoError('Invalid promotion code');
+                setPromoError(t('checkout.invalidPromo'));
                 setDiscountPercentage(0);
             }
         } catch (e: any) {
-            setPromoError(e.message || 'Invalid promotion code');
+            setPromoError(e.message || t('checkout.invalidPromo'));
             setDiscountPercentage(0);
         } finally {
             setApplyingPromo(false);
@@ -122,25 +122,25 @@ export const Checkout: React.FC = () => {
         setLoading(true);
         setError('');
         if (!user || !user.id) {
-            toast("You must be logged in to book.", "error");
+            toast(t('checkout.mustBeLoggedIn'), "error");
             setLoading(false);
             return;
         }
 
         if (!roomId) {
-            toast("No rooms available for this room type. Please try a different category.", "error");
+            toast(t('checkout.noRoomsAvailable'), "error");
             setLoading(false);
             return;
         }
 
         if (!checkInDate || !checkOutDate) {
-            toast("Please select valid dates.", "error");
+            toast(t('checkout.selectValidDates'), "error");
             setLoading(false);
             return;
         }
 
         if (totalAmount <= 0) {
-            toast("Invalid booking amount.", "error");
+            toast(t('checkout.invalidAmount'), "error");
             setLoading(false);
             return;
         }
@@ -166,13 +166,13 @@ export const Checkout: React.FC = () => {
             if (paymentRes.paymentUrl) {
                 window.location.href = paymentRes.paymentUrl;
             } else {
-                toast("Payment initialized, but no redirect URL provided.", "error");
+                toast(t('checkout.paymentInitializedNoRedirect'), "error");
                 setLoading(false);
             }
 
         } catch (err: any) {
-            toast(err.message || 'Payment processing failed. Please try again.', "error");
-            setError(err.message || 'Payment processing failed. Please try again.');
+            toast(err.message || t('checkout.paymentFailed'), "error");
+            setError(err.message || t('checkout.paymentFailed'));
             setLoading(false);
         }
     };
@@ -200,11 +200,11 @@ export const Checkout: React.FC = () => {
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                             <h2 className="text-2xl font-serif text-[#1A1A1A] mb-8 border-b border-[#1A1A1A]/10 pb-4">{t('checkout.guestInfo.title')}</h2>
                             <div className="grid grid-cols-2 gap-6">
-                                <Input label={t('checkout.guestInfo.firstName')} placeholder="John" value={guestInfo.firstName} onChange={e => setGuestInfo({...guestInfo, firstName: e.target.value})} />
-                                <Input label={t('checkout.guestInfo.lastName')} placeholder="Doe" value={guestInfo.lastName} onChange={e => setGuestInfo({...guestInfo, lastName: e.target.value})} />
+                                <Input label={t('checkout.guestInfo.firstName')} placeholder={t('checkout.guestInfo.firstNamePlaceholder')} value={guestInfo.firstName} onChange={e => setGuestInfo({...guestInfo, firstName: e.target.value})} />
+                                <Input label={t('checkout.guestInfo.lastName')} placeholder={t('checkout.guestInfo.lastNamePlaceholder')} value={guestInfo.lastName} onChange={e => setGuestInfo({...guestInfo, lastName: e.target.value})} />
                             </div>
-                            <Input label={t('checkout.guestInfo.email')} type="email" placeholder="john.doe@example.com" value={guestInfo.email} onChange={e => setGuestInfo({...guestInfo, email: e.target.value})} />
-                            <Input label={t('checkout.guestInfo.phone')} type="tel" placeholder="+1 (555) 000-0000" value={guestInfo.phone} onChange={e => setGuestInfo({...guestInfo, phone: e.target.value})} />
+                            <Input label={t('checkout.guestInfo.email')} type="email" placeholder={t('checkout.guestInfo.emailPlaceholder')} value={guestInfo.email} onChange={e => setGuestInfo({...guestInfo, email: e.target.value})} />
+                            <Input label={t('checkout.guestInfo.phone')} type="tel" placeholder={t('checkout.guestInfo.phonePlaceholder')} value={guestInfo.phone} onChange={e => setGuestInfo({...guestInfo, phone: e.target.value})} />
                             
                             <div className="pt-8 flex justify-end">
                                 <Button onClick={handleNext} disabled={!guestInfo.firstName || !guestInfo.email} className="w-full sm:w-auto">{t('checkout.guestInfo.continue')}</Button>
@@ -218,7 +218,7 @@ export const Checkout: React.FC = () => {
                             <Card className="p-6 border border-[#1A1A1A]/20 shadow-[0_4px_16px_rgba(0,0,0,0.02)] bg-[#F9F8F6]/50">
                                <div className="space-y-6 flex flex-col items-center py-6">
                                   <div className="px-12 py-8 bg-white border border-[#1A1A1A]/10 rounded-lg shadow-sm w-full max-w-sm flex flex-col items-center space-y-4">
-                                      <p className="text-sm text-[#6C6863] text-center">You will be redirected to VNPay to complete your transaction securely.</p>
+                                                  <p className="text-sm text-[#6C6863] text-center">{t('checkout.vnpayRedirect')}</p>
                                   </div>
                                </div>
                             </Card>
@@ -232,7 +232,7 @@ export const Checkout: React.FC = () => {
                             <div className="pt-8 flex justify-between">
                                 <Button variant="ghost" onClick={handlePrev} disabled={loading} className="hidden sm:flex text-[#6C6863] hover:text-[#1A1A1A]">{t('checkout.paymentDetails.back')}</Button>
                                 <Button onClick={handleConfirmBooking} disabled={loading || roomLoading || !roomId} className="w-full sm:w-auto bg-[#D4AF37] hover:bg-[#1A1A1A] text-white">
-                                    {roomLoading ? 'Checking availability...' : !roomId ? 'No rooms available' : loading ? 'Processing...' : 'Pay with VNPay'}
+                                    {roomLoading ? t('checkout.checkingAvailability') : !roomId ? t('checkout.noRoomsAvailableShort') : loading ? t('checkout.processing') : t('checkout.payWithVnPay')}
                                 </Button>
                             </div>
                         </div>

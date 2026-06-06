@@ -1,57 +1,104 @@
 {
-  "nav": {
-    "home": "Home",
-    "rooms": "Rooms & Suites",
-    "amenities": "Amenities",
-    "contact": "Contact",
-    "signIn": "Sign In",
-    "bookNow": "Book Now",
-    "profile": "Profile"
-  },
-  "dashboard": {
-    "title": "Management",
-    "nav": {
-      "overview": "Overview",
-      "reservations": "Reservations",
-      "inventory": "Inventory",
-      "guests": "Guests",
-      "settings": "Settings"
-    },
-    "metrics": {
-      "title": "Performance",
-      "titleItalic": "Metrics",
-      "occupancy": "Today's Occupancy",
-      "checkIns": "Pending Check-Ins",
-      "revenue": "Revenue (MTD)"
-    },
-    "recent": {
-      "title": "Recent Reservations",
-      "viewAll": "View All Calendar"
-    },
-    "table": {
-      "guest": "Guest",
-      "dates": "Dates",
-      "residence": "Residence",
-      "status": "Status",
-      "action": "Action",
-      "confirmed": "Confirmed",
-      "pending": "Pending",
-      "manage": "Manage"
-    },
-    "rooms": {
-      "grandSuite": "The Grand Suite",
-      "oceanVilla": "Ocean Villa"
-    }
-  },
-  "profile": {
-    "welcome": "Welcome,",
-    "activeStay": "Active Stay",
-    "reservations": "Reservations",
-    "management": "Profile Management",
-    "payment": "Payment Methods",
-    "preferences": "Guest Preferences",
-    "signOut": "Sign Out",
-    "currentStay": {
+      "nav": {
+        "home": "Home",
+        "rooms": "Rooms & Suites",
+        "amenities": "Amenities",
+        "contact": "Contact",
+        "signIn": "Sign In",
+        "bookNow": "Book Now",
+        "profile": "Profile",
+        "dashboard": "Dashboard",
+        "staffDashboard": "Staff Dashboard",
+        "logout": "Log out"
+      },
+      "ui": {
+        "showPassword": "Show password",
+        "hidePassword": "Hide password"
+      },
+      "roomDetail": {
+        "goBack": "Go Back",
+        "notFound": "Room not found",
+        "loadError": "Could not load room details. Please try again later."
+      },
+      "vnpay": {
+        "processing": "Processing Payment...",
+        "wait": "Please wait while we verify your transaction.",
+        "successBadge": "Payment Successful",
+        "successTitle": "Thank you for your reservation.",
+        "successSubtitle": "We look forward to seeing you.",
+        "reference": "Reservation Reference:",
+        "viewStays": "View Your Stays",
+        "failedBadge": "Payment Failed",
+        "failedTitle": "We could not process your payment.",
+        "failedSubtitle": "Please try again.",
+        "returnToCheckout": "Return to Checkout",
+        "invalidToast": "Invalid payment callback."
+      },
+      "authCallback": {
+        "verifying": "Verifying via Provider",
+        "finalizing": "Finalizing your secure access..."
+      },
+      "dashboard": {
+        "title": "Management",
+        "nav": {
+          "overview": "Overview",
+          "reservations": "Reservations",
+          "inventory": "Inventory",
+          "guests": "Guests",
+          "settings": "Settings"
+        },
+        "metrics": {
+          "title": "Performance",
+          "titleItalic": "Metrics",
+          "occupancy": "Today's Occupancy",
+          "checkIns": "Pending Check-Ins",
+          "revenue": "Revenue (MTD)"
+        },
+        "recent": {
+          "title": "Recent Reservations",
+          "viewAll": "View All Calendar"
+        },
+        "table": {
+          "guest": "Guest",
+          "dates": "Dates",
+          "residence": "Residence",
+          "status": "Status",
+          "action": "Action",
+          "confirmed": "Confirmed",
+          "pending": "Pending",
+          "manage": "Manage"
+        },
+        "rooms": {
+          "grandSuite": "The Grand Suite",
+          "oceanVilla": "Ocean Villa"
+        },
+        "totalStays": "Total Stays",
+        "upcoming": "Upcoming",
+        "totalSpent": "Total Spent",
+        "booking": "Booking",
+        "cancel": "Cancel",
+        "receipt": "Receipt",
+        "noReservations": "No reservations found.",
+        "cancelConfirm": "Cancel this reservation?",
+        "reservationCancelled": "Reservation cancelled successfully",
+        "failedCancelReservation": "Failed to cancel reservation.",
+        "receiptFor": "Receipt for",
+        "amount": "Amount",
+        "status": "Status",
+        "method": "Method",
+        "date": "Date",
+        "creditCard": "Credit Card",
+        "receiptNotFound": "Receipt not found"
+      },
+      "profile": {
+        "welcome": "Welcome,",
+        "activeStay": "Active Stay",
+        "reservations": "Room Reservations",
+        "management": "Profile Management",
+        "payment": "Payment Methods",
+        "preferences": "Guest Preferences",
+        "signOut": "Sign Out",
+        "currentStay": {
       "title": "Your",
       "titleItalic": "Current Stay",
       "checkedIn": "Checked In",
@@ -89,16 +136,17 @@
       "email": "Email Address",
       "phone": "Phone Number"
     },
-    "accountSettings": {
-      "title": "Account",
-      "titleItalic": "Settings",
-      "password": "Password",
-      "lastChanged": "Last updated {{count}} months ago",
-      "resetPassword": "Reset Password",
-      "langPref": "Language Preference",
-      "langDesc": "Select your preferred interface language",
-      "saveChanges": "Save Changes"
-    },
+      "accountSettings": {
+        "title": "Account",
+        "titleItalic": "Settings",
+        "password": "Password",
+        "lastChanged": "Last updated {{count}} months ago",
+        "resetPassword": "Reset Password",
+        "updateSuccess": "Profile updated successfully!",
+        "langPref": "Language Preference",
+        "langDesc": "Select your preferred interface language",
+        "saveChanges": "Save Changes"
+      },
     "dangerZone": {
       "title": "Danger Zone",
       "deactivate": "Deactivate Account",
@@ -202,6 +250,10 @@
   "checkout": {
     "title": "Complete your",
     "titleItalic": "reservation.",
+    "vnpayRedirect": "Redirecting to VNPay for secure payment...",
+    "payWithVnPay": "Pay with VNPay",
+    "processing": "Processing your reservation...",
+    "checkAvailability": "Checking room availability...",
     "steps": {
       "details": "01 Details",
       "payment": "02 Payment",
@@ -213,6 +265,7 @@
       "lastName": "Last Name",
       "email": "Email Address",
       "phone": "Phone Number",
+      "phonePlaceholder": "Enter your phone number",
       "continue": "Continue to Payment"
     },
     "paymentDetails": {
@@ -293,7 +346,6 @@
       "completed": "Completed",
       "stayOvers": "Stay-overs",
       "bookedRooms": "Booked Rooms",
-      "availableRooms": "Available Rooms",
       "actionNeeded": "Action Needed (Alerts)",
       "overbooked": "Overbooked Room Type",
       "overbookedDesc": "Standard King is overbooked by 2 rooms for Oct 15.",
@@ -445,6 +497,12 @@
       "twitter": "X (Twitter) Updates"
     }
   },
+  "chatbot": {
+    "welcome": "Welcome to The Lumière Estate. How may I assist you with your stay today?",
+    "welcomeGuest": "Welcome to The Lumière Estate, {{guestName}}. How may I assist you with your stay today?",
+    "verificationRequired": "Please complete the verification.",
+    "failedConnection": "Failed to connect to concierge service"
+  },
   "experiences": {
     "title": "Curated",
     "titleItalic": "Experiences.",
@@ -542,7 +600,32 @@
     "signInAdmin": "Sign In as Admin",
     "noAccount": "Don't have an account?",
     "createAccount": "Create an Account",
-    "success": "Login successful!"
+    "success": "Login successful!",
+    "google": "Google",
+    "facebook": "Facebook",
+    "gg": "Google",
+    "fb": "Facebook",
+    "orContinue": "Or continue with",
+    "welcomeBack": "Welcome Back",
+    "curatingExperience": "Curating your experience...",
+    "welcomeUser": "Welcome",
+    "yourSuiteAwaits": "Your suite awaits",
+    "fillAllFields": "Please fill in all fields",
+    "invalidCredentials": "Invalid credentials",
+    "invalidEmailOrPassword": "Invalid email or password",
+    "emailRequired": "Email is required",
+    "forgotPasswordSent": "Reset link sent to your email",
+    "failedToSendResetEmail": "Failed to send reset email",
+    "passwordResetSuccess": "Password reset successful",
+    "failedToResetPassword": "Failed to reset password",
+    "sendOtp": "Send OTP",
+    "backToLogin": "Back to Login",
+    "otpLabel": "Verification Code",
+    "otpPlaceholder": "Enter the 6-digit code",
+    "newPasswordLabel": "New Password",
+    "newPasswordPlaceholder": "Enter your new password",
+    "resetPassword": "Reset Password",
+    "back": "Back"
   },
   "register": {
     "title": "Join the",

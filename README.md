@@ -1,18 +1,28 @@
 <a id="readme-top"></a>
 
-<!-- PROJECT SHIELDS -->
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![License][license-shield]][license-url]
-
-
-
 <!-- PROJECT HEADER -->
 <br />
 <div align="center">
-  <h3 align="center">Lumiere Estate Hotel Management SaaS</h3>
+  <h3 align="center">Lumière Estate Hotel Management SaaS</h3>
+
+  <!-- PROJECT SHIELDS -->
+  <p align="center">
+    <a href="https://github.com/sniknerduke/HotelManagementSaaS/graphs/contributors">
+      <img src="https://img.shields.io/github/contributors/sniknerduke/HotelManagementSaaS.svg?style=for-the-badge" alt="Contributors" />
+    </a>
+    <a href="https://github.com/sniknerduke/HotelManagementSaaS/network/members">
+      <img src="https://img.shields.io/github/forks/sniknerduke/HotelManagementSaaS.svg?style=for-the-badge" alt="Forks" />
+    </a>
+    <a href="https://github.com/sniknerduke/HotelManagementSaaS/stargazers">
+      <img src="https://img.shields.io/github/stars/sniknerduke/HotelManagementSaaS.svg?style=for-the-badge" alt="Stargazers" />
+    </a>
+    <a href="https://github.com/sniknerduke/HotelManagementSaaS/issues">
+      <img src="https://img.shields.io/github/issues/sniknerduke/HotelManagementSaaS.svg?style=for-the-badge" alt="Issues" />
+    </a>
+    <a href="https://github.com/sniknerduke/HotelManagementSaaS/blob/main/LICENSE">
+      <img src="https://img.shields.io/github/license/sniknerduke/HotelManagementSaaS.svg?style=for-the-badge" alt="MIT License" />
+    </a>
+  </p>
 
   <p align="center">
     Full-stack hotel booking and management platform built with a React 19 + TypeScript frontend and a Quarkus 3 + Java 21 microservice backend.
@@ -30,7 +40,6 @@
 
 
 
-<!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
   <ol>
@@ -64,27 +73,27 @@
 
 
 
-<!-- ABOUT THE PROJECT -->
 ## About The Project
 
 **Lumiere Estate Hotel Management SaaS** is a connected hotel booking and operations platform. The frontend communicates with the backend through a centralized fetch client and the Kong API gateway, so the application runs as a real integrated system rather than a mock-only prototype.
 
 The platform supports the full guest journey, account management, staff operations, administration workflows, payments, and localization for English and Vietnamese users.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right"><a href="#readme-top">🔼</a></p>
 
 
 
 ### Highlights
 
-* Guest booking flow with home, search, room detail, checkout, and VNPay callback screens.
-* Auth and account flows with login, register, OAuth callback, forgot/reset password, guest dashboard, and profile pages.
-* Separate staff and admin portals at `/staff` and `/admin`.
-* English and Vietnamese localization.
-* Shared UI shell with splash screen, layout chrome, chatbot, and animated sections.
-* API-wired frontend with a centralized client in `src/api/client.ts` and service modules in `src/api/index.ts`.
+* **Guest Journey**: Hero search, dynamic room results, detailed listings, and a 3-step checkout flow.
+* **Integrated Payments**: Full VNPay sandbox integration with secure callback handling and event-driven booking confirmation.
+* **Microservice Auth**: JWT-based security with bcrypt hashing and integrated Google/Facebook OAuth2 flows.
+* **Luxury UI**: Framer Motion animations, immersive splash screen, AI-powered concierge chatbot, and Tailwind CSS v4 styling.
+* **Operations Portals**: Dedicated, role-based dashboards for **Staff** (housekeeping, occupancy) and **Admins** (CRM, revenue analytics, inventory).
+* **Localization**: Complete support for English (EN) and Vietnamese (VI) throughout the application.
+* **Robust Infrastructure**: Dynamic amenity management, OTP-based password reset, and event-driven architecture via RabbitMQ.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right"><a href="#readme-top">🔼</a></p>
 
 
 
@@ -103,28 +112,63 @@ The platform supports the full guest journey, account management, staff operatio
 
 The frontend also uses Tailwind CSS v4, React Router, i18next/react-i18next, Framer Motion, Lucide React, Recharts, jsPDF, and jsPDF-AutoTable for styling, navigation, localization, motion, charts, and reporting.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right"><a href="#readme-top">🔼</a></p>
 
 
 
 ### Architecture
 
-In development, Vite proxies `/api` to Kong at `http://localhost:8000`. Kong routes requests to four Quarkus services:
+The system follows a microservices architecture coordinated through the **Kong API Gateway**.
 
-| Gateway Path | Service |
-| --- | --- |
-| `/api/users`, `/api/auth` | `user-service` |
-| `/api/inventory`, `/api/settings`, `/api/housekeeping` | `inventory-service` |
-| `/api/bookings`, `/api/promotions`, `/api/analytics` | `booking-service` |
-| `/api/payments` | `payment-service` |
+```mermaid
+graph LR
+    subgraph Frontend["Frontend (React 19 + Vite)"]
+        FE_Pages["27+ Pages/Components"]
+        FE_API["api/client.ts"]
+        FE_i18n["i18n (EN/VN)"]
+    end
+
+    subgraph Gateway["Kong API Gateway (Port 8000)"]
+        KG["Routing & Rate Limiting"]
+    end
+
+    subgraph Backend["Quarkus 3 Microservices"]
+        US["user-service (8081)"]
+        IS["inventory-service (8082)"]
+        BS["booking-service (8083)"]
+        PS["payment-service (8084)"]
+    end
+
+    subgraph Infrastructure["Shared Infrastructure"]
+        DB["4x PostgreSQL"]
+        Redis["Redis Cache"]
+        RMQ["RabbitMQ Events"]
+    end
+
+    FE_API -- "/api/*" --> KG
+    KG --> US
+    KG --> IS
+    KG --> BS
+    KG --> PS
+    US & IS & BS & PS --> DB
+    BS & PS --> RMQ
+```
+
+In development, Vite proxies `/api` to Kong. Kong routes requests to the appropriate services:
+
+| Gateway Path | Service | Base Paths |
+| --- | --- | --- |
+| `/api/users`, `/api/auth` | `user-service` | Auth, Profile, OAuth, CRM |
+| `/api/inventory`, `/api/settings`, `/api/housekeeping` | `inventory-service` | Rooms, Availability, Amenities |
+| `/api/bookings`, `/api/promotions`, `/api/analytics` | `booking-service` | Reservations, Discounts, Analytics |
+| `/api/payments` | `payment-service` | Payments, VNPay, Receipts |
 
 Shared infrastructure in the Docker stack includes PostgreSQL, Redis, RabbitMQ, and Kong.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right"><a href="#readme-top">🔼</a></p>
 
 
 
-<!-- GETTING STARTED -->
 ## Getting Started
 
 Follow the steps below to run the frontend, backend services, or full Docker stack locally.
@@ -285,17 +329,23 @@ The backend is a Maven multi-module project with Quarkus DevServices configured 
 ## Project Structure
 
 ```text
-src/                    # React frontend
-backend/
-  kong/                 # Declarative API gateway config
-  user-service/         # User auth/profile service
-  inventory-service/    # Room, amenity, housekeeping, and settings service
-  booking-service/      # Reservation, promotion, and analytics service
-  payment-service/      # Payment and VNPay service
-  docker-compose*.yml   # Local and production stack definitions
-prompt/                 # Objective and prompt documents
-public/                 # Static assets
-README.md               # Project documentation
+📁 Java NC BTL/                     ← Root
+├── 📁 src/                         ← Frontend (React 19 + Vite)
+│   ├── App.tsx                     ← Router & route definitions
+│   ├── 📁 api/                     ← Centralized fetch client & service modules
+│   ├── 📁 components/              ← UI primitives & layout elements
+│   ├── 📁 context/                 ← In-memory auth state & toast notifications
+│   ├── 📁 pages/                   ← Guest, Admin, and Staff portal screens
+│   └── 📁 locales/                 ← i18next bundles (en/vi)
+│
+├── 📁 backend/                     ← Backend (Quarkus Multi-Module Maven)
+│   ├── 📁 kong/                    ← Declarative API gateway config
+│   ├── 📁 user-service/            ← Registration, login, OAuth, profile
+│   ├── 📁 inventory-service/       ← Rooms, availability, amenities, housekeeping
+│   ├── 📁 booking-service/         ← Reservations, booking lifecycle, analytics
+│   ├── 📁 payment-service/         ← Payments, refunds, VNPay integration
+│   └── docker-compose.yml          ← Local infrastructure stack
+└── README.md                       ← Project documentation
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

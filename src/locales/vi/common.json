@@ -6,7 +6,37 @@
     "contact": "Liên Hệ",
     "signIn": "Đăng Nhập",
     "bookNow": "Đặt Ngay",
-    "profile": "Hồ sơ"
+    "profile": "Hồ sơ",
+    "dashboard": "Bảng điều khiển",
+    "staffDashboard": "Bảng điều khiển nhân viên",
+    "logout": "Đăng xuất"
+  },
+  "ui": {
+    "showPassword": "Hiện mật khẩu",
+    "hidePassword": "Ẩn mật khẩu"
+  },
+  "roomDetail": {
+    "goBack": "Quay lại",
+    "notFound": "Không tìm thấy phòng",
+    "loadError": "Không thể tải chi tiết phòng. Vui lòng thử lại sau."
+  },
+  "vnpay": {
+    "processing": "Đang xử lý thanh toán...",
+    "wait": "Vui lòng chờ trong khi chúng tôi xác minh giao dịch của bạn.",
+    "successBadge": "Thanh toán thành công",
+    "successTitle": "Cảm ơn bạn đã đặt phòng.",
+    "successSubtitle": "Chúng tôi mong được đón tiếp bạn.",
+    "reference": "Mã tham chiếu đặt phòng:",
+    "viewStays": "Xem các kỳ nghỉ của bạn",
+    "failedBadge": "Thanh toán thất bại",
+    "failedTitle": "Chúng tôi không thể xử lý thanh toán của bạn.",
+    "failedSubtitle": "Vui lòng thử lại.",
+    "returnToCheckout": "Quay lại thanh toán",
+    "invalidToast": "Đường dẫn thanh toán không hợp lệ."
+  },
+  "authCallback": {
+    "verifying": "Đang xác minh qua nhà cung cấp",
+    "finalizing": "Đang hoàn tất truy cập an toàn của bạn..."
   },
   "dashboard": {
     "title": "Quản lý",
@@ -41,7 +71,24 @@
     "rooms": {
       "grandSuite": "Căn hộ Grand Suite",
       "oceanVilla": "Biệt thự Hướng biển"
-    }
+    },
+    "totalStays": "Tổng số kỳ nghỉ",
+    "upcoming": "Sắp tới",
+    "totalSpent": "Tổng đã chi",
+    "booking": "Đặt phòng",
+    "cancel": "Hủy",
+    "receipt": "Biên lai",
+    "noReservations": "Không tìm thấy đặt phòng nào.",
+    "cancelConfirm": "Hủy đặt phòng này?",
+    "reservationCancelled": "Đã hủy đặt phòng thành công",
+    "failedCancelReservation": "Không thể hủy đặt phòng.",
+    "receiptFor": "Biên lai cho",
+    "amount": "Số tiền",
+    "status": "Trạng thái",
+    "method": "Phương thức",
+    "date": "Ngày",
+    "creditCard": "Thẻ tín dụng",
+    "receiptNotFound": "Không tìm thấy biên lai"
   },
   "profile": {
     "welcome": "Chào mừng,",
@@ -95,6 +142,7 @@
       "password": "Mật khẩu",
       "lastChanged": "Cập nhật {{count}} tháng trước",
       "resetPassword": "Đặt lại mật khẩu",
+      "updateSuccess": "Cập nhật hồ sơ thành công!",
       "langPref": "Sở thích ngôn ngữ",
       "langDesc": "Chọn ngôn ngữ giao diện ưu tiên của bạn",
       "saveChanges": "Lưu thay đổi"
@@ -202,6 +250,10 @@
   "checkout": {
     "title": "Hoàn tất",
     "titleItalic": "đặt phòng của bạn.",
+    "vnpayRedirect": "Đang chuyển hướng tới VNPay để thanh toán an toàn...",
+    "payWithVnPay": "Thanh toán bằng VNPay",
+    "processing": "Đang xử lý đặt phòng của bạn...",
+    "checkAvailability": "Đang kiểm tra phòng trống...",
     "steps": {
       "details": "01 Thông tin",
       "payment": "02 Thanh toán",
@@ -213,6 +265,7 @@
       "lastName": "Họ",
       "email": "Địa chỉ Email",
       "phone": "Số Điện Thoại",
+      "phonePlaceholder": "Nhập số điện thoại của bạn",
       "continue": "Tiếp tục thanh toán"
     },
     "paymentDetails": {
@@ -293,7 +346,6 @@
       "completed": "Đã xong",
       "stayOvers": "Khách lưu trú",
       "bookedRooms": "Số phòng đang đặt",
-      "availableRooms": "Số phòng trống",
       "actionNeeded": "Cần Xử lý (Cảnh báo)",
       "overbooked": "Loại phòng vượt mức",
       "overbookedDesc": "Standard King đang bị đặt vượt 2 phòng cho ngày 15/10.",
@@ -446,6 +498,12 @@
       "twitter": "Cập nhật X (Twitter)"
     }
   },
+  "chatbot": {
+    "welcome": "Chào mừng đến với The Lumière Estate. Tôi có thể hỗ trợ gì cho kỳ nghỉ của bạn hôm nay?",
+    "welcomeGuest": "Chào mừng đến với The Lumière Estate, {{guestName}}. Tôi có thể hỗ trợ gì cho kỳ nghỉ của bạn hôm nay?",
+    "verificationRequired": "Vui lòng hoàn tất xác minh.",
+    "failedConnection": "Không thể kết nối tới dịch vụ concierge"
+  },
   "experiences": {
     "title": "Trải nghiệm",
     "titleItalic": "Chọn lọc.",
@@ -543,7 +601,32 @@
     "signInAdmin": "Đăng nhập với tư cách Admin",
     "noAccount": "Chưa có tài khoản?",
     "createAccount": "Tạo tài khoản",
-    "success": "Đăng nhập thành công!"
+    "success": "Đăng nhập thành công!",
+    "google": "Google",
+    "facebook": "Facebook",
+    "gg": "Google",
+    "fb": "Facebook",
+    "orContinue": "Hoặc tiếp tục với",
+    "welcomeBack": "Chào mừng Quay lại",
+    "curatingExperience": "Đang chuẩn bị trải nghiệm cho bạn...",
+    "welcomeUser": "Chào mừng",
+    "yourSuiteAwaits": "Căn phòng đang chờ đón bạn",
+    "fillAllFields": "Vui lòng điền đầy đủ các trường",
+    "invalidCredentials": "Thông tin đăng nhập không hợp lệ",
+    "invalidEmailOrPassword": "Email hoặc mật khẩu không đúng",
+    "emailRequired": "Email là bắt buộc",
+    "forgotPasswordSent": "Liên kết đặt lại đã được gửi đến email của bạn",
+    "failedToSendResetEmail": "Không thể gửi email đặt lại mật khẩu",
+    "passwordResetSuccess": "Đặt lại mật khẩu thành công",
+    "failedToResetPassword": "Không thể đặt lại mật khẩu",
+    "sendOtp": "Gửi mã OTP",
+    "backToLogin": "Quay lại Đăng nhập",
+    "otpLabel": "Mã xác thực",
+    "otpPlaceholder": "Nhập mã 6 chữ số",
+    "newPasswordLabel": "Mật khẩu mới",
+    "newPasswordPlaceholder": "Nhập mật khẩu mới của bạn",
+    "resetPassword": "Đặt lại Mật khẩu",
+    "back": "Quay lại"
   },
   "register": {
     "title": "Gia nhập",

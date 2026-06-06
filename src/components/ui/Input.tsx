@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from './Button';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -9,6 +10,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, label, error, type, ...props }, ref) => {
     const [showPassword, setShowPassword] = useState(false);
+    const { t } = useTranslation();
     const isPassword = type === 'password';
     const inputType = isPassword ? (showPassword ? 'text' : 'password') : type;
 
@@ -39,7 +41,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-0 top-1/2 -translate-y-1/2 text-[#6C6863] hover:text-[#1A1A1A] transition-colors p-2 flex items-center justify-center outline-none"
-              title={showPassword ? "Hide password" : "Show password"}
+              title={showPassword ? t('ui.hidePassword') : t('ui.showPassword')}
             >
               {showPassword ? (
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

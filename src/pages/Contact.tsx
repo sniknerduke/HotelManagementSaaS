@@ -68,18 +68,18 @@ export const Contact: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="flex flex-col">
                                 <label className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-2">{t('contact.form.fullName')}</label>
-                                <input type="text" required className="w-full bg-transparent border-b border-[#1A1A1A]/20 py-3 outline-none focus:border-[#D4AF37] transition-colors font-serif text-lg text-[#1A1A1A]" placeholder="Jane Doe" />
+                                <input type="text" required className="w-full bg-transparent border-b border-[#1A1A1A]/20 py-3 outline-none focus:border-[#D4AF37] transition-colors font-serif text-lg text-[#1A1A1A]" placeholder={t('contact.form.fullName')} />
                             </div>
                             <div className="flex flex-col">
                                 <label className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-2">{t('contact.form.email')}</label>
-                                <input type="email" required className="w-full bg-transparent border-b border-[#1A1A1A]/20 py-3 outline-none focus:border-[#D4AF37] transition-colors font-serif text-lg text-[#1A1A1A]" placeholder="jane@example.com" />
+                                <input type="email" required className="w-full bg-transparent border-b border-[#1A1A1A]/20 py-3 outline-none focus:border-[#D4AF37] transition-colors font-serif text-lg text-[#1A1A1A]" placeholder={t('contact.form.email')} />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="flex flex-col">
                                 <label className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-2">{t('contact.form.phone')} <span className="lowercase normal-case font-normal">{t('contact.form.optional')}</span></label>
-                                <input type="tel" className="w-full bg-transparent border-b border-[#1A1A1A]/20 py-3 outline-none focus:border-[#D4AF37] transition-colors font-serif text-lg text-[#1A1A1A]" placeholder="+1 (234) 567-8900" />
+                                <input type="tel" className="w-full bg-transparent border-b border-[#1A1A1A]/20 py-3 outline-none focus:border-[#D4AF37] transition-colors font-serif text-lg text-[#1A1A1A]" placeholder={t('contact.form.phone')} />
                             </div>
                             <div className="flex flex-col">
                                 <label className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-2">{t('contact.form.subject.label')}</label>
@@ -117,7 +117,7 @@ export const Contact: React.FC = () => {
                         
                         <div className="mb-8">
                             <h4 className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#6C6863] mb-3">{t('contact.info.addressTitle')}</h4>
-                            <p className="font-serif text-xl text-[#1A1A1A] leading-relaxed">1 Le Duan Boulevard<br/>District 1, Ho Chi Minh City, Vietnam</p>
+                            <p className="font-serif text-xl text-[#1A1A1A] leading-relaxed">{t('contact.info.address')}</p>
                         </div>
                         
                         {/* Embedded Interactive Map (Google Maps iframe) */}
@@ -186,11 +186,11 @@ export const Contact: React.FC = () => {
                                     <svg className="w-5 h-5 text-[#1A1A1A]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="1.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                     {t('contact.info.faq')}
                                 </a>
-                                <a href="https://instagram.com/sniknerduke" className="font-serif text-lg text-[#1A1A1A] hover:text-[#D4AF37] transition-colors flex items-center gap-3">
+                                <a href="https://instagram.com/sniknerduke" title={t('contact.info.instagram')} className="font-serif text-lg text-[#1A1A1A] hover:text-[#D4AF37] transition-colors flex items-center gap-3">
                                     <svg className="w-5 h-5 text-[#1A1A1A]/50" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
                                     @sniknerduke
                                 </a>
-                                <a href="https://x.com/sniknerduke" className="font-serif text-lg text-[#1A1A1A] hover:text-[#D4AF37] transition-colors flex items-center gap-3">
+                                <a href="https://x.com/sniknerduke" title={t('contact.info.twitter')} className="font-serif text-lg text-[#1A1A1A] hover:text-[#D4AF37] transition-colors flex items-center gap-3">
                                     <svg className="w-5 h-5 text-[#1A1A1A]/50" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
                                     @sniknerduke
                                 </a>

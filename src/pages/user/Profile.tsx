@@ -41,7 +41,7 @@ export const Profile: React.FC = () => {
     await logout();
   };
 
-  const language = i18n.language.toUpperCase() === 'VI' ? 'VN' : i18n.language.toUpperCase();
+  const language = i18n.language.toLowerCase().startsWith('vi') ? 'VN' : 'EN';
   const setLanguage = (lang: string) => {
     const code = lang === 'VN' ? 'vi' : 'en';
     i18n.changeLanguage(code);

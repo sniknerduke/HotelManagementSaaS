@@ -202,7 +202,7 @@ Make sure the following tools are installed:
    ```
 5. Open the app at `http://localhost:5173`.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right"><a href="#readme-top">🔼</a></p>
 
 
 
@@ -275,7 +275,7 @@ Backend:
 .\mvnw.cmd clean install
 ```
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right"><a href="#readme-top">🔼</a></p>
 
 
 
@@ -305,7 +305,7 @@ Backend:
 
 > `/dashboard` is the guest dashboard; staff access lives on `/staff`.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right"><a href="#readme-top">🔼</a></p>
 
 
 
@@ -348,7 +348,7 @@ The backend is a Maven multi-module project with Quarkus DevServices configured 
 └── README.md                       ← Project documentation
 ```
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right"><a href="#readme-top">🔼</a></p>
 
 
 
@@ -359,7 +359,7 @@ The backend is a Maven multi-module project with Quarkus DevServices configured 
 * Booking and payment flows coordinate through service-to-service REST clients and RabbitMQ events.
 * Dev traffic goes through Kong on port `8000`; the UI proxy points `/api` there.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right"><a href="#readme-top">🔼</a></p>
 
 
 
@@ -394,7 +394,7 @@ If you have a suggestion that would make this better, please fork the repo and c
 
 A license file has not been added yet.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right"><a href="#readme-top">🔼</a></p>
 
 
 
@@ -405,7 +405,7 @@ Project Link: [https://github.com/sniknerduke/HotelManagementSaaS](https://githu
 
 Live Demo: [https://sniknerduke.dev](https://sniknerduke.dev)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right"><a href="#readme-top">🔼</a></p>
 
 
 

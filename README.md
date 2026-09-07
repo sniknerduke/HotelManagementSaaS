@@ -322,7 +322,7 @@ Backend root: `backend/`
 
 The backend is a Maven multi-module project with Quarkus DevServices configured for local PostgreSQL startup when running services individually.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right"><a href="#readme-top">🔼</a></p>
 
 
 
@@ -379,7 +379,7 @@ If you have a suggestion that would make this better, please fork the repo and c
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right"><a href="#readme-top">🔼</a></p>
 
 ### Top contributors:
 
@@ -416,7 +416,7 @@ Live Demo: [https://sniknerduke.dev](https://sniknerduke.dev)
 * Kong, PostgreSQL, Redis, RabbitMQ, and Docker documentation
 * VNPay integration resources
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right"><a href="#readme-top">🔼</a></p>
 
 
 
